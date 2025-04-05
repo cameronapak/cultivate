@@ -10,13 +10,14 @@ generator client {
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   title       String
   description String?
   tasks       Task[]
   pitch       Pitch?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  resources   Resource[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model Pitch {
@@ -46,5 +47,15 @@ model Task {
   updatedAt   DateTime @updatedAt
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId   Int
+}
+
+model Resource {
+  id        Int      @id @default(autoincrement())
+  url       String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int
 }
 

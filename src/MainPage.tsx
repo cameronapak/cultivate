@@ -1,5 +1,5 @@
 import { FormEvent, useRef, useState, useEffect } from 'react'
-import { Project as BaseProject, Task as BaseTask, Pitch as BasePitch } from 'wasp/entities'
+import { Project as BaseProject, Task as BaseTask, Pitch as BasePitch, Resource as BaseResource } from 'wasp/entities'
 import { useSearchParams } from 'react-router-dom'
 import { 
   getProjects, 
@@ -11,7 +11,10 @@ import {
   createPitch,
   updatePitch,
   deletePitch,
-  updateProject
+  updateProject,
+  createResource,
+  updateResource,
+  deleteResource
 } from 'wasp/client/operations'
 import './Main.css'
 
@@ -20,9 +23,12 @@ interface Task extends BaseTask {}
 
 interface Pitch extends BasePitch {}
 
+interface Resource extends BaseResource {}
+
 interface Project extends BaseProject {
   tasks?: Task[];
   pitch?: Pitch;
+  resources?: Resource[];
 }
 
 export const MainPage = () => {
@@ -604,6 +610,187 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
   )
 }
 
+const ResourceItem = ({ resource, onEdit, onDelete }: { 
+  resource: Resource, 
+  onEdit: () => void, 
+  onDelete: () => void 
+}) => {
+  return (
+    <div className="resource-item">
+      <div className="resource-content">
+        <a href={resource.url} target="_blank" rel="noopener noreferrer" className="resource-title">
+          {resource.title}
+        </a>
+        <span className="resource-url">{resource.url}</span>
+      </div>
+      <div className="resource-actions">
+        <button onClick={onEdit} className="edit-btn">Edit</button>
+        <button onClick={onDelete} className="delete-btn">Delete</button>
+      </div>
+    </div>
+  )
+}
+
+const NewResourceForm = ({ projectId, onSave, onCancel }: { 
+  projectId: number, 
+  onSave: () => void, 
+  onCancel: () => void 
+}) => {
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    try {
+      const formData = new FormData(event.currentTarget)
+      
+      await createResource({
+        url: formData.get('url') as string,
+        title: formData.get('title') as string,
+        projectId
+      })
+      
+      formRef.current?.reset()
+      onSave()
+    } catch (err: any) {
+      window.alert('Error creating resource: ' + err.message)
+    }
+  }
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="resource-form">
+      <h4>Add Resource</h4>
+      
+      <div className="form-section">
+        <label>
+          Title *
+          <input name="title" type="text" required placeholder="Resource title or description" />
+        </label>
+        
+        <label>
+          URL *
+          <input name="url" type="url" required placeholder="https://example.com" />
+        </label>
+      </div>
+      
+      <div className="form-actions">
+        <button type="submit" className="submit-btn">Add Resource</button>
+        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      </div>
+    </form>
+  )
+}
+
+const EditResourceForm = ({ resource, onSave, onCancel }: { 
+  resource: Resource, 
+  onSave: () => void, 
+  onCancel: () => void 
+}) => {
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    try {
+      const formData = new FormData(event.currentTarget)
+      
+      await updateResource({
+        id: resource.id,
+        url: formData.get('url') as string,
+        title: formData.get('title') as string
+      })
+      
+      onSave()
+    } catch (err: any) {
+      window.alert('Error updating resource: ' + err.message)
+    }
+  }
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="resource-form">
+      <h4>Edit Resource</h4>
+      
+      <div className="form-section">
+        <label>
+          Title *
+          <input name="title" type="text" required defaultValue={resource.title} placeholder="Resource title or description" />
+        </label>
+        
+        <label>
+          URL *
+          <input name="url" type="url" required defaultValue={resource.url} placeholder="https://example.com" />
+        </label>
+      </div>
+      
+      <div className="form-actions">
+        <button type="submit" className="submit-btn">Save Changes</button>
+        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      </div>
+    </form>
+  )
+}
+
+const ResourcesSection = ({ project }: { project: Project }) => {
+  const [isAddingResource, setIsAddingResource] = useState(false)
+  const [editingResourceId, setEditingResourceId] = useState<number | null>(null)
+  
+  const handleDeleteResource = async (resourceId: number) => {
+    if (confirm('Are you sure you want to delete this resource?')) {
+      try {
+        await deleteResource({ id: resourceId })
+      } catch (err: any) {
+        window.alert('Error deleting resource: ' + err.message)
+      }
+    }
+  }
+
+  return (
+    <div className="resources-section">
+      <div className="resources-header">
+        <h4>Resources</h4>
+        {!isAddingResource && (
+          <button 
+            onClick={() => setIsAddingResource(true)} 
+            className="add-resource-btn"
+          >
+            + Add Resource
+          </button>
+        )}
+      </div>
+      
+      {isAddingResource && (
+        <NewResourceForm 
+          projectId={project.id} 
+          onSave={() => setIsAddingResource(false)} 
+          onCancel={() => setIsAddingResource(false)} 
+        />
+      )}
+      
+      {project.resources && project.resources.length > 0 ? (
+        <div className="resources-list">
+          {project.resources.map(resource => 
+            editingResourceId === resource.id ? (
+              <EditResourceForm 
+                key={resource.id}
+                resource={resource} 
+                onSave={() => setEditingResourceId(null)} 
+                onCancel={() => setEditingResourceId(null)} 
+              />
+            ) : (
+              <ResourceItem 
+                key={resource.id} 
+                resource={resource} 
+                onEdit={() => setEditingResourceId(resource.id)} 
+                onDelete={() => handleDeleteResource(resource.id)} 
+              />
+            )
+          )}
+        </div>
+      ) : (
+        <p className="no-resources">No resources yet. Add links to helpful websites, documents, and other references.</p>
+      )}
+    </div>
+  )
+}
+
 const ProjectView = ({ project }: { project: Project }) => {
   const [showNewPitchForm, setShowNewPitchForm] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -611,7 +798,8 @@ const ProjectView = ({ project }: { project: Project }) => {
   
   // Initialize from URL query parameters
   const hideCompletedTasks = searchParams.get('hideCompleted') === 'true'
-  const activeTab = searchParams.get('tab') === 'tasks' ? 'tasks' : 'pitches'
+  const activeTab = searchParams.get('tab')
+  const currentTab = activeTab === 'tasks' || activeTab === 'resources' ? activeTab : 'pitches'
   
   const handleHideCompletedChange = (hide: boolean) => {
     const newParams = new URLSearchParams(searchParams)
@@ -623,7 +811,7 @@ const ProjectView = ({ project }: { project: Project }) => {
     setSearchParams(newParams)
   }
   
-  const handleTabChange = (tab: 'pitches' | 'tasks') => {
+  const handleTabChange = (tab: 'pitches' | 'tasks' | 'resources') => {
     const newParams = new URLSearchParams(searchParams)
     newParams.set('tab', tab)
     setSearchParams(newParams)
@@ -681,25 +869,32 @@ const ProjectView = ({ project }: { project: Project }) => {
       <div className="project-meta">
         <p className="task-count">Tasks: {project.tasks?.length || 0}</p>
         <p className="pitch-count">Pitch: {project.pitch ? 'Yes' : 'No'}</p>
+        <p className="resource-count">Resources: {project.resources?.length || 0}</p>
         <p className="date-info">Created: {new Date(project.createdAt).toLocaleDateString()}</p>
       </div>
 
       <div className="tabs">
         <button 
-          className={`tab-btn ${activeTab === 'pitches' ? 'active' : ''}`} 
+          className={`tab-btn ${currentTab === 'pitches' ? 'active' : ''}`} 
           onClick={() => handleTabChange('pitches')}
         >
-          Pitches
+          Pitch
         </button>
         <button 
-          className={`tab-btn ${activeTab === 'tasks' ? 'active' : ''}`} 
+          className={`tab-btn ${currentTab === 'tasks' ? 'active' : ''}`} 
           onClick={() => handleTabChange('tasks')}
         >
           Tasks
         </button>
+        <button 
+          className={`tab-btn ${currentTab === 'resources' ? 'active' : ''}`} 
+          onClick={() => handleTabChange('resources')}
+        >
+          Resources
+        </button>
       </div>
       
-      {activeTab === 'pitches' && (
+      {currentTab === 'pitches' && (
         <div className="pitches-container">
           {!project.pitch && !showNewPitchForm ? (
             <button onClick={() => setShowNewPitchForm(true)} className="new-pitch-btn">
@@ -723,7 +918,7 @@ const ProjectView = ({ project }: { project: Project }) => {
         </div>
       )}
       
-      {activeTab === 'tasks' && (
+      {currentTab === 'tasks' && (
         <div className="tasks-container">
           <div className="tasks-header">
             <h4>Tasks</h4>
@@ -754,6 +949,10 @@ const ProjectView = ({ project }: { project: Project }) => {
             </p>
           )}
         </div>
+      )}
+
+      {currentTab === 'resources' && (
+        <ResourcesSection project={project} />
       )}
     </div>
   )

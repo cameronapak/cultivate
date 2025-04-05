@@ -1,4 +1,4 @@
-import { Project, Task, Pitch } from 'wasp/entities'
+import { Project, Task, Pitch, Resource } from 'wasp/entities'
 import { 
   type GetProjects, 
   type CreateProject, 
@@ -10,7 +10,11 @@ import {
   type CreatePitch,
   type UpdatePitch,
   type DeletePitch,
-  type UpdateProject
+  type UpdateProject,
+  type GetProjectResources,
+  type CreateResource,
+  type UpdateResource,
+  type DeleteResource
 } from 'wasp/server/operations'
 
 export const getProjects: GetProjects<void, Project[]> = async (args, context) => {
@@ -18,7 +22,8 @@ export const getProjects: GetProjects<void, Project[]> = async (args, context) =
     orderBy: { id: 'asc' },
     include: { 
       tasks: true,
-      pitch: true
+      pitch: true,
+      resources: true
     }
   })
 }
@@ -221,5 +226,67 @@ export const updatePitch: UpdatePitch<UpdatePitchPayload, Pitch> = async (
       insights: args.insights,
       successMetrics: args.successMetrics
     }
+  })
+}
+
+type GetProjectResourcesInput = {
+  projectId: number
+}
+
+export const getProjectResources: GetProjectResources<GetProjectResourcesInput, Resource[]> = async (args, context) => {
+  return context.entities.Resource.findMany({
+    where: { projectId: args.projectId },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+type CreateResourcePayload = {
+  url: string
+  title: string
+  projectId: number
+}
+
+export const createResource: CreateResource<CreateResourcePayload, Resource> = async (
+  args,
+  context
+) => {
+  return context.entities.Resource.create({
+    data: {
+      url: args.url,
+      title: args.title,
+      project: { connect: { id: args.projectId } }
+    }
+  })
+}
+
+type UpdateResourcePayload = {
+  id: number
+  url: string
+  title: string
+}
+
+export const updateResource: UpdateResource<UpdateResourcePayload, Resource> = async (
+  args,
+  context
+) => {
+  return context.entities.Resource.update({
+    where: { id: args.id },
+    data: {
+      url: args.url,
+      title: args.title
+    }
+  })
+}
+
+type DeleteResourcePayload = {
+  id: number
+}
+
+export const deleteResource: DeleteResource<DeleteResourcePayload, Resource> = async (
+  args,
+  context
+) => {
+  return context.entities.Resource.delete({
+    where: { id: args.id }
   })
 }
