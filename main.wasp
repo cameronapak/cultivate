@@ -19,3 +19,8 @@ query getProjects {
   // automatically update the results of this query when tasks are modified.
   entities: [Project]
 }
+
+action createProject {
+  fn: import { createProject } from "@src/queries",
+  entities: [Project]
+}
