@@ -382,6 +382,7 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 const ProjectView = ({ project }: { project: Project }) => {
   const [activeTab, setActiveTab] = useState<'pitches' | 'tasks'>('pitches')
   const [showNewPitchForm, setShowNewPitchForm] = useState(false)
+  const [hideCompletedTasks, setHideCompletedTasks] = useState(false)
   
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
@@ -410,6 +411,11 @@ const ProjectView = ({ project }: { project: Project }) => {
       }
     }
   }
+
+  // Filter tasks based on the hideCompletedTasks state
+  const filteredTasks = project.tasks?.filter(task => 
+    !hideCompletedTasks || !task.complete
+  );
 
   return (
     <div className="project-card">
@@ -475,17 +481,33 @@ const ProjectView = ({ project }: { project: Project }) => {
       
       {activeTab === 'tasks' && (
         <div className="tasks-container">
-          <h4>Tasks</h4>
-          <NewTaskForm projectId={project.id} />
+          <div className="tasks-header">
+            <h4>Tasks</h4>
+            <div className="tasks-actions">
+              <label className="hide-completed-toggle">
+                <input 
+                  type="checkbox" 
+                  checked={hideCompletedTasks} 
+                  onChange={e => setHideCompletedTasks(e.target.checked)} 
+                />
+                Hide completed tasks
+              </label>
+              <NewTaskForm projectId={project.id} />
+            </div>
+          </div>
           
-          {project.tasks && project.tasks.length > 0 ? (
+          {filteredTasks && filteredTasks.length > 0 ? (
             <div className="task-list">
-              {project.tasks.map((task: Task) => (
+              {filteredTasks.map((task: Task) => (
                 <TaskItem key={task.id} task={task} />
               ))}
             </div>
           ) : (
-            <p className="no-tasks">No tasks yet</p>
+            <p className="no-tasks">
+              {project.tasks && project.tasks.length > 0 
+                ? 'All tasks are completed and hidden.' 
+                : 'No tasks yet'}
+            </p>
           )}
         </div>
       )}

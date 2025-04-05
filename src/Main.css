@@ -308,6 +308,36 @@ h1 {
   margin-top: 1.5rem;
 }
 
+.tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tasks-header h4 {
+  margin: 0;
+}
+
+.tasks-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hide-completed-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #495057;
+  cursor: pointer;
+}
+
+.hide-completed-toggle input {
+  cursor: pointer;
+}
+
 .task-list {
   margin-top: 1rem;
   display: flex;
