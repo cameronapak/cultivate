@@ -573,3 +573,26 @@ textarea {
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
+
+.edit-btn {
+  background-color: #e6f7ff;
+  color: #0077cc;
+  margin-right: 0.5rem;
+}
+
+.edit-btn:hover {
+  background-color: #d1e8ff;
+}
+
+.edit-project-form {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.edit-project-form h4 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}

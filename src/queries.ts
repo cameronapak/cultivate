@@ -9,7 +9,8 @@ import {
   type GetProjectPitches,
   type CreatePitch,
   type SelectPitch,
-  type DeletePitch
+  type DeletePitch,
+  type UpdateProject
 } from 'wasp/server/operations'
 
 export const getProjects: GetProjects<void, Project[]> = async (args, context) => {
@@ -60,6 +61,25 @@ export const createProject: CreateProject<CreateProjectPayload, Project> = async
       title: args.title,
       description: args.description
     },
+  })
+}
+
+type UpdateProjectPayload = {
+  id: number
+  title: string
+  description?: string
+}
+
+export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async (
+  args,
+  context
+) => {
+  return context.entities.Project.update({
+    where: { id: args.id },
+    data: {
+      title: args.title,
+      description: args.description
+    }
   })
 }
 

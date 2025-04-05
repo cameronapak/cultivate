@@ -35,6 +35,11 @@ action createProject {
   entities: [Project]
 }
 
+action updateProject {
+  fn: import { updateProject } from "@src/queries",
+  entities: [Project]
+}
+
 action deleteProject {
   fn: import { deleteProject } from "@src/queries",
   entities: [Project]

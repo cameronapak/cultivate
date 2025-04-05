@@ -9,7 +9,8 @@ import {
   updateTaskStatus,
   createPitch,
   selectPitch,
-  deletePitch
+  deletePitch,
+  updateProject
 } from 'wasp/client/operations'
 import './Main.css'
 
@@ -404,10 +405,66 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
   )
 }
 
+const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSave: () => void, onCancel: () => void }) => {
+  const formRef = useRef<HTMLFormElement>(null)
+  
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    try {
+      const formData = new FormData(event.currentTarget)
+      
+      await updateProject({
+        id: project.id,
+        title: formData.get('title') as string,
+        description: formData.get('description') as string
+      })
+      
+      onSave()
+    } catch (err: any) {
+      window.alert('Error: ' + err.message)
+    }
+  }
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="edit-project-form">
+      <h4>Edit Project</h4>
+      
+      <div className="form-section">
+        <label>
+          Project Title *
+          <input 
+            name="title" 
+            type="text" 
+            required 
+            defaultValue={project.title}
+            placeholder="Give your project a clear title" 
+          />
+        </label>
+        
+        <label>
+          Description
+          <input 
+            name="description" 
+            type="text"
+            defaultValue={project.description || ''}
+            placeholder="Brief overview of the project" 
+          />
+        </label>
+      </div>
+      
+      <div className="form-actions">
+        <button type="submit" className="submit-btn">Save Changes</button>
+        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      </div>
+    </form>
+  )
+}
+
 const ProjectView = ({ project }: { project: Project }) => {
   const [activeTab, setActiveTab] = useState<'pitches' | 'tasks'>('pitches')
   const [showNewPitchForm, setShowNewPitchForm] = useState(false)
   const [hideCompletedTasks, setHideCompletedTasks] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
@@ -442,11 +499,24 @@ const ProjectView = ({ project }: { project: Project }) => {
     !hideCompletedTasks || !task.complete
   );
 
+  if (isEditing) {
+    return (
+      <div className="project-card">
+        <EditProjectForm 
+          project={project} 
+          onSave={() => setIsEditing(false)} 
+          onCancel={() => setIsEditing(false)}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="project-card">
       <div className="project-header">
         <h3>{project.title}</h3>
         <div className="project-actions">
+          <button onClick={() => setIsEditing(true)} className="edit-btn">Edit Project</button>
           <button onClick={handleDelete} className="delete-btn">Delete Project</button>
         </div>
       </div>
