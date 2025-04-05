@@ -261,7 +261,6 @@ const PitchItem = ({ pitch, onDelete }: {
   pitch: Pitch, 
   onDelete: () => void 
 }) => {
-  const [showDetails, setShowDetails] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
   if (isEditing) {
@@ -279,9 +278,6 @@ const PitchItem = ({ pitch, onDelete }: {
       <div className="pitch-header">
         <h4>{pitch.title}</h4>
         <div className="pitch-controls">
-          <button onClick={() => setShowDetails(!showDetails)} className="detail-btn">
-            {showDetails ? 'Hide Details' : 'Show Details'}
-          </button>
           <button onClick={() => setIsEditing(true)} className="edit-btn">Edit Pitch</button>
           <button onClick={onDelete} className="delete-btn">Delete</button>
         </div>
@@ -292,59 +288,57 @@ const PitchItem = ({ pitch, onDelete }: {
         <span className="date-info">Created: {new Date(pitch.createdAt).toLocaleDateString()}</span>
       </div>
 
-      {showDetails && (
-        <div className="pitch-details">
-          <div className="pitch-section">
-            <h5>1. Problem</h5>
-            <p>{pitch.problem}</p>
-          </div>
-          
-          <div className="pitch-section">
-            <h5>2. Appetite</h5>
-            <p>{pitch.appetite}</p>
-          </div>
-          
-          <div className="pitch-section">
-            <h5>3. Solution</h5>
-            <p>{pitch.solution}</p>
-          </div>
-          
-          {pitch.rabbitHoles && (
-            <div className="pitch-section">
-              <h5>4. Rabbit Holes</h5>
-              <p>{pitch.rabbitHoles}</p>
-            </div>
-          )}
-          
-          {pitch.noGos && (
-            <div className="pitch-section">
-              <h5>5. No-Gos</h5>
-              <p>{pitch.noGos}</p>
-            </div>
-          )}
-          
-          {pitch.audience && (
-            <div className="pitch-section">
-              <h5>Target Audience</h5>
-              <p>{pitch.audience}</p>
-            </div>
-          )}
-          
-          {pitch.insights && (
-            <div className="pitch-section">
-              <h5>Insights</h5>
-              <p>{pitch.insights}</p>
-            </div>
-          )}
-          
-          {pitch.successMetrics && (
-            <div className="pitch-section">
-              <h5>Success Metrics</h5>
-              <p>{pitch.successMetrics}</p>
-            </div>
-          )}
+      <div className="pitch-details">
+        <div className="pitch-section">
+          <h5>1. Problem</h5>
+          <p>{pitch.problem}</p>
         </div>
-      )}
+        
+        <div className="pitch-section">
+          <h5>2. Appetite</h5>
+          <p>{pitch.appetite}</p>
+        </div>
+        
+        <div className="pitch-section">
+          <h5>3. Solution</h5>
+          <p>{pitch.solution}</p>
+        </div>
+        
+        {pitch.rabbitHoles && (
+          <div className="pitch-section">
+            <h5>4. Rabbit Holes</h5>
+            <p>{pitch.rabbitHoles}</p>
+          </div>
+        )}
+        
+        {pitch.noGos && (
+          <div className="pitch-section">
+            <h5>5. No-Gos</h5>
+            <p>{pitch.noGos}</p>
+          </div>
+        )}
+        
+        {pitch.audience && (
+          <div className="pitch-section">
+            <h5>Target Audience</h5>
+            <p>{pitch.audience}</p>
+          </div>
+        )}
+        
+        {pitch.insights && (
+          <div className="pitch-section">
+            <h5>Insights</h5>
+            <p>{pitch.insights}</p>
+          </div>
+        )}
+        
+        {pitch.successMetrics && (
+          <div className="pitch-section">
+            <h5>Success Metrics</h5>
+            <p>{pitch.successMetrics}</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
