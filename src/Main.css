@@ -87,3 +87,300 @@ code {
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
     Bitstream Vera Sans Mono, Courier New, monospace;
 }
+
+/* Main container */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+/* Project list */
+.projects-list {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.project-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.project-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.project-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.project-description {
+  color: #5d6778;
+  margin-bottom: 1rem;
+}
+
+.project-meta {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.appetite-badge {
+  background-color: #e6f7ff;
+  color: #0077cc;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+/* Pitch details */
+.pitch-details {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #0077cc;
+}
+
+.pitch-details h4 {
+  margin-top: 0;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.pitch-section {
+  margin-bottom: 1.5rem;
+}
+
+.pitch-section h5 {
+  color: #0077cc;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.pitch-section p {
+  white-space: pre-line;
+  color: #3c4858;
+  margin: 0;
+}
+
+/* Tasks section */
+.tasks-container {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eaecef;
+}
+
+.task-list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-item {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 3px solid #6c757d;
+}
+
+.task-item.completed {
+  border-left-color: #28a745;
+  opacity: 0.8;
+}
+
+.task-description {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.task-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.task-checkbox {
+  margin-right: 0.75rem;
+}
+
+.no-tasks, .no-projects {
+  color: #6c757d;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.new-project-btn {
+  background-color: #0077cc;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.new-project-btn:hover {
+  background-color: #0066b3;
+}
+
+.expand-btn, .pitch-btn {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.expand-btn:hover, .pitch-btn:hover {
+  background-color: #dee2e6;
+}
+
+.delete-btn {
+  background-color: #f8d7da;
+  color: #721c24;
+  margin-top: 1rem;
+}
+
+.delete-btn:hover {
+  background-color: #f5c6cb;
+}
+
+.add-task-btn {
+  background-color: #e8f4ff;
+  color: #0077cc;
+  margin-bottom: 1rem;
+}
+
+.add-task-btn:hover {
+  background-color: #d1e8ff;
+}
+
+.submit-task-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.submit-task-btn:hover {
+  background-color: #218838;
+}
+
+.cancel-btn {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.cancel-btn:hover {
+  background-color: #e9ecef;
+}
+
+/* Forms */
+.new-project-form {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.new-project-form h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.form-section h3 {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+}
+
+.help-text {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+  font-family: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form-actions button {
+  padding: 0.6rem 1.2rem;
+}
+
+.submit-btn {
+  background-color: #0077cc;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #0066b3;
+}
+
+/* New task form */
+.new-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}

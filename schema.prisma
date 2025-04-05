@@ -16,6 +16,16 @@ model Project {
   tasks       Task[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Shape Up Pitch Fields
+  problem        String?
+  appetite       String?
+  solution       String?
+  rabbitHoles    String?
+  noGos          String?
+  audience       String?
+  insights       String?
+  successMetrics String?
 }
 
 model Task {
@@ -23,7 +33,7 @@ model Task {
   title       String
   description String?
   complete    Boolean  @default(false)
-  status      String   @default("TODO")
+  status      String   @default("TODO") // Using String instead of enum
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   project     Project  @relation(fields: [projectId], references: [id])

@@ -19,14 +19,36 @@ export const getProjectTasks: GetProjectTasks<GetProjectTasksInput, Task[]> = as
   })
 }
 
-type CreateProjectPayload = Pick<Project, 'title' | 'description'>
+type CreateProjectPayload = {
+  title: string
+  description?: string
+  problem: string
+  appetite: string
+  solution: string
+  rabbitHoles?: string
+  noGos?: string
+  audience?: string
+  insights?: string
+  successMetrics?: string
+}
 
 export const createProject: CreateProject<CreateProjectPayload, Project> = async (
   args,
   context
 ) => {
   return context.entities.Project.create({
-    data: { title: args.title, description: args.description },
+    data: {
+      title: args.title,
+      description: args.description,
+      problem: args.problem,
+      appetite: args.appetite,
+      solution: args.solution,
+      rabbitHoles: args.rabbitHoles,
+      noGos: args.noGos,
+      audience: args.audience,
+      insights: args.insights,
+      successMetrics: args.successMetrics
+    },
   })
 }
 
