@@ -17,7 +17,12 @@ query getProjects {
   fn: import { getProjects } from "@src/queries",
   // Tell Wasp that this query reads from the `Task` entity. Wasp will
   // automatically update the results of this query when tasks are modified.
-  entities: [Project]
+  entities: [Project, Task]
+}
+
+query getProjectTasks {
+  fn: import { getProjectTasks } from "@src/queries",
+  entities: [Project, Task]
 }
 
 action createProject {
@@ -28,4 +33,14 @@ action createProject {
 action deleteProject {
   fn: import { deleteProject } from "@src/queries",
   entities: [Project]
+}
+
+action createTask {
+  fn: import { createTask } from "@src/queries",
+  entities: [Project, Task]
+}
+
+action updateTaskStatus {
+  fn: import { updateTaskStatus } from "@src/queries",
+  entities: [Task]
 }
