@@ -1,5 +1,6 @@
-import { FormEvent, useRef, useState } from 'react'
+import { FormEvent, useRef, useState, useEffect } from 'react'
 import { Project as BaseProject, Task as BaseTask, Pitch as BasePitch } from 'wasp/entities'
+import { useSearchParams } from 'react-router-dom'
 import { 
   getProjects, 
   useQuery, 
@@ -21,7 +22,7 @@ interface Pitch extends BasePitch {}
 
 interface Project extends BaseProject {
   tasks?: Task[];
-  pitches?: Pitch[];
+  pitch?: Pitch;
 }
 
 export const MainPage = () => {
@@ -461,10 +462,29 @@ const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSa
 }
 
 const ProjectView = ({ project }: { project: Project }) => {
-  const [activeTab, setActiveTab] = useState<'pitches' | 'tasks'>('pitches')
   const [showNewPitchForm, setShowNewPitchForm] = useState(false)
-  const [hideCompletedTasks, setHideCompletedTasks] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
   const [isEditing, setIsEditing] = useState(false)
+  
+  // Initialize from URL query parameters
+  const hideCompletedTasks = searchParams.get('hideCompleted') === 'true'
+  const activeTab = searchParams.get('tab') === 'tasks' ? 'tasks' : 'pitches'
+  
+  const handleHideCompletedChange = (hide: boolean) => {
+    const newParams = new URLSearchParams(searchParams)
+    if (hide) {
+      newParams.set('hideCompleted', 'true')
+    } else {
+      newParams.delete('hideCompleted')
+    }
+    setSearchParams(newParams)
+  }
+  
+  const handleTabChange = (tab: 'pitches' | 'tasks') => {
+    const newParams = new URLSearchParams(searchParams)
+    newParams.set('tab', tab)
+    setSearchParams(newParams)
+  }
   
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
@@ -525,20 +545,20 @@ const ProjectView = ({ project }: { project: Project }) => {
       
       <div className="project-meta">
         <p className="task-count">Tasks: {project.tasks?.length || 0}</p>
-        <p className="pitch-count">Pitches: {project.pitches?.length || 0}</p>
+        <p className="pitch-count">Pitch: {project.pitch ? 'Yes' : 'No'}</p>
         <p className="date-info">Created: {new Date(project.createdAt).toLocaleDateString()}</p>
       </div>
 
       <div className="tabs">
         <button 
           className={`tab-btn ${activeTab === 'pitches' ? 'active' : ''}`} 
-          onClick={() => setActiveTab('pitches')}
+          onClick={() => handleTabChange('pitches')}
         >
           Pitches
         </button>
         <button 
           className={`tab-btn ${activeTab === 'tasks' ? 'active' : ''}`} 
-          onClick={() => setActiveTab('tasks')}
+          onClick={() => handleTabChange('tasks')}
         >
           Tasks
         </button>
@@ -546,30 +566,25 @@ const ProjectView = ({ project }: { project: Project }) => {
       
       {activeTab === 'pitches' && (
         <div className="pitches-container">
-          {!showNewPitchForm ? (
+          {!project.pitch && !showNewPitchForm ? (
             <button onClick={() => setShowNewPitchForm(true)} className="new-pitch-btn">
-              + Create New Pitch
+              + Create Project Pitch
             </button>
-          ) : (
+          ) : showNewPitchForm ? (
             <NewPitchForm 
               projectId={project.id} 
               onCancel={() => setShowNewPitchForm(false)} 
             />
-          )}
-          
-          {project.pitches && project.pitches.length > 0 ? (
+          ) : project.pitch ? (
             <div className="pitches-list">
-              {project.pitches.map((pitch: Pitch) => (
-                <PitchItem 
-                  key={pitch.id} 
-                  pitch={pitch} 
-                  onSelect={() => handleSelectPitch(pitch.id)} 
-                  onDelete={() => handleDeletePitch(pitch.id)} 
-                />
-              ))}
+              <PitchItem 
+                pitch={project.pitch} 
+                onSelect={() => handleSelectPitch(project.pitch!.id)} 
+                onDelete={() => handleDeletePitch(project.pitch!.id)} 
+              />
             </div>
           ) : (
-            <p className="no-pitches">No pitches yet. Create one to get started!</p>
+            <p className="no-pitches">No pitch yet. Create one to get started!</p>
           )}
         </div>
       )}
@@ -583,7 +598,7 @@ const ProjectView = ({ project }: { project: Project }) => {
                 <input 
                   type="checkbox" 
                   checked={hideCompletedTasks} 
-                  onChange={e => setHideCompletedTasks(e.target.checked)} 
+                  onChange={e => handleHideCompletedChange(e.target.checked)} 
                 />
                 Hide completed tasks
               </label>

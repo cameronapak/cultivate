@@ -18,9 +18,7 @@ export const getProjects: GetProjects<void, Project[]> = async (args, context) =
     orderBy: { id: 'asc' },
     include: { 
       tasks: true,
-      pitches: {
-        orderBy: { createdAt: 'desc' }
-      }
+      pitch: true
     }
   })
 }
@@ -113,6 +111,19 @@ export const createPitch: CreatePitch<CreatePitchPayload, Pitch> = async (
   args,
   context
 ) => {
+  // First, check if the project already has a pitch
+  const existingPitch = await context.entities.Pitch.findUnique({
+    where: { projectId: args.projectId }
+  });
+
+  // If there's an existing pitch, delete it first
+  if (existingPitch) {
+    await context.entities.Pitch.delete({
+      where: { id: existingPitch.id }
+    });
+  }
+
+  // Then create the new pitch
   return context.entities.Pitch.create({
     data: {
       title: args.title,
@@ -138,13 +149,7 @@ export const selectPitch: SelectPitch<SelectPitchPayload, Pitch> = async (
   args,
   context
 ) => {
-  // First, unselect all pitches for this project
-  await context.entities.Pitch.updateMany({
-    where: { projectId: args.projectId },
-    data: { isSelected: false }
-  })
-  
-  // Then select the chosen pitch
+  // Simply mark the pitch as selected
   return context.entities.Pitch.update({
     where: { id: args.id },
     data: { isSelected: true }
