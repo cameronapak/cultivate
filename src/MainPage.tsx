@@ -36,7 +36,7 @@ export const MainPage = () => {
   const [showNewProjectForm, setShowNewProjectForm] = useState(false)
 
   return (
-    <div className="main-container">
+    <div>
       <h1>Shape Up Projects</h1>
       
       {!showNewProjectForm ? (
@@ -78,10 +78,10 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="new-project-form">
+    <form ref={formRef} onSubmit={handleSubmit}>
       <h2>Create New Project</h2>
       
-      <div className="form-section">
+      <div>
         <label>
           Project Title *
           <input name="title" type="text" required placeholder="Give your project a clear title" />
@@ -93,9 +93,9 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
         </label>
       </div>
       
-      <div className="form-actions">
-        <button type="submit" className="submit-btn">Create Project</button>
-        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      <div>
+        <button type="submit">Create Project</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   )
@@ -130,11 +130,11 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="new-pitch-form">
+    <form ref={formRef} onSubmit={handleSubmit}>
       <h3>Create New Pitch</h3>
       
-      <div className="shape-up-info">
-        <div className="shape-up-header">
+      <div>
+        <div>
           <h4>About Shape Up Pitches</h4>
           <a 
             href="https://basecamp.com/shapeup/1.5-chapter-06" 
@@ -149,7 +149,7 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
           A Shape Up pitch is a presentation of a problem and solution that helps teams make informed decisions about what to build.
           Each pitch should include these five key elements:
         </p>
-        <ol className="shape-up-elements">
+        <ol>
           <li><strong>Problem</strong> — The specific issue or use case that motivates the project</li>
           <li><strong>Appetite</strong> — How much time you're willing to invest (2 weeks, 6 weeks, etc.)</li>
           <li><strong>Solution</strong> — Core elements presented in an easily understandable form</li>
@@ -158,16 +158,16 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
         </ol>
       </div>
       
-      <div className="form-section">
+      <div>
         <label>
           Pitch Title *
           <input name="title" type="text" required placeholder="A clear, descriptive title" />
         </label>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>1. Problem</h4>
-        <p className="help-text">Describe the specific problem or use case that motivates this project</p>
+        <p>Describe the specific problem or use case that motivates this project</p>
         <textarea 
           name="problem" 
           required 
@@ -176,9 +176,9 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
         ></textarea>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>2. Appetite</h4>
-        <p className="help-text">How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
+        <p>How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
         <input 
           name="appetite" 
           type="text" 
@@ -187,9 +187,9 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
         />
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>3. Solution</h4>
-        <p className="help-text">Describe the core elements of your solution</p>
+        <p>Describe the core elements of your solution</p>
         <textarea 
           name="solution" 
           required 
@@ -198,9 +198,9 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
         ></textarea>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>4. Rabbit Holes</h4>
-        <p className="help-text">Details worth calling out to avoid problems</p>
+        <p>Details worth calling out to avoid problems</p>
         <textarea 
           name="rabbitHoles" 
           placeholder="What parts of the implementation might be tricky or time-consuming?"
@@ -208,9 +208,9 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
         ></textarea>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>5. No-Gos</h4>
-        <p className="help-text">Anything explicitly excluded from the concept</p>
+        <p>Anything explicitly excluded from the concept</p>
         <textarea 
           name="noGos" 
           placeholder="What features or use cases are we intentionally NOT addressing?"
@@ -218,7 +218,7 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
         ></textarea>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>Additional Information</h4>
         
         <label>
@@ -249,9 +249,9 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
         </label>
       </div>
       
-      <div className="form-actions">
-        <button type="submit" className="submit-btn">Submit Pitch</button>
-        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      <div>
+        <button type="submit">Submit Pitch</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   )
@@ -274,66 +274,61 @@ const PitchItem = ({ pitch, onDelete }: {
   }
 
   return (
-    <div className="pitch-item">
-      <div className="pitch-header">
+    <div>
+      <div>
         <h4>{pitch.title}</h4>
-        <div className="pitch-controls">
-          <button onClick={() => setIsEditing(true)} className="edit-btn">Edit Pitch</button>
-          <button onClick={onDelete} className="delete-btn">Delete</button>
+        <div>
+          <button onClick={() => setIsEditing(true)}>Edit Pitch</button>
+          <button onClick={onDelete}>Delete</button>
         </div>
-      </div>
-      
-      <div className="pitch-meta">
-        <span className="appetite-badge">Appetite: {pitch.appetite}</span>
-        <span className="date-info">Created: {new Date(pitch.createdAt).toLocaleDateString()}</span>
-      </div>
+      </div>    
 
-      <div className="pitch-details">
-        <div className="pitch-section">
+      <div>
+        <div>
           <h5>1. Problem</h5>
           <p>{pitch.problem}</p>
         </div>
         
-        <div className="pitch-section">
+        <div>
           <h5>2. Appetite</h5>
           <p>{pitch.appetite}</p>
         </div>
         
-        <div className="pitch-section">
+        <div>
           <h5>3. Solution</h5>
           <p>{pitch.solution}</p>
         </div>
         
         {pitch.rabbitHoles && (
-          <div className="pitch-section">
+          <div>
             <h5>4. Rabbit Holes</h5>
             <p>{pitch.rabbitHoles}</p>
           </div>
         )}
         
         {pitch.noGos && (
-          <div className="pitch-section">
+          <div>
             <h5>5. No-Gos</h5>
             <p>{pitch.noGos}</p>
           </div>
         )}
         
         {pitch.audience && (
-          <div className="pitch-section">
+          <div>
             <h5>Target Audience</h5>
             <p>{pitch.audience}</p>
           </div>
         )}
         
         {pitch.insights && (
-          <div className="pitch-section">
+          <div>
             <h5>Insights</h5>
             <p>{pitch.insights}</p>
           </div>
         )}
         
         {pitch.successMetrics && (
-          <div className="pitch-section">
+          <div>
             <h5>Success Metrics</h5>
             <p>{pitch.successMetrics}</p>
           </div>
@@ -363,10 +358,10 @@ const TaskItem = ({ task }: { task: Task }) => {
         />
         <span>{task.title}</span>
       </div>
-      {task.description && <p className="task-description">{task.description}</p>}
-      <div className="task-footer">
-        <span className="task-status">Status: {task.status}</span>
-        <span className="task-date">Created: {new Date(task.createdAt).toLocaleDateString()}</span>
+      {task.description && <p>{task.description}</p>}
+      <div>
+        <span>Status: {task.status}</span>
+        <span>Created: {new Date(task.createdAt).toLocaleDateString()}</span>
       </div>
     </div>
   )
@@ -393,19 +388,19 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   if (!isAdding) {
     return (
-      <button onClick={() => setIsAdding(true)} className="add-task-btn">
+      <button onClick={() => setIsAdding(true)}>
         + Add Task
       </button>
     )
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="new-task-form">
+    <form ref={formRef} onSubmit={handleSubmit}>
       <input name="title" type="text" required placeholder="Task title" />
       <input name="description" type="text" placeholder="Task description (optional)" />
-      <div className="form-actions">
-        <button type="submit" className="submit-task-btn">Add</button>
-        <button type="button" onClick={() => setIsAdding(false)} className="cancel-btn">Cancel</button>
+      <div>
+        <button type="submit">Add</button>
+        <button type="button" onClick={() => setIsAdding(false)}>Cancel</button>
       </div>
     </form>
   )
@@ -432,10 +427,10 @@ const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSa
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="edit-project-form">
+    <form ref={formRef} onSubmit={handleSubmit}>
       <h4>Edit Project</h4>
       
-      <div className="form-section">
+      <div>
         <label>
           Project Title *
           <input 
@@ -458,9 +453,9 @@ const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSa
         </label>
       </div>
       
-      <div className="form-actions">
-        <button type="submit" className="submit-btn">Save Changes</button>
-        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      <div>
+        <button type="submit">Save Changes</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   )
@@ -494,19 +489,19 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="edit-pitch-form">
+    <form ref={formRef} onSubmit={handleSubmit}>
       <h3>Edit Pitch</h3>
       
-      <div className="form-section">
+      <div>
         <label>
           Pitch Title *
           <input name="title" type="text" required defaultValue={pitch.title} placeholder="A clear, descriptive title" />
         </label>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>1. Problem</h4>
-        <p className="help-text">Describe the specific problem or use case that motivates this project</p>
+        <p>Describe the specific problem or use case that motivates this project</p>
         <textarea 
           name="problem" 
           required 
@@ -516,9 +511,9 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
         ></textarea>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>2. Appetite</h4>
-        <p className="help-text">How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
+        <p>How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
         <input 
           name="appetite" 
           type="text" 
@@ -528,9 +523,9 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
         />
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>3. Solution</h4>
-        <p className="help-text">Describe the core elements of your solution</p>
+        <p>Describe the core elements of your solution</p>
         <textarea 
           name="solution" 
           required 
@@ -540,9 +535,9 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
         ></textarea>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>4. Rabbit Holes</h4>
-        <p className="help-text">Details worth calling out to avoid problems</p>
+        <p>Details worth calling out to avoid problems</p>
         <textarea 
           name="rabbitHoles" 
           defaultValue={pitch.rabbitHoles || ''}
@@ -551,9 +546,9 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
         ></textarea>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>5. No-Gos</h4>
-        <p className="help-text">Anything explicitly excluded from the concept</p>
+        <p>Anything explicitly excluded from the concept</p>
         <textarea 
           name="noGos" 
           defaultValue={pitch.noGos || ''}
@@ -562,7 +557,7 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
         ></textarea>
       </div>
       
-      <div className="form-section">
+      <div>
         <h4>Additional Information</h4>
         
         <label>
@@ -596,9 +591,9 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
         </label>
       </div>
       
-      <div className="form-actions">
-        <button type="submit" className="submit-btn">Save Changes</button>
-        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      <div>
+        <button type="submit">Save Changes</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   )
@@ -610,16 +605,16 @@ const ResourceItem = ({ resource, onEdit, onDelete }: {
   onDelete: () => void 
 }) => {
   return (
-    <div className="resource-item">
-      <div className="resource-content">
-        <a href={resource.url} target="_blank" rel="noopener noreferrer" className="resource-title">
+    <div>
+      <div>
+        <a href={resource.url} target="_blank" rel="noopener noreferrer">
           {resource.title}
         </a>
-        <span className="resource-url">{resource.url}</span>
+        <span>{resource.url}</span>
       </div>
-      <div className="resource-actions">
-        <button onClick={onEdit} className="edit-btn">Edit</button>
-        <button onClick={onDelete} className="delete-btn">Delete</button>
+      <div>
+        <button onClick={onEdit}>Edit</button>
+        <button onClick={onDelete}>Delete</button>
       </div>
     </div>
   )
@@ -651,10 +646,10 @@ const NewResourceForm = ({ projectId, onSave, onCancel }: {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="resource-form">
+    <form ref={formRef} onSubmit={handleSubmit}>
       <h4>Add Resource</h4>
       
-      <div className="form-section">
+      <div>
         <label>
           Title *
           <input name="title" type="text" required placeholder="Resource title or description" />
@@ -666,9 +661,9 @@ const NewResourceForm = ({ projectId, onSave, onCancel }: {
         </label>
       </div>
       
-      <div className="form-actions">
-        <button type="submit" className="submit-btn">Add Resource</button>
-        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      <div>
+        <button type="submit">Add Resource</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   )
@@ -699,10 +694,10 @@ const EditResourceForm = ({ resource, onSave, onCancel }: {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="resource-form">
+    <form ref={formRef} onSubmit={handleSubmit}>
       <h4>Edit Resource</h4>
       
-      <div className="form-section">
+      <div>
         <label>
           Title *
           <input name="title" type="text" required defaultValue={resource.title} placeholder="Resource title or description" />
@@ -714,9 +709,9 @@ const EditResourceForm = ({ resource, onSave, onCancel }: {
         </label>
       </div>
       
-      <div className="form-actions">
-        <button type="submit" className="submit-btn">Save Changes</button>
-        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      <div>
+        <button type="submit">Save Changes</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   )
@@ -737,8 +732,8 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   }
 
   return (
-    <div className="resources-section">
-      <div className="resources-header">
+    <div>
+      <div>
         <h4>Resources</h4>
         {!isAddingResource && (
           <button 
@@ -759,7 +754,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       )}
       
       {project.resources && project.resources.length > 0 ? (
-        <div className="resources-list">
+        <div>
           {project.resources.map(resource => 
             editingResourceId === resource.id ? (
               <EditResourceForm 
@@ -779,7 +774,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
           )}
         </div>
       ) : (
-        <p className="no-resources">No resources yet. Add links to helpful websites, documents, and other references.</p>
+        <p>No resources yet. Add links to helpful websites, documents, and other references.</p>
       )}
     </div>
   )
@@ -838,7 +833,7 @@ const ProjectView = ({ project }: { project: Project }) => {
 
   if (isEditing) {
     return (
-      <div className="project-card">
+      <div>
         <EditProjectForm 
           project={project} 
           onSave={() => setIsEditing(false)} 
@@ -849,25 +844,25 @@ const ProjectView = ({ project }: { project: Project }) => {
   }
 
   return (
-    <div className="project-card">
-      <div className="project-header">
+    <div>
+      <div>
         <h3>{project.title}</h3>
-        <div className="project-actions">
-          <button onClick={() => setIsEditing(true)} className="edit-btn">Edit Project</button>
-          <button onClick={handleDelete} className="delete-btn">Delete Project</button>
+        <div>
+          <button onClick={() => setIsEditing(true)}>Edit Project</button>
+          <button onClick={handleDelete}>Delete Project</button>
         </div>
       </div>
       
-      {project.description && <p className="project-description">{project.description}</p>}
+      {project.description && <p>{project.description}</p>}
       
-      <div className="project-meta">
-        <p className="task-count">Tasks: {project.tasks?.length || 0}</p>
-        <p className="pitch-count">Pitch: {project.pitch ? 'Yes' : 'No'}</p>
-        <p className="resource-count">Resources: {project.resources?.length || 0}</p>
-        <p className="date-info">Created: {new Date(project.createdAt).toLocaleDateString()}</p>
+      <div>
+        <p>Tasks: {project.tasks?.length || 0}</p>
+        <p>Pitch: {project.pitch ? 'Yes' : 'No'}</p>
+        <p>Resources: {project.resources?.length || 0}</p>
+        <p>Created: {new Date(project.createdAt).toLocaleDateString()}</p>
       </div>
 
-      <div className="tabs">
+      <div>
         <button 
           className={`tab-btn ${currentTab === 'pitches' ? 'active' : ''}`} 
           onClick={() => handleTabChange('pitches')}
@@ -889,9 +884,9 @@ const ProjectView = ({ project }: { project: Project }) => {
       </div>
       
       {currentTab === 'pitches' && (
-        <div className="pitches-container">
+        <div>
           {!project.pitch && !showNewPitchForm ? (
-            <button onClick={() => setShowNewPitchForm(true)} className="new-pitch-btn">
+            <button onClick={() => setShowNewPitchForm(true)}>
               + Create Project Pitch
             </button>
           ) : showNewPitchForm ? (
@@ -900,24 +895,24 @@ const ProjectView = ({ project }: { project: Project }) => {
               onCancel={() => setShowNewPitchForm(false)} 
             />
           ) : project.pitch ? (
-            <div className="pitches-list">
+            <div>
               <PitchItem 
                 pitch={project.pitch} 
                 onDelete={() => handleDeletePitch(project.pitch!.id)} 
               />
             </div>
           ) : (
-            <p className="no-pitches">No pitch yet. Create one to get started!</p>
+            <p>No pitch yet. Create one to get started!</p>
           )}
         </div>
       )}
       
       {currentTab === 'tasks' && (
-        <div className="tasks-container">
-          <div className="tasks-header">
+        <div>
+          <div>
             <h4>Tasks</h4>
-            <div className="tasks-actions">
-              <label className="hide-completed-toggle">
+            <div>
+              <label>
                 <input 
                   type="checkbox" 
                   checked={hideCompletedTasks} 
@@ -930,13 +925,13 @@ const ProjectView = ({ project }: { project: Project }) => {
           </div>
           
           {filteredTasks && filteredTasks.length > 0 ? (
-            <div className="task-list">
+            <div>
               {filteredTasks.map((task: Task) => (
                 <TaskItem key={task.id} task={task} />
               ))}
             </div>
           ) : (
-            <p className="no-tasks">
+            <p>
               {project.tasks && project.tasks.length > 0 
                 ? 'All tasks are completed and hidden.' 
                 : 'No tasks yet'}
@@ -953,10 +948,10 @@ const ProjectView = ({ project }: { project: Project }) => {
 }
 
 const ProjectsList = ({ projects }: { projects: Project[] }) => {
-  if (!projects?.length) return <div className="no-projects">No projects yet. Create one above!</div>
+  if (!projects?.length) return <div>No projects yet. Create one above!</div>
 
   return (
-    <div className="projects-list">
+    <div>
       {projects.map((project) => (
         <ProjectView project={project} key={project.id} />
       ))}
