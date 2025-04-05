@@ -9,6 +9,7 @@ import {
   createTask, 
   updateTaskStatus,
   createPitch,
+  updatePitch,
   selectPitch,
   deletePitch,
   updateProject
@@ -257,6 +258,17 @@ const PitchItem = ({ pitch, onSelect, onDelete }: {
   onDelete: () => void 
 }) => {
   const [showDetails, setShowDetails] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+
+  if (isEditing) {
+    return (
+      <EditPitchForm 
+        pitch={pitch} 
+        onSave={() => setIsEditing(false)} 
+        onCancel={() => setIsEditing(false)} 
+      />
+    )
+  }
 
   return (
     <div className={`pitch-item ${pitch.isSelected ? 'selected' : ''}`}>
@@ -266,6 +278,7 @@ const PitchItem = ({ pitch, onSelect, onDelete }: {
           <button onClick={() => setShowDetails(!showDetails)} className="detail-btn">
             {showDetails ? 'Hide Details' : 'Show Details'}
           </button>
+          <button onClick={() => setIsEditing(true)} className="edit-btn">Edit Pitch</button>
           {!pitch.isSelected && (
             <>
               <button onClick={onSelect} className="select-btn">Select</button>
@@ -450,6 +463,144 @@ const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSa
             defaultValue={project.description || ''}
             placeholder="Brief overview of the project" 
           />
+        </label>
+      </div>
+      
+      <div className="form-actions">
+        <button type="submit" className="submit-btn">Save Changes</button>
+        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      </div>
+    </form>
+  )
+}
+
+const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () => void, onCancel: () => void }) => {
+  const formRef = useRef<HTMLFormElement>(null)
+  
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    try {
+      const formData = new FormData(event.currentTarget)
+      
+      await updatePitch({
+        id: pitch.id,
+        title: formData.get('title') as string,
+        problem: formData.get('problem') as string,
+        appetite: formData.get('appetite') as string,
+        solution: formData.get('solution') as string,
+        rabbitHoles: formData.get('rabbitHoles') as string,
+        noGos: formData.get('noGos') as string,
+        audience: formData.get('audience') as string,
+        insights: formData.get('insights') as string,
+        successMetrics: formData.get('successMetrics') as string
+      })
+      
+      onSave()
+    } catch (err: any) {
+      window.alert('Error: ' + err.message)
+    }
+  }
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="edit-pitch-form">
+      <h3>Edit Pitch</h3>
+      
+      <div className="form-section">
+        <label>
+          Pitch Title *
+          <input name="title" type="text" required defaultValue={pitch.title} placeholder="A clear, descriptive title" />
+        </label>
+      </div>
+      
+      <div className="form-section">
+        <h4>1. Problem</h4>
+        <p className="help-text">Describe the specific problem or use case that motivates this project</p>
+        <textarea 
+          name="problem" 
+          required 
+          defaultValue={pitch.problem}
+          placeholder="What specific problem does this solve? Include a clear story showing why the status quo doesn't work."
+          rows={4}
+        ></textarea>
+      </div>
+      
+      <div className="form-section">
+        <h4>2. Appetite</h4>
+        <p className="help-text">How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
+        <input 
+          name="appetite" 
+          type="text" 
+          required 
+          defaultValue={pitch.appetite}
+          placeholder="e.g., 2 weeks, 6 weeks" 
+        />
+      </div>
+      
+      <div className="form-section">
+        <h4>3. Solution</h4>
+        <p className="help-text">Describe the core elements of your solution</p>
+        <textarea 
+          name="solution" 
+          required 
+          defaultValue={pitch.solution}
+          placeholder="Outline the key elements of your solution in a way that's easy to understand"
+          rows={6}
+        ></textarea>
+      </div>
+      
+      <div className="form-section">
+        <h4>4. Rabbit Holes</h4>
+        <p className="help-text">Details worth calling out to avoid problems</p>
+        <textarea 
+          name="rabbitHoles" 
+          defaultValue={pitch.rabbitHoles || ''}
+          placeholder="What parts of the implementation might be tricky or time-consuming?"
+          rows={3}
+        ></textarea>
+      </div>
+      
+      <div className="form-section">
+        <h4>5. No-Gos</h4>
+        <p className="help-text">Anything explicitly excluded from the concept</p>
+        <textarea 
+          name="noGos" 
+          defaultValue={pitch.noGos || ''}
+          placeholder="What features or use cases are we intentionally NOT addressing?"
+          rows={3}
+        ></textarea>
+      </div>
+      
+      <div className="form-section">
+        <h4>Additional Information</h4>
+        
+        <label>
+          Target Audience
+          <textarea 
+            name="audience" 
+            defaultValue={pitch.audience || ''}
+            placeholder="Who is this project for? Who will benefit the most?"
+            rows={2}
+          ></textarea>
+        </label>
+        
+        <label>
+          Insights
+          <textarea 
+            name="insights" 
+            defaultValue={pitch.insights || ''}
+            placeholder="Any key insights or data points that support this project"
+            rows={2}
+          ></textarea>
+        </label>
+        
+        <label>
+          Success Metrics
+          <textarea 
+            name="successMetrics" 
+            defaultValue={pitch.successMetrics || ''}
+            placeholder="How will we measure the success of this project?"
+            rows={2}
+          ></textarea>
         </label>
       </div>
       

@@ -50,6 +50,11 @@ action createPitch {
   entities: [Project, Pitch]
 }
 
+action updatePitch {
+  fn: import { updatePitch } from "@src/queries",
+  entities: [Pitch]
+}
+
 action selectPitch {
   fn: import { selectPitch } from "@src/queries",
   entities: [Pitch]
