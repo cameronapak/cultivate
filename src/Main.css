@@ -130,7 +130,7 @@ h1 {
   font-size: 1.5rem;
 }
 
-.project-controls {
+.project-actions {
   display: flex;
   gap: 0.5rem;
 }
@@ -148,6 +148,98 @@ h1 {
   color: #6c757d;
 }
 
+/* Tabs */
+.tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tab-btn {
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active {
+  color: #0077cc;
+  border-bottom: 3px solid #0077cc;
+}
+
+.tab-btn:hover {
+  color: #0077cc;
+}
+
+/* Pitches */
+.pitches-container {
+  margin-bottom: 1.5rem;
+}
+
+.new-pitch-btn {
+  background-color: #0077cc;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.new-pitch-btn:hover {
+  background-color: #0066b3;
+}
+
+.pitches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pitch-item {
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1.25rem;
+  background-color: #f8f9fa;
+}
+
+.pitch-item.selected {
+  border-left: 4px solid #28a745;
+  background-color: #f0fff4;
+}
+
+.pitch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.pitch-header h4 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.pitch-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pitch-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.selected-badge {
+  background-color: #d4edda;
+  color: #28a745;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
 .appetite-badge {
   background-color: #e6f7ff;
   color: #0077cc;
@@ -156,19 +248,43 @@ h1 {
   font-weight: 500;
 }
 
-/* Pitch details */
-.pitch-details {
+.new-pitch-form {
   background-color: #f8f9fa;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  border-left: 4px solid #0077cc;
+  border: 1px solid #e9ecef;
 }
 
-.pitch-details h4 {
+.new-pitch-form h3 {
   margin-top: 0;
+  margin-bottom: 1.5rem;
   color: #2c3e50;
-  margin-bottom: 1rem;
+}
+
+.detail-btn {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.select-btn {
+  background-color: #e6f7ff;
+  color: #0077cc;
+}
+
+.no-pitches {
+  color: #6c757d;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+/* Pitch details */
+.pitch-details {
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border: 1px solid #e9ecef;
 }
 
 .pitch-section {
@@ -190,8 +306,6 @@ h1 {
 /* Tasks section */
 .tasks-container {
   margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #eaecef;
 }
 
 .task-list {
@@ -260,19 +374,9 @@ button {
   background-color: #0066b3;
 }
 
-.expand-btn, .pitch-btn {
-  background-color: #e9ecef;
-  color: #495057;
-}
-
-.expand-btn:hover, .pitch-btn:hover {
-  background-color: #dee2e6;
-}
-
 .delete-btn {
   background-color: #f8d7da;
   color: #721c24;
-  margin-top: 1rem;
 }
 
 .delete-btn:hover {
@@ -326,7 +430,7 @@ button {
   margin-bottom: 1.5rem;
 }
 
-.form-section h3 {
+.form-section h3, .form-section h4 {
   font-size: 1.1rem;
   color: #2c3e50;
   margin-bottom: 0.75rem;

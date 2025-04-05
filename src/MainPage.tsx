@@ -1,19 +1,26 @@
 import { FormEvent, useRef, useState } from 'react'
-import { Project as BaseProject, Task } from 'wasp/entities'
-import { getProjects, useQuery, createProject, deleteProject, createTask, updateTaskStatus } from 'wasp/client/operations'
+import { Project as BaseProject, Task as BaseTask, Pitch as BasePitch } from 'wasp/entities'
+import { 
+  getProjects, 
+  useQuery, 
+  createProject, 
+  deleteProject, 
+  createTask, 
+  updateTaskStatus,
+  createPitch,
+  selectPitch,
+  deletePitch
+} from 'wasp/client/operations'
 import './Main.css'
 
-// Extended Project interface with tasks array
+// Extended types with relationships
+interface Task extends BaseTask {}
+
+interface Pitch extends BasePitch {}
+
 interface Project extends BaseProject {
-  tasks?: Task[]
-  problem: string | null
-  appetite: string | null
-  solution: string | null
-  rabbitHoles: string | null
-  noGos: string | null
-  audience: string | null
-  insights: string | null
-  successMetrics: string | null
+  tasks?: Task[];
+  pitches?: Pitch[];
 }
 
 export const MainPage = () => {
@@ -29,7 +36,7 @@ export const MainPage = () => {
           onClick={() => setShowNewProjectForm(true)} 
           className="new-project-btn"
         >
-          Create New Pitch
+          Create New Project
         </button>
       ) : (
         <NewProjectForm onCancel={() => setShowNewProjectForm(false)} />
@@ -52,15 +59,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       
       await createProject({
         title: formData.get('title') as string,
-        description: formData.get('description') as string,
-        problem: formData.get('problem') as string,
-        appetite: formData.get('appetite') as string,
-        solution: formData.get('solution') as string,
-        rabbitHoles: formData.get('rabbitHoles') as string,
-        noGos: formData.get('noGos') as string,
-        audience: formData.get('audience') as string,
-        insights: formData.get('insights') as string,
-        successMetrics: formData.get('successMetrics') as string
+        description: formData.get('description') as string
       })
       
       formRef.current?.reset()
@@ -72,23 +71,69 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="new-project-form">
-      <h2>Create New Pitch</h2>
+      <h2>Create New Project</h2>
       
       <div className="form-section">
-        <h3>Basic Information</h3>
         <label>
           Project Title *
           <input name="title" type="text" required placeholder="Give your project a clear title" />
         </label>
         
         <label>
-          Short Description
+          Description
           <input name="description" type="text" placeholder="Brief overview of the project" />
         </label>
       </div>
       
+      <div className="form-actions">
+        <button type="submit" className="submit-btn">Create Project</button>
+        <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
+      </div>
+    </form>
+  )
+}
+
+const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: () => void }) => {
+  const formRef = useRef<HTMLFormElement>(null)
+  
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    try {
+      const formData = new FormData(event.currentTarget)
+      
+      await createPitch({
+        title: formData.get('title') as string,
+        problem: formData.get('problem') as string,
+        appetite: formData.get('appetite') as string,
+        solution: formData.get('solution') as string,
+        rabbitHoles: formData.get('rabbitHoles') as string,
+        noGos: formData.get('noGos') as string,
+        audience: formData.get('audience') as string,
+        insights: formData.get('insights') as string,
+        successMetrics: formData.get('successMetrics') as string,
+        projectId
+      })
+      
+      formRef.current?.reset()
+      onCancel()
+    } catch (err: any) {
+      window.alert('Error: ' + err.message)
+    }
+  }
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="new-pitch-form">
+      <h3>Create New Pitch</h3>
+      
       <div className="form-section">
-        <h3>1. Problem</h3>
+        <label>
+          Pitch Title *
+          <input name="title" type="text" required placeholder="A clear, descriptive title" />
+        </label>
+      </div>
+      
+      <div className="form-section">
+        <h4>1. Problem</h4>
         <p className="help-text">Describe the specific problem or use case that motivates this project</p>
         <textarea 
           name="problem" 
@@ -99,7 +144,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       </div>
       
       <div className="form-section">
-        <h3>2. Appetite</h3>
+        <h4>2. Appetite</h4>
         <p className="help-text">How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
         <input 
           name="appetite" 
@@ -110,7 +155,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       </div>
       
       <div className="form-section">
-        <h3>3. Solution</h3>
+        <h4>3. Solution</h4>
         <p className="help-text">Describe the core elements of your solution</p>
         <textarea 
           name="solution" 
@@ -121,7 +166,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       </div>
       
       <div className="form-section">
-        <h3>4. Rabbit Holes</h3>
+        <h4>4. Rabbit Holes</h4>
         <p className="help-text">Details worth calling out to avoid problems</p>
         <textarea 
           name="rabbitHoles" 
@@ -131,7 +176,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       </div>
       
       <div className="form-section">
-        <h3>5. No-Gos</h3>
+        <h4>5. No-Gos</h4>
         <p className="help-text">Anything explicitly excluded from the concept</p>
         <textarea 
           name="noGos" 
@@ -141,7 +186,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       </div>
       
       <div className="form-section">
-        <h3>Additional Information</h3>
+        <h4>Additional Information</h4>
         
         <label>
           Target Audience
@@ -172,10 +217,97 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       </div>
       
       <div className="form-actions">
-        <button type="submit" className="submit-btn">Create Project</button>
+        <button type="submit" className="submit-btn">Submit Pitch</button>
         <button type="button" onClick={onCancel} className="cancel-btn">Cancel</button>
       </div>
     </form>
+  )
+}
+
+const PitchItem = ({ pitch, onSelect, onDelete }: { 
+  pitch: Pitch, 
+  onSelect: () => void, 
+  onDelete: () => void 
+}) => {
+  const [showDetails, setShowDetails] = useState(false)
+
+  return (
+    <div className={`pitch-item ${pitch.isSelected ? 'selected' : ''}`}>
+      <div className="pitch-header">
+        <h4>{pitch.title}</h4>
+        <div className="pitch-controls">
+          <button onClick={() => setShowDetails(!showDetails)} className="detail-btn">
+            {showDetails ? 'Hide Details' : 'Show Details'}
+          </button>
+          {!pitch.isSelected && (
+            <>
+              <button onClick={onSelect} className="select-btn">Select</button>
+              <button onClick={onDelete} className="delete-btn">Delete</button>
+            </>
+          )}
+        </div>
+      </div>
+      
+      <div className="pitch-meta">
+        <span className="appetite-badge">Appetite: {pitch.appetite}</span>
+        <span className="date-info">Created: {new Date(pitch.createdAt).toLocaleDateString()}</span>
+        {pitch.isSelected && <span className="selected-badge">✓ Selected</span>}
+      </div>
+
+      {showDetails && (
+        <div className="pitch-details">
+          <div className="pitch-section">
+            <h5>1. Problem</h5>
+            <p>{pitch.problem}</p>
+          </div>
+          
+          <div className="pitch-section">
+            <h5>2. Appetite</h5>
+            <p>{pitch.appetite}</p>
+          </div>
+          
+          <div className="pitch-section">
+            <h5>3. Solution</h5>
+            <p>{pitch.solution}</p>
+          </div>
+          
+          {pitch.rabbitHoles && (
+            <div className="pitch-section">
+              <h5>4. Rabbit Holes</h5>
+              <p>{pitch.rabbitHoles}</p>
+            </div>
+          )}
+          
+          {pitch.noGos && (
+            <div className="pitch-section">
+              <h5>5. No-Gos</h5>
+              <p>{pitch.noGos}</p>
+            </div>
+          )}
+          
+          {pitch.audience && (
+            <div className="pitch-section">
+              <h5>Target Audience</h5>
+              <p>{pitch.audience}</p>
+            </div>
+          )}
+          
+          {pitch.insights && (
+            <div className="pitch-section">
+              <h5>Insights</h5>
+              <p>{pitch.insights}</p>
+            </div>
+          )}
+          
+          {pitch.successMetrics && (
+            <div className="pitch-section">
+              <h5>Success Metrics</h5>
+              <p>{pitch.successMetrics}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -248,8 +380,8 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 }
 
 const ProjectView = ({ project }: { project: Project }) => {
-  const [expanded, setExpanded] = useState(false)
-  const [showPitch, setShowPitch] = useState(false)
+  const [activeTab, setActiveTab] = useState<'pitches' | 'tasks'>('pitches')
+  const [showNewPitchForm, setShowNewPitchForm] = useState(false)
   
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
@@ -261,91 +393,87 @@ const ProjectView = ({ project }: { project: Project }) => {
     }
   }
 
+  const handleSelectPitch = async (pitchId: number) => {
+    try {
+      await selectPitch({ id: pitchId, projectId: project.id })
+    } catch (err: any) {
+      window.alert('Error selecting pitch: ' + err.message)
+    }
+  }
+
+  const handleDeletePitch = async (pitchId: number) => {
+    if (confirm('Are you sure you want to delete this pitch?')) {
+      try {
+        await deletePitch({ id: pitchId })
+      } catch (err: any) {
+        window.alert('Error deleting pitch: ' + err.message)
+      }
+    }
+  }
+
   return (
     <div className="project-card">
       <div className="project-header">
         <h3>{project.title}</h3>
-        <div className="project-controls">
-          <button onClick={() => setShowPitch(!showPitch)} className="pitch-btn">
-            {showPitch ? 'Hide Pitch' : 'Show Pitch'}
-          </button>
-          <button onClick={() => setExpanded(!expanded)} className="expand-btn">
-            {expanded ? 'Hide Tasks' : 'Show Tasks'}
-          </button>
+        <div className="project-actions">
+          <button onClick={handleDelete} className="delete-btn">Delete Project</button>
         </div>
       </div>
       
       {project.description && <p className="project-description">{project.description}</p>}
       
       <div className="project-meta">
-        {project.appetite && <p className="appetite-badge">Appetite: {project.appetite}</p>}
         <p className="task-count">Tasks: {project.tasks?.length || 0}</p>
+        <p className="pitch-count">Pitches: {project.pitches?.length || 0}</p>
         <p className="date-info">Created: {new Date(project.createdAt).toLocaleDateString()}</p>
       </div>
+
+      <div className="tabs">
+        <button 
+          className={`tab-btn ${activeTab === 'pitches' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('pitches')}
+        >
+          Pitches
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'tasks' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('tasks')}
+        >
+          Tasks
+        </button>
+      </div>
       
-      {showPitch && (
-        <div className="pitch-details">
-          <h4>Project Pitch</h4>
-          
-          {project.problem && (
-            <div className="pitch-section">
-              <h5>1. Problem</h5>
-              <p>{project.problem}</p>
-            </div>
+      {activeTab === 'pitches' && (
+        <div className="pitches-container">
+          {!showNewPitchForm ? (
+            <button onClick={() => setShowNewPitchForm(true)} className="new-pitch-btn">
+              + Create New Pitch
+            </button>
+          ) : (
+            <NewPitchForm 
+              projectId={project.id} 
+              onCancel={() => setShowNewPitchForm(false)} 
+            />
           )}
           
-          {project.appetite && (
-            <div className="pitch-section">
-              <h5>2. Appetite</h5>
-              <p>{project.appetite}</p>
+          {project.pitches && project.pitches.length > 0 ? (
+            <div className="pitches-list">
+              {project.pitches.map((pitch: Pitch) => (
+                <PitchItem 
+                  key={pitch.id} 
+                  pitch={pitch} 
+                  onSelect={() => handleSelectPitch(pitch.id)} 
+                  onDelete={() => handleDeletePitch(pitch.id)} 
+                />
+              ))}
             </div>
-          )}
-          
-          {project.solution && (
-            <div className="pitch-section">
-              <h5>3. Solution</h5>
-              <p>{project.solution}</p>
-            </div>
-          )}
-          
-          {project.rabbitHoles && (
-            <div className="pitch-section">
-              <h5>4. Rabbit Holes</h5>
-              <p>{project.rabbitHoles}</p>
-            </div>
-          )}
-          
-          {project.noGos && (
-            <div className="pitch-section">
-              <h5>5. No-Gos</h5>
-              <p>{project.noGos}</p>
-            </div>
-          )}
-          
-          {project.audience && (
-            <div className="pitch-section">
-              <h5>Target Audience</h5>
-              <p>{project.audience}</p>
-            </div>
-          )}
-          
-          {project.insights && (
-            <div className="pitch-section">
-              <h5>Insights</h5>
-              <p>{project.insights}</p>
-            </div>
-          )}
-          
-          {project.successMetrics && (
-            <div className="pitch-section">
-              <h5>Success Metrics</h5>
-              <p>{project.successMetrics}</p>
-            </div>
+          ) : (
+            <p className="no-pitches">No pitches yet. Create one to get started!</p>
           )}
         </div>
       )}
       
-      {expanded && (
+      {activeTab === 'tasks' && (
         <div className="tasks-container">
           <h4>Tasks</h4>
           <NewTaskForm projectId={project.id} />
@@ -361,8 +489,6 @@ const ProjectView = ({ project }: { project: Project }) => {
           )}
         </div>
       )}
-      
-      <button onClick={handleDelete} className="delete-btn">Delete Project</button>
     </div>
   )
 }

@@ -1,10 +1,26 @@
-import { Project, Task } from 'wasp/entities'
-import { type GetProjects, type CreateProject, type DeleteProject, type GetProjectTasks, type CreateTask, type UpdateTaskStatus } from 'wasp/server/operations'
+import { Project, Task, Pitch } from 'wasp/entities'
+import { 
+  type GetProjects, 
+  type CreateProject, 
+  type DeleteProject, 
+  type GetProjectTasks, 
+  type CreateTask, 
+  type UpdateTaskStatus,
+  type GetProjectPitches,
+  type CreatePitch,
+  type SelectPitch,
+  type DeletePitch
+} from 'wasp/server/operations'
 
 export const getProjects: GetProjects<void, Project[]> = async (args, context) => {
   return context.entities.Project.findMany({
     orderBy: { id: 'asc' },
-    include: { tasks: true }
+    include: { 
+      tasks: true,
+      pitches: {
+        orderBy: { createdAt: 'desc' }
+      }
+    }
   })
 }
 
@@ -19,17 +35,20 @@ export const getProjectTasks: GetProjectTasks<GetProjectTasksInput, Task[]> = as
   })
 }
 
+type GetProjectPitchesInput = {
+  projectId: number
+}
+
+export const getProjectPitches: GetProjectPitches<GetProjectPitchesInput, Pitch[]> = async (args, context) => {
+  return context.entities.Pitch.findMany({
+    where: { projectId: args.projectId },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
 type CreateProjectPayload = {
   title: string
   description?: string
-  problem: string
-  appetite: string
-  solution: string
-  rabbitHoles?: string
-  noGos?: string
-  audience?: string
-  insights?: string
-  successMetrics?: string
 }
 
 export const createProject: CreateProject<CreateProjectPayload, Project> = async (
@@ -39,15 +58,7 @@ export const createProject: CreateProject<CreateProjectPayload, Project> = async
   return context.entities.Project.create({
     data: {
       title: args.title,
-      description: args.description,
-      problem: args.problem,
-      appetite: args.appetite,
-      solution: args.solution,
-      rabbitHoles: args.rabbitHoles,
-      noGos: args.noGos,
-      audience: args.audience,
-      insights: args.insights,
-      successMetrics: args.successMetrics
+      description: args.description
     },
   })
 }
@@ -61,6 +72,74 @@ export const deleteProject: DeleteProject<DeleteProjectPayload, Project> = async
   context
 ) => {
   return context.entities.Project.delete({
+    where: { id: args.id }
+  })
+}
+
+type CreatePitchPayload = {
+  title: string
+  problem: string
+  appetite: string
+  solution: string
+  rabbitHoles?: string
+  noGos?: string
+  audience?: string
+  insights?: string
+  successMetrics?: string
+  projectId: number
+}
+
+export const createPitch: CreatePitch<CreatePitchPayload, Pitch> = async (
+  args,
+  context
+) => {
+  return context.entities.Pitch.create({
+    data: {
+      title: args.title,
+      problem: args.problem,
+      appetite: args.appetite,
+      solution: args.solution,
+      rabbitHoles: args.rabbitHoles,
+      noGos: args.noGos,
+      audience: args.audience,
+      insights: args.insights,
+      successMetrics: args.successMetrics,
+      project: { connect: { id: args.projectId } }
+    }
+  })
+}
+
+type SelectPitchPayload = {
+  id: number
+  projectId: number
+}
+
+export const selectPitch: SelectPitch<SelectPitchPayload, Pitch> = async (
+  args,
+  context
+) => {
+  // First, unselect all pitches for this project
+  await context.entities.Pitch.updateMany({
+    where: { projectId: args.projectId },
+    data: { isSelected: false }
+  })
+  
+  // Then select the chosen pitch
+  return context.entities.Pitch.update({
+    where: { id: args.id },
+    data: { isSelected: true }
+  })
+}
+
+type DeletePitchPayload = {
+  id: number
+}
+
+export const deletePitch: DeletePitch<DeletePitchPayload, Pitch> = async (
+  args,
+  context
+) => {
+  return context.entities.Pitch.delete({
     where: { id: args.id }
   })
 }
