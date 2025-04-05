@@ -202,11 +202,6 @@ h1 {
   background-color: #f8f9fa;
 }
 
-.pitch-item.selected {
-  border-left: 4px solid #28a745;
-  background-color: #f0fff4;
-}
-
 .pitch-header {
   display: flex;
   justify-content: space-between;
@@ -230,14 +225,6 @@ h1 {
   flex-wrap: wrap;
   margin-bottom: 1rem;
   font-size: 0.875rem;
-}
-
-.selected-badge {
-  background-color: #d4edda;
-  color: #28a745;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-weight: 500;
 }
 
 .appetite-badge {
@@ -320,11 +307,6 @@ h1 {
 .detail-btn {
   background-color: #e9ecef;
   color: #495057;
-}
-
-.select-btn {
-  background-color: #e6f7ff;
-  color: #0077cc;
 }
 
 .no-pitches {

@@ -9,7 +9,6 @@ import {
   type GetProjectPitches,
   type CreatePitch,
   type UpdatePitch,
-  type SelectPitch,
   type DeletePitch,
   type UpdateProject
 } from 'wasp/server/operations'
@@ -138,22 +137,6 @@ export const createPitch: CreatePitch<CreatePitchPayload, Pitch> = async (
       successMetrics: args.successMetrics,
       project: { connect: { id: args.projectId } }
     }
-  })
-}
-
-type SelectPitchPayload = {
-  id: number
-  projectId: number
-}
-
-export const selectPitch: SelectPitch<SelectPitchPayload, Pitch> = async (
-  args,
-  context
-) => {
-  // Simply mark the pitch as selected
-  return context.entities.Pitch.update({
-    where: { id: args.id },
-    data: { isSelected: true }
   })
 }
 

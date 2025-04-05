@@ -30,7 +30,6 @@ model Pitch {
   audience      String?
   insights      String?
   successMetrics String?
-  isSelected    Boolean  @default(false)
   project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId     Int      @unique
   createdAt     DateTime @default(now())

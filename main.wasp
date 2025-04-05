@@ -55,11 +55,6 @@ action updatePitch {
   entities: [Pitch]
 }
 
-action selectPitch {
-  fn: import { selectPitch } from "@src/queries",
-  entities: [Pitch]
-}
-
 action deletePitch {
   fn: import { deletePitch } from "@src/queries",
   entities: [Pitch]

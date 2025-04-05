@@ -10,7 +10,6 @@ import {
   updateTaskStatus,
   createPitch,
   updatePitch,
-  selectPitch,
   deletePitch,
   updateProject
 } from 'wasp/client/operations'
@@ -252,9 +251,8 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
   )
 }
 
-const PitchItem = ({ pitch, onSelect, onDelete }: { 
+const PitchItem = ({ pitch, onDelete }: { 
   pitch: Pitch, 
-  onSelect: () => void, 
   onDelete: () => void 
 }) => {
   const [showDetails, setShowDetails] = useState(false)
@@ -271,7 +269,7 @@ const PitchItem = ({ pitch, onSelect, onDelete }: {
   }
 
   return (
-    <div className={`pitch-item ${pitch.isSelected ? 'selected' : ''}`}>
+    <div className="pitch-item">
       <div className="pitch-header">
         <h4>{pitch.title}</h4>
         <div className="pitch-controls">
@@ -279,19 +277,13 @@ const PitchItem = ({ pitch, onSelect, onDelete }: {
             {showDetails ? 'Hide Details' : 'Show Details'}
           </button>
           <button onClick={() => setIsEditing(true)} className="edit-btn">Edit Pitch</button>
-          {!pitch.isSelected && (
-            <>
-              <button onClick={onSelect} className="select-btn">Select</button>
-              <button onClick={onDelete} className="delete-btn">Delete</button>
-            </>
-          )}
+          <button onClick={onDelete} className="delete-btn">Delete</button>
         </div>
       </div>
       
       <div className="pitch-meta">
         <span className="appetite-badge">Appetite: {pitch.appetite}</span>
         <span className="date-info">Created: {new Date(pitch.createdAt).toLocaleDateString()}</span>
-        {pitch.isSelected && <span className="selected-badge">✓ Selected</span>}
       </div>
 
       {showDetails && (
@@ -647,14 +639,6 @@ const ProjectView = ({ project }: { project: Project }) => {
     }
   }
 
-  const handleSelectPitch = async (pitchId: number) => {
-    try {
-      await selectPitch({ id: pitchId, projectId: project.id })
-    } catch (err: any) {
-      window.alert('Error selecting pitch: ' + err.message)
-    }
-  }
-
   const handleDeletePitch = async (pitchId: number) => {
     if (confirm('Are you sure you want to delete this pitch?')) {
       try {
@@ -730,7 +714,6 @@ const ProjectView = ({ project }: { project: Project }) => {
             <div className="pitches-list">
               <PitchItem 
                 pitch={project.pitch} 
-                onSelect={() => handleSelectPitch(project.pitch!.id)} 
                 onDelete={() => handleDeletePitch(project.pitch!.id)} 
               />
             </div>
