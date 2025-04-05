@@ -125,6 +125,31 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
     <form ref={formRef} onSubmit={handleSubmit} className="new-pitch-form">
       <h3>Create New Pitch</h3>
       
+      <div className="shape-up-info">
+        <div className="shape-up-header">
+          <h4>About Shape Up Pitches</h4>
+          <a 
+            href="https://basecamp.com/shapeup/1.5-chapter-06" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="shape-up-link"
+          >
+            Learn more from Shape Up by 37signals →
+          </a>
+        </div>
+        <p>
+          A Shape Up pitch is a presentation of a problem and solution that helps teams make informed decisions about what to build.
+          Each pitch should include these five key elements:
+        </p>
+        <ol className="shape-up-elements">
+          <li><strong>Problem</strong> — The specific issue or use case that motivates the project</li>
+          <li><strong>Appetite</strong> — How much time you're willing to invest (2 weeks, 6 weeks, etc.)</li>
+          <li><strong>Solution</strong> — Core elements presented in an easily understandable form</li>
+          <li><strong>Rabbit Holes</strong> — Potential challenges or time-consuming details</li>
+          <li><strong>No-Gos</strong> — Features or use cases explicitly excluded to fit the appetite</li>
+        </ol>
+      </div>
+      
       <div className="form-section">
         <label>
           Pitch Title *

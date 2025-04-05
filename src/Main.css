@@ -248,6 +248,61 @@ h1 {
   font-weight: 500;
 }
 
+/* Shape Up Info */
+.shape-up-info {
+  background-color: #ebf7ff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-left: 4px solid #0077cc;
+}
+
+.shape-up-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.shape-up-header h4 {
+  margin: 0;
+  color: #0077cc;
+}
+
+.shape-up-link {
+  color: #0077cc;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.shape-up-link:hover {
+  text-decoration: underline;
+}
+
+.shape-up-info p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #3c4858;
+}
+
+.shape-up-elements {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #3c4858;
+}
+
+.shape-up-elements li {
+  margin-bottom: 0.5rem;
+}
+
+.shape-up-elements li strong {
+  color: #0077cc;
+}
+
+/* New pitch form */
 .new-pitch-form {
   background-color: #f8f9fa;
   border-radius: 8px;
