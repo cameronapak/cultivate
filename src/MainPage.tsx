@@ -1,6 +1,6 @@
-import { FormEvent } from 'react'
+import { FormEvent, useRef } from 'react'
 import { Project } from 'wasp/entities'
-import { getProjects, useQuery, createProject } from 'wasp/client/operations'
+import { getProjects, useQuery, createProject, deleteProject } from 'wasp/client/operations'
 import './Main.css'
 
 export const MainPage = () => {
@@ -17,13 +17,15 @@ export const MainPage = () => {
 }
 
 const NewProjectForm = () => {
+  const formRef = useRef<HTMLFormElement>(null)
+  
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try {
-      const target = event.target as HTMLFormElement
-      const title = target.title.value
-      const description = target.description.value
-      target.reset()
+      const formData = new FormData(event.currentTarget)
+      const title = formData.get('title') as string
+      const description = formData.get('description') as string
+      formRef.current?.reset()
       await createProject({ title, description })
     } catch (err: any) {
       window.alert('Error: ' + err.message)
@@ -31,20 +33,31 @@ const NewProjectForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input name="title" type="text" defaultValue="" />
-      <input name="description" type="text" defaultValue="" />
-      <input type="submit" value="Create task" />
+    <form ref={formRef} onSubmit={handleSubmit}>
+      <input name="title" type="text" defaultValue="" required placeholder="Project title" />
+      <input name="description" type="text" defaultValue="" placeholder="Project description" />
+      <input type="submit" value="Create project" />
     </form>
   )
 }
 
 const ProjectView = ({ project }: { project: Project }) => {
+  const handleDelete = async () => {
+    if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
+      try {
+        await deleteProject({ id: project.id })
+      } catch (err: any) {
+        window.alert('Error deleting project: ' + err.message)
+      }
+    }
+  }
+
   return (
     <div className="project-card">
       <h3>{project.title}</h3>
       {project.description && <p>{project.description}</p>}
       <p className="date-info">Created: {new Date(project.createdAt).toLocaleDateString()}</p>
+      <button onClick={handleDelete} className="delete-btn">Delete</button>
     </div>
   )
 }

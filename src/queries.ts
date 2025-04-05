@@ -1,5 +1,5 @@
 import { Project } from 'wasp/entities'
-import { type GetProjects, type CreateProject } from 'wasp/server/operations'
+import { type GetProjects, type CreateProject, type DeleteProject } from 'wasp/server/operations'
 
 export const getProjects: GetProjects<void, Project[]> = async (args, context) => {
   return context.entities.Project.findMany({
@@ -15,5 +15,18 @@ export const createProject: CreateProject<CreateProjectPayload, Project> = async
 ) => {
   return context.entities.Project.create({
     data: { title: args.title, description: args.description },
+  })
+}
+
+type DeleteProjectPayload = {
+  id: number
+}
+
+export const deleteProject: DeleteProject<DeleteProjectPayload, Project> = async (
+  args,
+  context
+) => {
+  return context.entities.Project.delete({
+    where: { id: args.id }
   })
 }

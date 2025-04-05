@@ -24,3 +24,8 @@ action createProject {
   fn: import { createProject } from "@src/queries",
   entities: [Project]
 }
+
+action deleteProject {
+  fn: import { deleteProject } from "@src/queries",
+  entities: [Project]
+}
