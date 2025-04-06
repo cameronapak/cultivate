@@ -70,6 +70,11 @@ action createTask {
   entities: [Project, Task]
 }
 
+action updateTask {
+  fn: import { updateTask } from "@src/queries",
+  entities: [Task]
+}
+
 action updateTaskStatus {
   fn: import { updateTaskStatus } from "@src/queries",
   entities: [Task]

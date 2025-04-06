@@ -13,6 +13,7 @@ import {
   deleteProject,
   createTask,
   updateTaskStatus,
+  updateTask,
   createPitch,
   updatePitch,
   deletePitch,
@@ -26,6 +27,7 @@ import { Trash, Pencil, ExternalLink, Plus } from "lucide-react";
 import "./Main.css";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
+import { Textarea } from "./components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -450,7 +452,74 @@ const PitchItem = ({
   );
 };
 
+const EditTaskForm = ({ task, onSave, onCancel }: { task: Task, onSave: () => void, onCancel: () => void }) => {
+  const formRef = useRef<HTMLFormElement>(null);
+  const formSchema = z.object({
+    title: z.string().min(1, { message: "Task title is required" }),
+    description: z.string().optional(),
+  });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: task.title,
+      description: task.description || "",
+    },
+  });
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await updateTask({ id: task.id, title: form.getValues("title"), description: form.getValues("description") });
+      onSave();
+    } catch (err: any) {
+      window.alert("Error updating task: " + err.message);
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="Task title" autoFocus {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea placeholder="Task description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex gap-2 mt-4 items-center">
+          <Button size="sm" type="submit" variant="default">
+            Save Changes
+          </Button>
+          <Button size="sm" type="button" onClick={onCancel} variant="outline">
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
+
 const TaskItem = ({ task }: { task: Task }) => {
+  const [isEditing, setIsEditing] = useState(false);
+
   const handleStatusChange = async (complete: boolean) => {
     try {
       await updateTaskStatus({ id: task.id, complete });
@@ -469,6 +538,16 @@ const TaskItem = ({ task }: { task: Task }) => {
     }
   };
 
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  if (isEditing) {
+    return (
+      <EditTaskForm task={task} onSave={() => setIsEditing(false)} onCancel={() => setIsEditing(false)} />
+    );
+  }
+
   return (
     <div className={`task-item ${task.complete ? "completed" : ""}`}>
       <div className="flex items-center space-x-2 justify-between">
@@ -485,9 +564,14 @@ const TaskItem = ({ task }: { task: Task }) => {
             {task.title}
           </label>
         </div>
-        <Button variant="ghost" size="icon" onClick={handleDelete}>
-          <Trash className="h-4 w-4" />
-        </Button>
+        <div className="flex">
+          <Button onClick={handleEdit} variant="ghost" size="icon">
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button onClick={handleDelete} variant="ghost" size="icon">
+            <Trash className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -813,7 +897,7 @@ const ResourceItem = ({
   onEdit: () => void;
   onDelete: () => void;
 }) => {
-  let faviconUrl = null;
+  let faviconUrl: string | null = null;
   let url = resource.url;
   try {
     const urlObj = new URL(resource.url);
