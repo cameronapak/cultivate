@@ -35,6 +35,7 @@ import {
 } from "./components/ui/tabs"
 import { Checkbox } from "./components/ui/checkbox"
 import { Switch } from './components/ui/switch'
+import { Table, TableCaption, TableBody, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table'
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -381,11 +382,11 @@ const TaskItem = ({ task }: { task: Task }) => {
             {task.title}
           </label>
       </div>
-      {task.description && <p className="paragraph">{task.description}</p>}
+      {/* {task.description && <p className="paragraph">{task.description}</p>}
       <div>
         <span>Status: {task.status}</span>
         <span>Created: {new Date(task.createdAt).toLocaleDateString()}</span>
-      </div>
+      </div> */}
     </div>
   )
 }
@@ -924,20 +925,34 @@ const ProjectView = ({ project }: { project: Project }) => {
                     <NewTaskForm projectId={project.id} />
                   </div>
                 </div>
-                
-                {filteredTasks && filteredTasks.length > 0 ? (
-                  <div>
-                    {filteredTasks.map((task: Task) => (
-                      <TaskItem key={task.id} task={task} />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="paragraph">
-                    {project.tasks && project.tasks.length > 0 
-                      ? 'All tasks are completed and hidden.' 
-                      : 'No tasks yet'}
-                  </p>
-                )}
+
+                <Table>
+                  <TableCaption>A list of your recent invoices.</TableCaption>
+                  {/* <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[100px]">Task</TableHead>
+                    </TableRow>
+                  </TableHeader> */}
+                  <TableBody>
+                    {filteredTasks && filteredTasks.length > 0 ? (
+                        <>
+                        {filteredTasks.map((task: Task) => (
+                          <TableRow key={task.id}>
+                            <TableCell>
+                              <TaskItem key={task.id} task={task} />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        </>
+                      ) : (
+                        <p className="paragraph">
+                          {project.tasks && project.tasks.length > 0 
+                            ? 'All tasks are completed and hidden.' 
+                            : 'No tasks yet'}
+                        </p>
+                      )}
+                  </TableBody>
+                </Table>
               </div>
             </TabsContent>
 
