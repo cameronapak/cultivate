@@ -38,7 +38,7 @@ export const MainPage = () => {
 
   return (
     <div className="container mx-auto px-6">
-      <h1>Shape Up Projects</h1>
+      <h1 className="heading-1">Shape Up Projects</h1>
       
       {!showNewProjectForm ? (
         <Button 
@@ -80,7 +80,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <h2>Create New Project</h2>
+      <h2 className="heading-2">Create New Project</h2>
       
       <div>
         <label>
@@ -132,25 +132,25 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <h3>Create New Pitch</h3>
+      <h3 className="heading-3">Create New Pitch</h3>
       
       <div>
         <div>
-          <h4>About Shape Up Pitches</h4>
+          <h4 className="heading-3">About Shape Up Pitches</h4>
           <a 
             href="https://basecamp.com/shapeup/1.5-chapter-06" 
             target="_blank" 
             rel="noopener noreferrer"
-            
+            className="link"
           >
             Learn more from Shape Up by 37signals →
           </a>
         </div>
-        <p>
+        <p className="paragraph">
           A Shape Up pitch is a presentation of a problem and solution that helps teams make informed decisions about what to build.
           Each pitch should include these five key elements:
         </p>
-        <ol>
+        <ol className="list">
           <li><strong>Problem</strong> — The specific issue or use case that motivates the project</li>
           <li><strong>Appetite</strong> — How much time you're willing to invest (2 weeks, 6 weeks, etc.)</li>
           <li><strong>Solution</strong> — Core elements presented in an easily understandable form</li>
@@ -167,8 +167,8 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       </div>
       
       <div>
-        <h4>1. Problem</h4>
-        <p>Describe the specific problem or use case that motivates this project</p>
+        <h4 className="heading-3">1. Problem</h4>
+        <p className="paragraph">Describe the specific problem or use case that motivates this project</p>
         <textarea 
           name="problem" 
           required 
@@ -178,8 +178,8 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       </div>
       
       <div>
-        <h4>2. Appetite</h4>
-        <p>How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
+        <h4 className="heading-3">2. Appetite</h4>
+        <p className="paragraph">How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
         <input 
           name="appetite" 
           type="text" 
@@ -189,8 +189,8 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       </div>
       
       <div>
-        <h4>3. Solution</h4>
-        <p>Describe the core elements of your solution</p>
+        <h4 className="heading-3">3. Solution</h4>
+        <p className="paragraph">Describe the core elements of your solution</p>
         <textarea 
           name="solution" 
           required 
@@ -200,8 +200,8 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       </div>
       
       <div>
-        <h4>4. Rabbit Holes</h4>
-        <p>Details worth calling out to avoid problems</p>
+        <h4 className="heading-3">4. Rabbit Holes</h4>
+        <p className="paragraph">Details worth calling out to avoid problems</p>
         <textarea 
           name="rabbitHoles" 
           placeholder="What parts of the implementation might be tricky or time-consuming?"
@@ -210,8 +210,8 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       </div>
       
       <div>
-        <h4>5. No-Gos</h4>
-        <p>Anything explicitly excluded from the concept</p>
+        <h4 className="heading-3">5. No-Gos</h4>
+        <p className="paragraph">Anything explicitly excluded from the concept</p>
         <textarea 
           name="noGos" 
           placeholder="What features or use cases are we intentionally NOT addressing?"
@@ -220,7 +220,7 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       </div>
       
       <div>
-        <h4>Additional Information</h4>
+        <h4 className="heading-3">Additional Information</h4>
         
         <label>
           Target Audience
@@ -277,7 +277,7 @@ const PitchItem = ({ pitch, onDelete }: {
   return (
     <div>
       <div>
-        <h4>{pitch.title}</h4>
+        <h4 className="heading-3">{pitch.title}</h4>
         <div>
           <Button onClick={() => setIsEditing(true)} variant="outline">Edit Pitch</Button>
           <Button onClick={onDelete} variant="destructive">Delete</Button>
@@ -286,52 +286,52 @@ const PitchItem = ({ pitch, onDelete }: {
 
       <div>
         <div>
-          <h5>1. Problem</h5>
-          <p>{pitch.problem}</p>
+          <h5 className="heading-3">1. Problem</h5>
+          <p className="paragraph">{pitch.problem}</p>
         </div>
         
         <div>
-          <h5>2. Appetite</h5>
-          <p>{pitch.appetite}</p>
+          <h5 className="heading-3">2. Appetite</h5>
+          <p className="paragraph">{pitch.appetite}</p>
         </div>
         
         <div>
-          <h5>3. Solution</h5>
-          <p>{pitch.solution}</p>
+          <h5 className="heading-3">3. Solution</h5>
+          <p className="paragraph">{pitch.solution}</p>
         </div>
         
         {pitch.rabbitHoles && (
           <div>
-            <h5>4. Rabbit Holes</h5>
-            <p>{pitch.rabbitHoles}</p>
+            <h5 className="heading-3">4. Rabbit Holes</h5>
+            <p className="paragraph">{pitch.rabbitHoles}</p>
           </div>
         )}
         
         {pitch.noGos && (
           <div>
-            <h5>5. No-Gos</h5>
-            <p>{pitch.noGos}</p>
+            <h5 className="heading-3">5. No-Gos</h5>
+            <p className="paragraph">{pitch.noGos}</p>
           </div>
         )}
         
         {pitch.audience && (
           <div>
-            <h5>Target Audience</h5>
-            <p>{pitch.audience}</p>
+            <h5 className="heading-3">Target Audience</h5>
+            <p className="paragraph">{pitch.audience}</p>
           </div>
         )}
         
         {pitch.insights && (
           <div>
-            <h5>Insights</h5>
-            <p>{pitch.insights}</p>
+            <h5 className="heading-3">Insights</h5>
+            <p className="paragraph">{pitch.insights}</p>
           </div>
         )}
         
         {pitch.successMetrics && (
           <div>
-            <h5>Success Metrics</h5>
-            <p>{pitch.successMetrics}</p>
+            <h5 className="heading-3">Success Metrics</h5>
+            <p className="paragraph">{pitch.successMetrics}</p>
           </div>
         )}
       </div>
@@ -355,11 +355,10 @@ const TaskItem = ({ task }: { task: Task }) => {
           type="checkbox"
           checked={task.complete}
           onChange={(e) => handleStatusChange(e.target.checked)}
-          
         />
         <span>{task.title}</span>
       </div>
-      {task.description && <p>{task.description}</p>}
+      {task.description && <p className="paragraph">{task.description}</p>}
       <div>
         <span>Status: {task.status}</span>
         <span>Created: {new Date(task.createdAt).toLocaleDateString()}</span>
@@ -429,7 +428,7 @@ const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSa
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <h4>Edit Project</h4>
+      <h4 className="heading-3">Edit Project</h4>
       
       <div>
         <label>
@@ -491,7 +490,7 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <h3>Edit Pitch</h3>
+      <h3 className="heading-3">Edit Pitch</h3>
       
       <div>
         <label>
@@ -501,8 +500,8 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       </div>
       
       <div>
-        <h4>1. Problem</h4>
-        <p>Describe the specific problem or use case that motivates this project</p>
+        <h4 className="heading-3">1. Problem</h4>
+        <p className="paragraph">Describe the specific problem or use case that motivates this project</p>
         <textarea 
           name="problem" 
           required 
@@ -513,8 +512,8 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       </div>
       
       <div>
-        <h4>2. Appetite</h4>
-        <p>How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
+        <h4 className="heading-3">2. Appetite</h4>
+        <p className="paragraph">How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
         <input 
           name="appetite" 
           type="text" 
@@ -525,8 +524,8 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       </div>
       
       <div>
-        <h4>3. Solution</h4>
-        <p>Describe the core elements of your solution</p>
+        <h4 className="heading-3">3. Solution</h4>
+        <p className="paragraph">Describe the core elements of your solution</p>
         <textarea 
           name="solution" 
           required 
@@ -537,8 +536,8 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       </div>
       
       <div>
-        <h4>4. Rabbit Holes</h4>
-        <p>Details worth calling out to avoid problems</p>
+        <h4 className="heading-3">4. Rabbit Holes</h4>
+        <p className="paragraph">Details worth calling out to avoid problems</p>
         <textarea 
           name="rabbitHoles" 
           defaultValue={pitch.rabbitHoles || ''}
@@ -548,8 +547,8 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       </div>
       
       <div>
-        <h4>5. No-Gos</h4>
-        <p>Anything explicitly excluded from the concept</p>
+        <h4 className="heading-3">5. No-Gos</h4>
+        <p className="paragraph">Anything explicitly excluded from the concept</p>
         <textarea 
           name="noGos" 
           defaultValue={pitch.noGos || ''}
@@ -559,7 +558,7 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       </div>
       
       <div>
-        <h4>Additional Information</h4>
+        <h4 className="heading-3">Additional Information</h4>
         
         <label>
           Target Audience
@@ -608,7 +607,7 @@ const ResourceItem = ({ resource, onEdit, onDelete }: {
   return (
     <div>
       <div>
-        <a href={resource.url} target="_blank" rel="noopener noreferrer">
+        <a href={resource.url} target="_blank" rel="noopener noreferrer" className="link">
           {resource.title}
         </a>
         <span>{resource.url}</span>
@@ -648,7 +647,7 @@ const NewResourceForm = ({ projectId, onSave, onCancel }: {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <h4>Add Resource</h4>
+      <h4 className="heading-3">Add Resource</h4>
       
       <div>
         <label>
@@ -696,7 +695,7 @@ const EditResourceForm = ({ resource, onSave, onCancel }: {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <h4>Edit Resource</h4>
+      <h4 className="heading-3">Edit Resource</h4>
       
       <div>
         <label>
@@ -735,7 +734,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   return (
     <div>
       <div>
-        <h4>Resources</h4>
+        <h4 className="heading-3">Resources</h4>
         {!isAddingResource && (
           <Button 
             onClick={() => setIsAddingResource(true)} 
@@ -775,7 +774,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
           )}
         </div>
       ) : (
-        <p>No resources yet. Add links to helpful websites, documents, and other references.</p>
+        <p className="paragraph">No resources yet. Add links to helpful websites, documents, and other references.</p>
       )}
     </div>
   )
@@ -847,20 +846,20 @@ const ProjectView = ({ project }: { project: Project }) => {
   return (
     <div>
       <div>
-        <h3>{project.title}</h3>
+        <h3 className="heading-2">{project.title}</h3>
         <div>
           <Button onClick={() => setIsEditing(true)} variant="outline">Edit Project</Button>
           <Button onClick={handleDelete} variant="destructive">Delete Project</Button>
         </div>
       </div>
       
-      {project.description && <p>{project.description}</p>}
+      {project.description && <p className="paragraph">{project.description}</p>}
       
       <div>
-        <p>Tasks: {project.tasks?.length || 0}</p>
-        <p>Pitch: {project.pitch ? 'Yes' : 'No'}</p>
-        <p>Resources: {project.resources?.length || 0}</p>
-        <p>Created: {new Date(project.createdAt).toLocaleDateString()}</p>
+        <p className="paragraph">Tasks: {project.tasks?.length || 0}</p>
+        <p className="paragraph">Pitch: {project.pitch ? 'Yes' : 'No'}</p>
+        <p className="paragraph">Resources: {project.resources?.length || 0}</p>
+        <p className="paragraph">Created: {new Date(project.createdAt).toLocaleDateString()}</p>
       </div>
 
       <div>
@@ -906,7 +905,7 @@ const ProjectView = ({ project }: { project: Project }) => {
               />
             </div>
           ) : (
-            <p>No pitch yet. Create one to get started!</p>
+            <p className="paragraph">No pitch yet. Create one to get started!</p>
           )}
         </div>
       )}
@@ -914,7 +913,7 @@ const ProjectView = ({ project }: { project: Project }) => {
       {currentTab === 'tasks' && (
         <div>
           <div>
-            <h4>Tasks</h4>
+            <h4 className="heading-3">Tasks</h4>
             <div>
               <label>
                 <input 
@@ -935,7 +934,7 @@ const ProjectView = ({ project }: { project: Project }) => {
               ))}
             </div>
           ) : (
-            <p>
+            <p className="paragraph">
               {project.tasks && project.tasks.length > 0 
                 ? 'All tasks are completed and hidden.' 
                 : 'No tasks yet'}
@@ -952,7 +951,7 @@ const ProjectView = ({ project }: { project: Project }) => {
 }
 
 const ProjectsList = ({ projects }: { projects: Project[] }) => {
-  if (!projects?.length) return <div>No projects yet. Create one above!</div>
+  if (!projects?.length) return <div className="paragraph">No projects yet. Create one above!</div>
 
   return (
     <div>

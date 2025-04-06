@@ -64,3 +64,59 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Typography classes */
+  .heading-1 {
+    @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+  }
+
+  .heading-2 {
+    @apply mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+  }
+
+  .heading-3 {
+    @apply mt-8 scroll-m-20 text-2xl font-semibold tracking-tight;
+  }
+
+  .paragraph {
+    @apply leading-7 [&:not(:first-child)]:mt-6;
+  }
+
+  .link {
+    @apply font-medium text-primary underline underline-offset-4;
+  }
+
+  .blockquote {
+    @apply mt-6 border-l-2 pl-6 italic;
+  }
+
+  .list {
+    @apply my-6 ml-6 list-disc [&>li]:mt-2;
+  }
+
+  /* Table styles */
+  .table-container {
+    @apply my-6 w-full overflow-y-auto;
+  }
+
+  .table {
+    @apply w-full;
+  }
+
+  .table-head-row {
+    @apply m-0 border-t p-0 even:bg-muted;
+  }
+
+  .table-head-cell {
+    @apply border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
+  }
+
+  .table-row {
+    @apply m-0 border-t p-0 even:bg-muted;
+  }
+
+  .table-cell {
+    @apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+  }
+}
