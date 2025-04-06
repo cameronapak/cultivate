@@ -33,6 +33,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "./components/ui/tabs"
+import { Checkbox } from "./components/ui/checkbox"
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -900,15 +901,20 @@ const ProjectView = ({ project }: { project: Project }) => {
             <TabsContent value="tasks">
               <div>
                 <div>
-                  <div>
-                    <label>
-                      <input 
-                        type="checkbox" 
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="hide-completed"
                         checked={hideCompletedTasks} 
-                        onChange={e => handleHideCompletedChange(e.target.checked)} 
+                        onCheckedChange={handleHideCompletedChange} 
                       />
-                      Hide completed tasks
-                    </label>
+                      <label
+                        htmlFor="hide-completed"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Hide completed tasks
+                      </label>
+                    </div>
                     <NewTaskForm projectId={project.id} />
                   </div>
                 </div>
