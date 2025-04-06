@@ -952,6 +952,9 @@ const ResourceItem = ({
             )}
             <div className="flex flex-col">
               <p className="text-sm hover:underline">{resource.title}</p>
+              {resource.description && (
+                <p className="text-sm text-gray-500">{resource.description}</p>
+              )}
               <p className="text-sm text-gray-500">{url}</p>
             </div>
             <ExternalLink className="mt-0.5 w-4 h-4 text-gray-500" />
@@ -982,6 +985,7 @@ const NewResourceForm = ({
   const formSchema = z.object({
     title: z.string().min(1, { message: "Title is required" }),
     url: z.string().url({ message: "Please enter a valid URL" }),
+    description: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -989,6 +993,7 @@ const NewResourceForm = ({
     defaultValues: {
       title: "",
       url: "",
+      description: "",
     },
   });
 
@@ -997,6 +1002,7 @@ const NewResourceForm = ({
       await createResource({
         title: values.title,
         url: values.url,
+        description: values.description,
         projectId,
       });
       form.reset();
@@ -1017,7 +1023,7 @@ const NewResourceForm = ({
               <FormControl>
                 <Input
                   autoFocus
-                  placeholder="Resource title or description"
+                  placeholder="Resource title or name"
                   {...field}
                 />
               </FormControl>
@@ -1033,6 +1039,22 @@ const NewResourceForm = ({
             <FormItem>
               <FormControl>
                 <Input placeholder="https://example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea 
+                  placeholder="Brief description of this resource (optional)"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -1068,6 +1090,7 @@ const EditResourceForm = ({
   const formSchema = z.object({
     title: z.string().min(1, { message: "Title is required" }),
     url: z.string().url({ message: "Please enter a valid URL" }),
+    description: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -1075,6 +1098,7 @@ const EditResourceForm = ({
     defaultValues: {
       title: resource.title,
       url: resource.url,
+      description: resource.description || "",
     },
   });
 
@@ -1084,6 +1108,7 @@ const EditResourceForm = ({
         id: resource.id,
         title: values.title,
         url: values.url,
+        description: values.description,
       });
       onSave();
     } catch (err: any) {
@@ -1102,7 +1127,7 @@ const EditResourceForm = ({
               <FormControl>
                 <Input
                   autoFocus
-                  placeholder="Resource title or description"
+                  placeholder="Resource title or name"
                   {...field}
                 />
               </FormControl>
@@ -1118,6 +1143,22 @@ const EditResourceForm = ({
             <FormItem>
               <FormControl>
                 <Input placeholder="https://example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea 
+                  placeholder="Brief description of this resource (optional)"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -277,6 +277,7 @@ export const getProjectResources: GetProjectResources<GetProjectResourcesInput, 
 type CreateResourcePayload = {
   url: string
   title: string
+  description?: string
   projectId: number
 }
 
@@ -288,6 +289,7 @@ export const createResource: CreateResource<CreateResourcePayload, Resource> = a
     data: {
       url: args.url,
       title: args.title,
+      description: args.description,
       project: { connect: { id: args.projectId } }
     }
   })
@@ -297,6 +299,7 @@ type UpdateResourcePayload = {
   id: number
   url: string
   title: string
+  description?: string
 }
 
 export const updateResource: UpdateResource<UpdateResourcePayload, Resource> = async (
@@ -307,7 +310,8 @@ export const updateResource: UpdateResource<UpdateResourcePayload, Resource> = a
     where: { id: args.id },
     data: {
       url: args.url,
-      title: args.title
+      title: args.title,
+      description: args.description
     }
   })
 }

@@ -50,12 +50,13 @@ model Task {
 }
 
 model Resource {
-  id        Int      @id @default(autoincrement())
-  url       String
-  title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId Int
+  id          Int      @id @default(autoincrement())
+  url         String
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   Int
 }
 
