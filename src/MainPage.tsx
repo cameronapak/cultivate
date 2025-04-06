@@ -26,6 +26,18 @@ import { Trash, Pencil, ExternalLink, Plus } from "lucide-react";
 import "./Main.css";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./components/ui/form";
 import {
   Card,
   CardContent,
@@ -810,58 +822,74 @@ const NewResourceForm = ({
   onSave: () => void;
   onCancel: () => void;
 }) => {
-  const formRef = useRef<HTMLFormElement>(null);
+  const formSchema = z.object({
+    title: z.string().min(1, { message: "Title is required" }),
+    url: z.string().url({ message: "Please enter a valid URL" }),
+  });
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      url: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const formData = new FormData(event.currentTarget);
-
       await createResource({
-        url: formData.get("url") as string,
-        title: formData.get("title") as string,
+        title: values.title,
+        url: values.url,
         projectId,
       });
-
-      formRef.current?.reset();
+      form.reset();
       onSave();
     } catch (err: any) {
       window.alert("Error creating resource: " + err.message);
     }
-  };
+  }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit}>
-      <div>
-        <label>
-          Title *
-          <Input
-            name="title"
-            required
-            placeholder="Resource title or description"
-          />
-        </label>
-
-        <label>
-          URL *
-          <Input
-            name="url"
-            type="url"
-            required
-            placeholder="https://example.com"
-          />
-        </label>
-      </div>
-
-      <div>
-        <Button type="submit" variant="default">
-          Add Resource
-        </Button>
-        <Button type="button" onClick={onCancel} variant="outline">
-          Cancel
-        </Button>
-      </div>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title *</FormLabel>
+              <FormControl>
+                <Input placeholder="Resource title or description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL *</FormLabel>
+              <FormControl>
+                <Input placeholder="https://example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="flex gap-2 mt-4">
+          <Button type="submit" variant="default">
+            Add Resource
+          </Button>
+          <Button type="button" onClick={onCancel} variant="outline">
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 
