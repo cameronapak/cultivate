@@ -495,22 +495,33 @@ const TaskItem = ({ task }: { task: Task }) => {
 
 const NewTaskForm = ({ projectId }: { projectId: number }) => {
   const [isAdding, setIsAdding] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  
+  const formSchema = z.object({
+    title: z.string().min(1, { message: "Task title is required" }),
+    description: z.string().optional(),
+  });
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const formData = new FormData(event.currentTarget);
-      const title = formData.get("title") as string;
-      const description = (formData.get("description") as string) || undefined;
-
-      formRef.current?.reset();
-      await createTask({ title, description, projectId });
+      await createTask({
+        title: values.title,
+        description: values.description,
+        projectId,
+      });
+      form.reset();
       setIsAdding(false);
     } catch (err: any) {
       window.alert("Error creating task: " + err.message);
     }
-  };
+  }
 
   if (!isAdding) {
     return (
@@ -522,22 +533,47 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
   }
 
   return (
-    <form className="flex flex-col gap-2" ref={formRef} onSubmit={handleSubmit}>
-      <Input name="title" required placeholder="Task title" autoFocus />
-      <Input name="description" placeholder="Task description (optional)" />
-      <div className="flex gap-2 mt-4 items-center">
-        <Button type="submit" variant="default">
-          Add
-        </Button>
-        <Button
-          type="button"
-          onClick={() => setIsAdding(false)}
-          variant="outline"
-        >
-          Cancel
-        </Button>
-      </div>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="Task title" autoFocus {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="Task description (optional)" {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        
+        <div className="flex gap-2 mt-4 items-center">
+          <Button type="submit" variant="default">
+            Add
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setIsAdding(false)}
+            variant="outline"
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 
