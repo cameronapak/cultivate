@@ -64,6 +64,8 @@ import {
   CollapsibleTrigger,
 } from "./components/ui/collapsible";
 import { getFaviconFromUrl } from "./lib/utils";
+import { Popover, PopoverTrigger, PopoverContent } from "./components/ui/popover";
+import { PopoverClose } from "@radix-ui/react-popover";
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -884,9 +886,11 @@ const NewResourceForm = ({
           <Button type="submit" variant="default">
             Add Resource
           </Button>
-          <Button type="button" onClick={onCancel} variant="outline">
-            Cancel
-          </Button>
+          <PopoverClose asChild>
+            <Button type="button" onClick={onCancel} variant="outline">
+              Cancel
+            </Button>
+          </PopoverClose>
         </div>
       </form>
     </Form>
@@ -978,22 +982,21 @@ const ResourcesSection = ({ project }: { project: Project }) => {
 
   return (
     <div className="mt-4">
-      <div>
-        {!isAddingResource && (
+      <Popover>
+      <PopoverTrigger asChild>
           <Button onClick={() => setIsAddingResource(true)} variant="outline">
             <Plus className="w-4 h-4" />
             Add Resource
           </Button>
-        )}
-      </div>
-
-      {isAddingResource && (
-        <NewResourceForm
-          projectId={project.id}
-          onSave={() => setIsAddingResource(false)}
-          onCancel={() => setIsAddingResource(false)}
-        />
-      )}
+        </PopoverTrigger>
+        <PopoverContent>
+          <NewResourceForm
+            projectId={project.id}
+            onSave={() => setIsAddingResource(false)}
+            onCancel={() => setIsAddingResource(false)}
+          />
+        </PopoverContent>
+      </Popover>
 
       {project.resources && project.resources.length > 0 ? (
         <Table className="mt-4">
