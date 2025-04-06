@@ -1408,9 +1408,9 @@ const ProjectView = ({ project }: { project: Project }) => {
                     ) : (
                       <TableRow>
                         <TableCell>
-                          <p className="paragraph">
+                          <p className="text-sm text-gray-500">
                             {project.tasks && project.tasks.length > 0
-                              ? "All tasks are completed and hidden."
+                              ? "All tasks are completed and/or hidden."
                               : "No tasks yet"}
                           </p>
                         </TableCell>
