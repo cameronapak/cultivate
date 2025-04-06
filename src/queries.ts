@@ -14,7 +14,8 @@ import {
   type GetProjectResources,
   type CreateResource,
   type UpdateResource,
-  type DeleteResource
+  type DeleteResource,
+  type DeleteTask
 } from 'wasp/server/operations'
 
 export const getProjects: GetProjects<void, Project[]> = async (args, context) => {
@@ -193,6 +194,19 @@ export const updateTaskStatus: UpdateTaskStatus<UpdateTaskStatusPayload, Task> =
   return context.entities.Task.update({
     where: { id: args.id },
     data: updateData
+  })
+}
+
+type DeleteTaskPayload = {
+  id: number
+}
+
+export const deleteTask: DeleteTask<DeleteTaskPayload, Task> = async (
+  args,
+  context
+) => {
+  return context.entities.Task.delete({
+    where: { id: args.id }
   })
 }
 

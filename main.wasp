@@ -75,6 +75,11 @@ action updateTaskStatus {
   entities: [Task]
 }
 
+action deleteTask {
+  fn: import { deleteTask } from "@src/queries",
+  entities: [Task]
+}
+
 action createResource {
   fn: import { createResource } from "@src/queries",
   entities: [Project, Resource]

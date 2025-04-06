@@ -14,7 +14,8 @@ import {
   updateProject,
   createResource,
   updateResource,
-  deleteResource
+  deleteResource,
+  deleteTask
 } from 'wasp/client/operations'
 import './Main.css'
 import { Button } from './components/ui/button'
@@ -36,6 +37,7 @@ import {
 import { Checkbox } from "./components/ui/checkbox"
 import { Switch } from './components/ui/switch'
 import { Table, TableCaption, TableBody, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table'
+import { Trash } from 'lucide-react'
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -367,26 +369,36 @@ const TaskItem = ({ task }: { task: Task }) => {
     }
   }
 
+  const handleDelete = async () => {
+    try {
+      if (confirm('Are you sure you want to delete this task?')) {
+        await deleteTask({ id: task.id })
+      }
+    } catch (err: any) {
+      window.alert('Error deleting task: ' + err.message)
+    }
+  }
+
   return (
     <div className={`task-item ${task.complete ? 'completed' : ''}`}>
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id={task.id.toString()}
-          checked={task.complete}
-          onCheckedChange={(checked) => handleStatusChange(checked === true)}
-        />
-         <label
+      <div className="flex items-center space-x-2 justify-between">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id={task.id.toString()}
+            checked={task.complete}
+            onCheckedChange={(checked) => handleStatusChange(checked === true)}
+          />
+          <label
             htmlFor={task.id.toString()}
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             {task.title}
           </label>
+        </div>
+        <Button variant="ghost" size="icon" onClick={handleDelete}>
+          <Trash className="h-4 w-4" />
+        </Button>
       </div>
-      {/* {task.description && <p className="paragraph">{task.description}</p>}
-      <div>
-        <span>Status: {task.status}</span>
-        <span>Created: {new Date(task.createdAt).toLocaleDateString()}</span>
-      </div> */}
     </div>
   )
 }
