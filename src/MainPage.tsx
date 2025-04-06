@@ -36,7 +36,7 @@ export const MainPage = () => {
   const [showNewProjectForm, setShowNewProjectForm] = useState(false)
 
   return (
-    <div>
+    <div className="container mx-auto px-6">
       <h1>Shape Up Projects</h1>
       
       {!showNewProjectForm ? (
