@@ -561,10 +561,11 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
         />
         
         <div className="flex gap-2 mt-4 items-center">
-          <Button type="submit" variant="default">
+          <Button size="sm" type="submit" variant="default">
             Add
           </Button>
           <Button
+            size="sm"
             type="button"
             onClick={() => setIsAdding(false)}
             variant="outline"
@@ -1265,7 +1266,7 @@ const ProjectView = ({ project }: { project: Project }) => {
                       </TableRow>
                     )}
                     <TableRow>
-                      <TableCell>
+                      <TableCell className="bg-white pt-4">
                         <NewTaskForm projectId={project.id} />
                       </TableCell>
                     </TableRow>
