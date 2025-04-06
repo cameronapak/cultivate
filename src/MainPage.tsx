@@ -42,7 +42,7 @@ export const MainPage = () => {
       {!showNewProjectForm ? (
         <button 
           onClick={() => setShowNewProjectForm(true)} 
-          className="new-project-btn"
+          className="btn btn-primary"
         >
           Create New Project
         </button>
@@ -140,7 +140,7 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
             href="https://basecamp.com/shapeup/1.5-chapter-06" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="shape-up-link"
+            
           >
             Learn more from Shape Up by 37signals →
           </a>
@@ -354,7 +354,7 @@ const TaskItem = ({ task }: { task: Task }) => {
           type="checkbox"
           checked={task.complete}
           onChange={(e) => handleStatusChange(e.target.checked)}
-          className="task-checkbox"
+          
         />
         <span>{task.title}</span>
       </div>
@@ -738,7 +738,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
         {!isAddingResource && (
           <button 
             onClick={() => setIsAddingResource(true)} 
-            className="add-resource-btn"
+            
           >
             + Add Resource
           </button>
