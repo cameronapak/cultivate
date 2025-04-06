@@ -926,8 +926,8 @@ const ProjectView = ({ project }: { project: Project }) => {
                   </div>
                 </div>
 
-                <Table>
-                  <TableCaption>A list of your recent invoices.</TableCaption>
+                <Table className="mt-4">
+                  {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
                   {/* <TableHeader>
                     <TableRow>
                       <TableHead className="w-[100px]">Task</TableHead>
