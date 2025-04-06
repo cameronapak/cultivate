@@ -452,7 +452,15 @@ const PitchItem = ({
   );
 };
 
-const EditTaskForm = ({ task, onSave, onCancel }: { task: Task, onSave: () => void, onCancel: () => void }) => {
+const EditTaskForm = ({
+  task,
+  onSave,
+  onCancel,
+}: {
+  task: Task;
+  onSave: () => void;
+  onCancel: () => void;
+}) => {
   const formRef = useRef<HTMLFormElement>(null);
   const formSchema = z.object({
     title: z.string().min(1, { message: "Task title is required" }),
@@ -468,7 +476,11 @@ const EditTaskForm = ({ task, onSave, onCancel }: { task: Task, onSave: () => vo
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await updateTask({ id: task.id, title: form.getValues("title"), description: form.getValues("description") });
+      await updateTask({
+        id: task.id,
+        title: form.getValues("title"),
+        description: form.getValues("description"),
+      });
       onSave();
     } catch (err: any) {
       window.alert("Error updating task: " + err.message);
@@ -477,7 +489,11 @@ const EditTaskForm = ({ task, onSave, onCancel }: { task: Task, onSave: () => vo
 
   return (
     <Form {...form}>
-      <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2">
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-2"
+      >
         <FormField
           control={form.control}
           name="title"
@@ -544,7 +560,11 @@ const TaskItem = ({ task }: { task: Task }) => {
 
   if (isEditing) {
     return (
-      <EditTaskForm task={task} onSave={() => setIsEditing(false)} onCancel={() => setIsEditing(false)} />
+      <EditTaskForm
+        task={task}
+        onSave={() => setIsEditing(false)}
+        onCancel={() => setIsEditing(false)}
+      />
     );
   }
 
@@ -557,12 +577,19 @@ const TaskItem = ({ task }: { task: Task }) => {
             checked={task.complete}
             onCheckedChange={(checked) => handleStatusChange(checked === true)}
           />
-          <label
-            htmlFor={task.id.toString()}
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            {task.title}
-          </label>
+          <div className="flex flex-col">
+            <label
+              htmlFor={task.id.toString()}
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {task.title}
+            </label>
+            {task.description && (
+              <p className="text-sm text-gray-500 line-clamp-1">
+                {task.description}
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex">
           <Button onClick={handleEdit} variant="ghost" size="icon">
@@ -579,7 +606,7 @@ const TaskItem = ({ task }: { task: Task }) => {
 
 const NewTaskForm = ({ projectId }: { projectId: number }) => {
   const [isAdding, setIsAdding] = useState(false);
-  
+
   const formSchema = z.object({
     title: z.string().min(1, { message: "Task title is required" }),
     description: z.string().optional(),
@@ -618,7 +645,10 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-2"
+      >
         <FormField
           control={form.control}
           name="title"
@@ -631,7 +661,7 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="description"
@@ -643,7 +673,7 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
             </FormItem>
           )}
         />
-        
+
         <div className="flex gap-2 mt-4 items-center">
           <Button size="sm" type="submit" variant="default">
             Add
@@ -1063,7 +1093,7 @@ const EditResourceForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-2">        
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-2">
         <FormField
           control={form.control}
           name="title"
@@ -1080,23 +1110,20 @@ const EditResourceForm = ({
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="url"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
-                  placeholder="https://example.com"
-                  {...field}
-                />
+                <Input placeholder="https://example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         <div className="flex gap-2 mt-4">
           <Button type="submit" variant="default">
             Save Changes
