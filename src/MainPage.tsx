@@ -951,11 +951,12 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   };
 
   return (
-    <div>
+    <div className="mt-4">
       <div>
         {!isAddingResource && (
           <Button onClick={() => setIsAddingResource(true)} variant="outline">
-            + Add Resource
+            <Plus className="w-4 h-4" />
+            Add Resource
           </Button>
         )}
       </div>
@@ -969,7 +970,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       )}
 
       {project.resources && project.resources.length > 0 ? (
-        <Table>
+        <Table className="mt-4">
           {project.resources.map((resource) =>
             editingResourceId === resource.id ? (
               <EditResourceForm
@@ -1119,6 +1120,10 @@ const ProjectView = ({ project }: { project: Project }) => {
             <TabsContent value="tasks">
               <div className="mt-4">
                 <div className="flex justify-between gap-2">
+                  <Button disabled variant="outline">
+                    <Plus className="w-4 h-4" />
+                    Add Task
+                  </Button>
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="hide-completed"
@@ -1132,10 +1137,6 @@ const ProjectView = ({ project }: { project: Project }) => {
                       Hide completed tasks
                     </label>
                   </div>
-                  <Button disabled variant="outline">
-                    <Plus className="w-4 h-4" />
-                    Add Task
-                  </Button>
                 </div>
 
                 <Table className="mt-4">
