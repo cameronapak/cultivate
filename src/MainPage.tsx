@@ -580,7 +580,7 @@ const TaskItem = ({ task }: { task: Task }) => {
           <div className="flex flex-col">
             <label
               htmlFor={task.id.toString()}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="pointer-events-none text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               {task.title}
             </label>
