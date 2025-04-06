@@ -17,6 +17,7 @@ import {
   deleteResource
 } from 'wasp/client/operations'
 import './Main.css'
+import { Button } from './components/ui/button'
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -40,12 +41,12 @@ export const MainPage = () => {
       <h1>Shape Up Projects</h1>
       
       {!showNewProjectForm ? (
-        <button 
+        <Button 
           onClick={() => setShowNewProjectForm(true)} 
-          className="btn btn-primary"
+          variant="default"
         >
           Create New Project
-        </button>
+        </Button>
       ) : (
         <NewProjectForm onCancel={() => setShowNewProjectForm(false)} />
       )}
@@ -94,8 +95,8 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       </div>
       
       <div>
-        <button type="submit">Create Project</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
+        <Button type="submit" variant="default">Create Project</Button>
+        <Button type="button" onClick={onCancel} variant="outline">Cancel</Button>
       </div>
     </form>
   )
@@ -250,8 +251,8 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       </div>
       
       <div>
-        <button type="submit">Submit Pitch</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
+        <Button type="submit" variant="default">Submit Pitch</Button>
+        <Button type="button" onClick={onCancel} variant="outline">Cancel</Button>
       </div>
     </form>
   )
@@ -278,8 +279,8 @@ const PitchItem = ({ pitch, onDelete }: {
       <div>
         <h4>{pitch.title}</h4>
         <div>
-          <button onClick={() => setIsEditing(true)}>Edit Pitch</button>
-          <button onClick={onDelete}>Delete</button>
+          <Button onClick={() => setIsEditing(true)} variant="outline">Edit Pitch</Button>
+          <Button onClick={onDelete} variant="destructive">Delete</Button>
         </div>
       </div>    
 
@@ -388,9 +389,9 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   if (!isAdding) {
     return (
-      <button onClick={() => setIsAdding(true)}>
+      <Button onClick={() => setIsAdding(true)} variant="outline">
         + Add Task
-      </button>
+      </Button>
     )
   }
 
@@ -399,8 +400,8 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
       <input name="title" type="text" required placeholder="Task title" />
       <input name="description" type="text" placeholder="Task description (optional)" />
       <div>
-        <button type="submit">Add</button>
-        <button type="button" onClick={() => setIsAdding(false)}>Cancel</button>
+        <Button type="submit" variant="default">Add</Button>
+        <Button type="button" onClick={() => setIsAdding(false)} variant="outline">Cancel</Button>
       </div>
     </form>
   )
@@ -454,8 +455,8 @@ const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSa
       </div>
       
       <div>
-        <button type="submit">Save Changes</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
+        <Button type="submit" variant="default">Save Changes</Button>
+        <Button type="button" onClick={onCancel} variant="outline">Cancel</Button>
       </div>
     </form>
   )
@@ -592,8 +593,8 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       </div>
       
       <div>
-        <button type="submit">Save Changes</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
+        <Button type="submit" variant="default">Save Changes</Button>
+        <Button type="button" onClick={onCancel} variant="outline">Cancel</Button>
       </div>
     </form>
   )
@@ -613,8 +614,8 @@ const ResourceItem = ({ resource, onEdit, onDelete }: {
         <span>{resource.url}</span>
       </div>
       <div>
-        <button onClick={onEdit}>Edit</button>
-        <button onClick={onDelete}>Delete</button>
+        <Button onClick={onEdit} variant="outline">Edit</Button>
+        <Button onClick={onDelete} variant="destructive">Delete</Button>
       </div>
     </div>
   )
@@ -662,8 +663,8 @@ const NewResourceForm = ({ projectId, onSave, onCancel }: {
       </div>
       
       <div>
-        <button type="submit">Add Resource</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
+        <Button type="submit" variant="default">Add Resource</Button>
+        <Button type="button" onClick={onCancel} variant="outline">Cancel</Button>
       </div>
     </form>
   )
@@ -710,8 +711,8 @@ const EditResourceForm = ({ resource, onSave, onCancel }: {
       </div>
       
       <div>
-        <button type="submit">Save Changes</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
+        <Button type="submit" variant="default">Save Changes</Button>
+        <Button type="button" onClick={onCancel} variant="outline">Cancel</Button>
       </div>
     </form>
   )
@@ -736,12 +737,12 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       <div>
         <h4>Resources</h4>
         {!isAddingResource && (
-          <button 
+          <Button 
             onClick={() => setIsAddingResource(true)} 
-            
+            variant="outline"
           >
             + Add Resource
-          </button>
+          </Button>
         )}
       </div>
       
@@ -848,8 +849,8 @@ const ProjectView = ({ project }: { project: Project }) => {
       <div>
         <h3>{project.title}</h3>
         <div>
-          <button onClick={() => setIsEditing(true)}>Edit Project</button>
-          <button onClick={handleDelete}>Delete Project</button>
+          <Button onClick={() => setIsEditing(true)} variant="outline">Edit Project</Button>
+          <Button onClick={handleDelete} variant="destructive">Delete Project</Button>
         </div>
       </div>
       
@@ -863,32 +864,35 @@ const ProjectView = ({ project }: { project: Project }) => {
       </div>
 
       <div>
-        <button 
+        <Button 
           className={`tab-btn ${currentTab === 'pitches' ? 'active' : ''}`} 
           onClick={() => handleTabChange('pitches')}
+          variant={currentTab === 'pitches' ? 'default' : 'outline'}
         >
           Pitch
-        </button>
-        <button 
+        </Button>
+        <Button 
           className={`tab-btn ${currentTab === 'tasks' ? 'active' : ''}`} 
           onClick={() => handleTabChange('tasks')}
+          variant={currentTab === 'tasks' ? 'default' : 'outline'}
         >
           Tasks
-        </button>
-        <button 
+        </Button>
+        <Button 
           className={`tab-btn ${currentTab === 'resources' ? 'active' : ''}`} 
           onClick={() => handleTabChange('resources')}
+          variant={currentTab === 'resources' ? 'default' : 'outline'}
         >
           Resources
-        </button>
+        </Button>
       </div>
       
       {currentTab === 'pitches' && (
         <div>
           {!project.pitch && !showNewPitchForm ? (
-            <button onClick={() => setShowNewPitchForm(true)}>
+            <Button onClick={() => setShowNewPitchForm(true)} variant="outline">
               + Create Project Pitch
-            </button>
+            </Button>
           ) : showNewPitchForm ? (
             <NewPitchForm 
               projectId={project.id} 
