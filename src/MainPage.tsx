@@ -22,7 +22,7 @@ import {
   deleteResource,
   deleteTask,
 } from "wasp/client/operations";
-import { Trash, Pencil, ExternalLink } from "lucide-react";
+import { Trash, Pencil, ExternalLink, Plus } from "lucide-react";
 import "./Main.css";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -496,8 +496,9 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   if (!isAdding) {
     return (
-      <Button onClick={() => setIsAdding(true)} variant="outline">
-        + Add Task
+      <Button size="sm" onClick={() => setIsAdding(true)} variant="outline">
+        <Plus className="w-4 h-4" />
+        Add Task
       </Button>
     );
   }
@@ -1117,18 +1118,24 @@ const ProjectView = ({ project }: { project: Project }) => {
 
             <TabsContent value="tasks">
               <div className="mt-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="hide-completed"
-                    checked={hideCompletedTasks}
-                    onCheckedChange={handleHideCompletedChange}
-                  />
-                  <label
-                    htmlFor="hide-completed"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Hide completed tasks
-                  </label>
+                <div className="flex justify-between gap-2">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hide-completed"
+                      checked={hideCompletedTasks}
+                      onCheckedChange={handleHideCompletedChange}
+                    />
+                    <label
+                      htmlFor="hide-completed"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Hide completed tasks
+                    </label>
+                  </div>
+                  <Button disabled variant="outline">
+                    <Plus className="w-4 h-4" />
+                    Add Task
+                  </Button>
                 </div>
 
                 <Table className="mt-4">
