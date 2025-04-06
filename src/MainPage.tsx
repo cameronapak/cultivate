@@ -34,6 +34,7 @@ import {
   TabsTrigger,
 } from "./components/ui/tabs"
 import { Checkbox } from "./components/ui/checkbox"
+import { Switch } from './components/ui/switch'
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -367,13 +368,18 @@ const TaskItem = ({ task }: { task: Task }) => {
 
   return (
     <div className={`task-item ${task.complete ? 'completed' : ''}`}>
-      <div>
-        <input
-          type="checkbox"
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id={task.id.toString()}
           checked={task.complete}
-          onChange={(e) => handleStatusChange(e.target.checked)}
+          onCheckedChange={(checked) => handleStatusChange(checked === true)}
         />
-        <span>{task.title}</span>
+         <label
+            htmlFor={task.id.toString()}
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            {task.title}
+          </label>
       </div>
       {task.description && <p className="paragraph">{task.description}</p>}
       <div>
@@ -903,7 +909,7 @@ const ProjectView = ({ project }: { project: Project }) => {
                 <div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Checkbox 
+                      <Switch 
                         id="hide-completed"
                         checked={hideCompletedTasks} 
                         onCheckedChange={handleHideCompletedChange} 
