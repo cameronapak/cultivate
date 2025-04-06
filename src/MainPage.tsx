@@ -420,7 +420,7 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   return (
     <form className="flex flex-col gap-2" ref={formRef} onSubmit={handleSubmit}>
-      <Input name="title" required placeholder="Task title" />
+      <Input name="title" required placeholder="Task title" autoFocus />
       <Input name="description" placeholder="Task description (optional)" />
       <div className="flex gap-2 mt-4 items-center">
         <Button type="submit" variant="default">Add</Button>
