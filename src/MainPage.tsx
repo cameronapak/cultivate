@@ -863,7 +863,6 @@ const NewResourceForm = ({
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title *</FormLabel>
               <FormControl>
                 <Input
                   autoFocus
@@ -881,7 +880,6 @@ const NewResourceForm = ({
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL *</FormLabel>
               <FormControl>
                 <Input placeholder="https://example.com" {...field} />
               </FormControl>
@@ -950,7 +948,6 @@ const EditResourceForm = ({
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title *</FormLabel>
               <FormControl>
                 <Input
                   autoFocus
@@ -968,7 +965,6 @@ const EditResourceForm = ({
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL *</FormLabel>
               <FormControl>
                 <Input
                   placeholder="https://example.com"
