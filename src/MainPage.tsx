@@ -1029,7 +1029,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
             {project.resources.map((resource) =>
               editingResourceId === resource.id ? (
                 <TableRow key={resource.id}>
-                  <TableCell colSpan={2}>
+                  <TableCell colSpan={2} className="bg-white">
                     <EditResourceForm
                       key={resource.id}
                       resource={resource}
