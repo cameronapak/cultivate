@@ -18,6 +18,7 @@ import {
 } from 'wasp/client/operations'
 import './Main.css'
 import { Button } from './components/ui/button'
+import { Input } from './components/ui/input'
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -85,12 +86,12 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       <div>
         <label>
           Project Title *
-          <input name="title" type="text" required placeholder="Give your project a clear title" />
+          <Input name="title" required placeholder="Give your project a clear title" />
         </label>
         
         <label>
           Description
-          <input name="description" type="text" placeholder="Brief overview of the project" />
+          <Input name="description" placeholder="Brief overview of the project" />
         </label>
       </div>
       
@@ -162,7 +163,7 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       <div>
         <label>
           Pitch Title *
-          <input name="title" type="text" required placeholder="A clear, descriptive title" />
+          <Input name="title" required placeholder="A clear, descriptive title" />
         </label>
       </div>
       
@@ -180,9 +181,8 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
       <div>
         <h4 className="heading-3">2. Appetite</h4>
         <p className="paragraph">How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
-        <input 
+        <Input 
           name="appetite" 
-          type="text" 
           required 
           placeholder="e.g., 2 weeks, 6 weeks" 
         />
@@ -396,8 +396,8 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <input name="title" type="text" required placeholder="Task title" />
-      <input name="description" type="text" placeholder="Task description (optional)" />
+      <Input name="title" required placeholder="Task title" />
+      <Input name="description" placeholder="Task description (optional)" />
       <div>
         <Button type="submit" variant="default">Add</Button>
         <Button type="button" onClick={() => setIsAdding(false)} variant="outline">Cancel</Button>
@@ -433,9 +433,8 @@ const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSa
       <div>
         <label>
           Project Title *
-          <input 
+          <Input 
             name="title" 
-            type="text" 
             required 
             defaultValue={project.title}
             placeholder="Give your project a clear title" 
@@ -444,9 +443,8 @@ const EditProjectForm = ({ project, onSave, onCancel }: { project: Project, onSa
         
         <label>
           Description
-          <input 
+          <Input 
             name="description" 
-            type="text"
             defaultValue={project.description || ''}
             placeholder="Brief overview of the project" 
           />
@@ -495,7 +493,7 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       <div>
         <label>
           Pitch Title *
-          <input name="title" type="text" required defaultValue={pitch.title} placeholder="A clear, descriptive title" />
+          <Input name="title" required defaultValue={pitch.title} placeholder="A clear, descriptive title" />
         </label>
       </div>
       
@@ -514,9 +512,8 @@ const EditPitchForm = ({ pitch, onSave, onCancel }: { pitch: Pitch, onSave: () =
       <div>
         <h4 className="heading-3">2. Appetite</h4>
         <p className="paragraph">How much time are you willing to spend on this? (e.g., "2 weeks", "6 weeks")</p>
-        <input 
+        <Input 
           name="appetite" 
-          type="text" 
           required 
           defaultValue={pitch.appetite}
           placeholder="e.g., 2 weeks, 6 weeks" 
@@ -652,12 +649,12 @@ const NewResourceForm = ({ projectId, onSave, onCancel }: {
       <div>
         <label>
           Title *
-          <input name="title" type="text" required placeholder="Resource title or description" />
+          <Input name="title" required placeholder="Resource title or description" />
         </label>
         
         <label>
           URL *
-          <input name="url" type="url" required placeholder="https://example.com" />
+          <Input name="url" type="url" required placeholder="https://example.com" />
         </label>
       </div>
       
@@ -700,12 +697,12 @@ const EditResourceForm = ({ resource, onSave, onCancel }: {
       <div>
         <label>
           Title *
-          <input name="title" type="text" required defaultValue={resource.title} placeholder="Resource title or description" />
+          <Input name="title" required defaultValue={resource.title} placeholder="Resource title or description" />
         </label>
         
         <label>
           URL *
-          <input name="url" type="url" required defaultValue={resource.url} placeholder="https://example.com" />
+          <Input name="url" type="url" required defaultValue={resource.url} placeholder="https://example.com" />
         </label>
       </div>
       
