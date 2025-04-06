@@ -885,7 +885,11 @@ const ProjectView = ({ project }: { project: Project }) => {
           {project.description && <CardDescription>{project.description}</CardDescription>}
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="pitches" className="w-[400px]">
+          <Tabs 
+            defaultValue={currentTab} 
+            className="w-[400px]"
+            onValueChange={(value) => handleTabChange(value as 'pitches' | 'tasks' | 'resources')}
+          >
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="pitches">Pitch</TabsTrigger>
               <TabsTrigger value="tasks">Tasks</TabsTrigger>
