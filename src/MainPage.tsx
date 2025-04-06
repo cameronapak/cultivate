@@ -906,23 +906,19 @@ const ProjectView = ({ project }: { project: Project }) => {
             </TabsContent>
             
             <TabsContent value="tasks">
-              <div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Switch 
-                        id="hide-completed"
-                        checked={hideCompletedTasks} 
-                        onCheckedChange={handleHideCompletedChange} 
-                      />
-                      <label
-                        htmlFor="hide-completed"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Hide completed tasks
-                      </label>
-                    </div>
-                  </div>
+              <div className="mt-4">
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="hide-completed"
+                    checked={hideCompletedTasks} 
+                    onCheckedChange={handleHideCompletedChange} 
+                  />
+                  <label
+                    htmlFor="hide-completed"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Hide completed tasks
+                  </label>
                 </div>
 
                 <Table className="mt-4">
