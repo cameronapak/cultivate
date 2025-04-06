@@ -19,6 +19,20 @@ import {
 import './Main.css'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
+import { 
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from './components/ui/card'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "./components/ui/tabs"
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -38,19 +52,21 @@ export const MainPage = () => {
   const [showNewProjectForm, setShowNewProjectForm] = useState(false)
 
   return (
-    <div className="container mx-auto px-6">
-      <h1 className="heading-1">Shape Up Projects</h1>
-      
-      {!showNewProjectForm ? (
-        <Button 
-          onClick={() => setShowNewProjectForm(true)} 
-          variant="default"
-        >
-          Create New Project
-        </Button>
-      ) : (
-        <NewProjectForm onCancel={() => setShowNewProjectForm(false)} />
-      )}
+    <div className="container mx-auto px-6 py-12">
+      <div className="flex justify-between items-center">
+        <h1 className="heading-1">Projects</h1>
+        
+        {!showNewProjectForm ? (
+          <Button 
+            onClick={() => setShowNewProjectForm(true)} 
+            variant="default"
+          >
+            Create New Project
+          </Button>
+        ) : (
+          <NewProjectForm onCancel={() => setShowNewProjectForm(false)} />
+        )}
+      </div>
       
       {projects && <ProjectsList projects={projects as Project[]} />}
       {isLoading && 'Loading...'}
@@ -731,7 +747,6 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   return (
     <div>
       <div>
-        <h4 className="heading-3">Resources</h4>
         {!isAddingResource && (
           <Button 
             onClick={() => setIsAddingResource(true)} 
@@ -841,109 +856,86 @@ const ProjectView = ({ project }: { project: Project }) => {
   }
 
   return (
-    <div>
-      <div>
-        <h3 className="heading-2">{project.title}</h3>
-        <div>
-          <Button onClick={() => setIsEditing(true)} variant="outline">Edit Project</Button>
-          <Button onClick={handleDelete} variant="destructive">Delete Project</Button>
-        </div>
-      </div>
-      
-      {project.description && <p className="paragraph">{project.description}</p>}
-      
-      <div>
-        <p className="paragraph">Tasks: {project.tasks?.length || 0}</p>
-        <p className="paragraph">Pitch: {project.pitch ? 'Yes' : 'No'}</p>
-        <p className="paragraph">Resources: {project.resources?.length || 0}</p>
-        <p className="paragraph">Created: {new Date(project.createdAt).toLocaleDateString()}</p>
-      </div>
+    <main className="mt-6">
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle>
+            <h2 className="heading-3 mt-0">{project.title}</h2>
+          </CardTitle>
+          {project.description && <CardDescription>{project.description}</CardDescription>}
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="pitches" className="w-[400px]">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="pitches">Pitch</TabsTrigger>
+              <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="resources">Resources</TabsTrigger>
+            </TabsList>
 
-      <div>
-        <Button 
-          className={`tab-btn ${currentTab === 'pitches' ? 'active' : ''}`} 
-          onClick={() => handleTabChange('pitches')}
-          variant={currentTab === 'pitches' ? 'default' : 'outline'}
-        >
-          Pitch
-        </Button>
-        <Button 
-          className={`tab-btn ${currentTab === 'tasks' ? 'active' : ''}`} 
-          onClick={() => handleTabChange('tasks')}
-          variant={currentTab === 'tasks' ? 'default' : 'outline'}
-        >
-          Tasks
-        </Button>
-        <Button 
-          className={`tab-btn ${currentTab === 'resources' ? 'active' : ''}`} 
-          onClick={() => handleTabChange('resources')}
-          variant={currentTab === 'resources' ? 'default' : 'outline'}
-        >
-          Resources
-        </Button>
-      </div>
-      
-      {currentTab === 'pitches' && (
-        <div>
-          {!project.pitch && !showNewPitchForm ? (
-            <Button onClick={() => setShowNewPitchForm(true)} variant="outline">
-              + Create Project Pitch
-            </Button>
-          ) : showNewPitchForm ? (
-            <NewPitchForm 
-              projectId={project.id} 
-              onCancel={() => setShowNewPitchForm(false)} 
-            />
-          ) : project.pitch ? (
-            <div>
-              <PitchItem 
-                pitch={project.pitch} 
-                onDelete={() => handleDeletePitch(project.pitch!.id)} 
-              />
-            </div>
-          ) : (
-            <p className="paragraph">No pitch yet. Create one to get started!</p>
-          )}
-        </div>
-      )}
-      
-      {currentTab === 'tasks' && (
-        <div>
-          <div>
-            <h4 className="heading-3">Tasks</h4>
-            <div>
-              <label>
-                <input 
-                  type="checkbox" 
-                  checked={hideCompletedTasks} 
-                  onChange={e => handleHideCompletedChange(e.target.checked)} 
-                />
-                Hide completed tasks
-              </label>
-              <NewTaskForm projectId={project.id} />
-            </div>
-          </div>
-          
-          {filteredTasks && filteredTasks.length > 0 ? (
-            <div>
-              {filteredTasks.map((task: Task) => (
-                <TaskItem key={task.id} task={task} />
-              ))}
-            </div>
-          ) : (
-            <p className="paragraph">
-              {project.tasks && project.tasks.length > 0 
-                ? 'All tasks are completed and hidden.' 
-                : 'No tasks yet'}
-            </p>
-          )}
-        </div>
-      )}
+            <TabsContent value="pitches">
+              <div>
+                {!project.pitch && !showNewPitchForm ? (
+                  <Button onClick={() => setShowNewPitchForm(true)} variant="outline">
+                    + Create Project Pitch
+                  </Button>
+                ) : showNewPitchForm ? (
+                  <NewPitchForm 
+                    projectId={project.id} 
+                    onCancel={() => setShowNewPitchForm(false)} 
+                  />
+                ) : project.pitch ? (
+                  <div>
+                    <PitchItem 
+                      pitch={project.pitch} 
+                      onDelete={() => handleDeletePitch(project.pitch!.id)} 
+                    />
+                  </div>
+                ) : (
+                  <p className="paragraph">No pitch yet. Create one to get started!</p>
+                )}
+              </div>
 
-      {currentTab === 'resources' && (
-        <ResourcesSection project={project} />
-      )}
-    </div>
+            </TabsContent>
+            
+            <TabsContent value="tasks">
+              <div>
+                <div>
+                  <div>
+                    <label>
+                      <input 
+                        type="checkbox" 
+                        checked={hideCompletedTasks} 
+                        onChange={e => handleHideCompletedChange(e.target.checked)} 
+                      />
+                      Hide completed tasks
+                    </label>
+                    <NewTaskForm projectId={project.id} />
+                  </div>
+                </div>
+                
+                {filteredTasks && filteredTasks.length > 0 ? (
+                  <div>
+                    {filteredTasks.map((task: Task) => (
+                      <TaskItem key={task.id} task={task} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="paragraph">
+                    {project.tasks && project.tasks.length > 0 
+                      ? 'All tasks are completed and hidden.' 
+                      : 'No tasks yet'}
+                  </p>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="resources">
+              <ResourcesSection project={project} />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </main>
   )
 }
 
