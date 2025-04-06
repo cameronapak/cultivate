@@ -832,8 +832,6 @@ const NewResourceForm = ({
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <h4 className="heading-3">Add Resource</h4>
-
       <div>
         <label>
           Title *
