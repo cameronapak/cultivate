@@ -916,61 +916,80 @@ const EditResourceForm = ({
   onSave: () => void;
   onCancel: () => void;
 }) => {
-  const formRef = useRef<HTMLFormElement>(null);
+  const formSchema = z.object({
+    title: z.string().min(1, { message: "Title is required" }),
+    url: z.string().url({ message: "Please enter a valid URL" }),
+  });
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: resource.title,
+      url: resource.url,
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const formData = new FormData(event.currentTarget);
-
       await updateResource({
         id: resource.id,
-        url: formData.get("url") as string,
-        title: formData.get("title") as string,
+        title: values.title,
+        url: values.url,
       });
-
       onSave();
     } catch (err: any) {
       window.alert("Error updating resource: " + err.message);
     }
-  };
+  }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit}>
-      <h4 className="heading-3">Edit Resource</h4>
-
-      <div>
-        <label>
-          Title *
-          <Input
-            name="title"
-            required
-            defaultValue={resource.title}
-            placeholder="Resource title or description"
-          />
-        </label>
-
-        <label>
-          URL *
-          <Input
-            name="url"
-            type="url"
-            required
-            defaultValue={resource.url}
-            placeholder="https://example.com"
-          />
-        </label>
-      </div>
-
-      <div>
-        <Button type="submit" variant="default">
-          Save Changes
-        </Button>
-        <Button type="button" onClick={onCancel} variant="outline">
-          Cancel
-        </Button>
-      </div>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-2">        
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title *</FormLabel>
+              <FormControl>
+                <Input
+                  autoFocus
+                  placeholder="Resource title or description"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL *</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://example.com"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="flex gap-2 mt-4">
+          <Button type="submit" variant="default">
+            Save Changes
+          </Button>
+          <Button type="button" onClick={onCancel} variant="outline">
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 
@@ -1010,23 +1029,29 @@ const ResourcesSection = ({ project }: { project: Project }) => {
 
       {project.resources && project.resources.length > 0 ? (
         <Table className="mt-4">
-          {project.resources.map((resource) =>
-            editingResourceId === resource.id ? (
-              <EditResourceForm
-                key={resource.id}
-                resource={resource}
-                onSave={() => setEditingResourceId(null)}
-                onCancel={() => setEditingResourceId(null)}
-              />
-            ) : (
-              <ResourceItem
-                key={resource.id}
-                resource={resource}
-                onEdit={() => setEditingResourceId(resource.id)}
-                onDelete={() => handleDeleteResource(resource.id)}
-              />
-            )
-          )}
+          <TableBody>
+            {project.resources.map((resource) =>
+              editingResourceId === resource.id ? (
+                <TableRow key={resource.id}>
+                  <TableCell colSpan={2}>
+                    <EditResourceForm
+                      key={resource.id}
+                      resource={resource}
+                      onSave={() => setEditingResourceId(null)}
+                      onCancel={() => setEditingResourceId(null)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <ResourceItem
+                  key={resource.id}
+                  resource={resource}
+                  onEdit={() => setEditingResourceId(resource.id)}
+                  onDelete={() => handleDeleteResource(resource.id)}
+                />
+              )
+            )}
+          </TableBody>
         </Table>
       ) : (
         <p className="paragraph">
