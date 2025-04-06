@@ -859,7 +859,7 @@ const NewResourceForm = ({
             <FormItem>
               <FormLabel>Title *</FormLabel>
               <FormControl>
-                <Input placeholder="Resource title or description" {...field} />
+                <Input autoFocus placeholder="Resource title or description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
