@@ -64,7 +64,11 @@ import {
   CollapsibleTrigger,
 } from "./components/ui/collapsible";
 import { getFaviconFromUrl } from "./lib/utils";
-import { Popover, PopoverTrigger, PopoverContent } from "./components/ui/popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "./components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
 
 // Extended types with relationships
@@ -861,13 +865,17 @@ const NewResourceForm = ({
             <FormItem>
               <FormLabel>Title *</FormLabel>
               <FormControl>
-                <Input autoFocus placeholder="Resource title or description" {...field} />
+                <Input
+                  autoFocus
+                  placeholder="Resource title or description"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="url"
@@ -881,11 +889,13 @@ const NewResourceForm = ({
             </FormItem>
           )}
         />
-        
+
         <div className="flex gap-2 mt-4">
-          <Button type="submit" variant="default">
-            Add Resource
-          </Button>
+          <PopoverClose asChild>
+            <Button type="submit" variant="default">
+              Add Resource
+            </Button>
+          </PopoverClose>
           <PopoverClose asChild>
             <Button type="button" onClick={onCancel} variant="outline">
               Cancel
@@ -983,7 +993,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   return (
     <div className="mt-4">
       <Popover>
-      <PopoverTrigger asChild>
+        <PopoverTrigger asChild>
           <Button onClick={() => setIsAddingResource(true)} variant="outline">
             <Plus className="w-4 h-4" />
             Add Resource
