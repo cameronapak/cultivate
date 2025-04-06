@@ -38,6 +38,7 @@ import { Checkbox } from "./components/ui/checkbox"
 import { Switch } from './components/ui/switch'
 import { Table, TableCaption, TableBody, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table'
 import { Trash } from 'lucide-react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './components/ui/collapsible'
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -156,30 +157,38 @@ const NewPitchForm = ({ projectId, onCancel }: { projectId: number, onCancel: ()
     <form ref={formRef} onSubmit={handleSubmit}>
       <h3 className="heading-3">Create New Pitch</h3>
       
-      <div>
-        <div>
-          <h4 className="heading-3">About Shape Up Pitches</h4>
-          <a 
-            href="https://basecamp.com/shapeup/1.5-chapter-06" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="link"
-          >
-            Learn more from Shape Up by 37signals →
-          </a>
-        </div>
-        <p className="paragraph">
-          A Shape Up pitch is a presentation of a problem and solution that helps teams make informed decisions about what to build.
-          Each pitch should include these five key elements:
-        </p>
-        <ol className="list">
-          <li><strong>Problem</strong> — The specific issue or use case that motivates the project</li>
-          <li><strong>Appetite</strong> — How much time you're willing to invest (2 weeks, 6 weeks, etc.)</li>
-          <li><strong>Solution</strong> — Core elements presented in an easily understandable form</li>
-          <li><strong>Rabbit Holes</strong> — Potential challenges or time-consuming details</li>
-          <li><strong>No-Gos</strong> — Features or use cases explicitly excluded to fit the appetite</li>
-        </ol>
-      </div>
+      <Collapsible className="mt-4 mb-4">
+        <CollapsibleTrigger className="underline">  
+          <Button size="sm" variant="secondary">Learn more about Pitches</Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-4 mb-4">
+          <Card>
+            <CardHeader>
+              <a 
+                href="https://basecamp.com/shapeup/1.5-chapter-06" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="link"
+              >
+                Learn more from Shape Up by 37signals →
+              </a>
+            </CardHeader>
+            <CardContent>
+            <p className="paragraph">
+              A Shape Up pitch is a presentation of a problem and solution that helps teams make informed decisions about what to build.
+              Each pitch should include these five key elements:
+            </p>
+            <ol className="list">
+              <li><strong>Problem</strong> — The specific issue or use case that motivates the project</li>
+              <li><strong>Appetite</strong> — How much time you're willing to invest (2 weeks, 6 weeks, etc.)</li>
+              <li><strong>Solution</strong> — Core elements presented in an easily understandable form</li>
+              <li><strong>Rabbit Holes</strong> — Potential challenges or time-consuming details</li>
+              <li><strong>No-Gos</strong> — Features or use cases explicitly excluded to fit the appetite</li>
+            </ol>
+            </CardContent>
+          </Card>
+        </CollapsibleContent>
+      </Collapsible>
       
       <div>
         <label>
