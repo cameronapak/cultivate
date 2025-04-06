@@ -781,7 +781,7 @@ const ResourceItem = ({
               <img src={faviconUrl} alt="Favicon" className="mt-0.5 w-4 h-4" />
             )}
             <div className="flex flex-col">
-              <p className="text-sm link">{resource.title}</p>
+              <p className="text-sm hover:underline">{resource.title}</p>
               <p className="text-sm text-gray-500">{url}</p>
             </div>
             <ExternalLink className="mt-0.5 w-4 h-4 text-gray-500" />
