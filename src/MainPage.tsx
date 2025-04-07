@@ -953,7 +953,9 @@ const ResourceItem = ({
             <div className="flex flex-col">
               <p className="text-sm hover:underline">{resource.title}</p>
               {resource.description && (
-                <p className="text-sm text-gray-500 line-clamp-2">{resource.description}</p>
+                <p className="text-sm text-gray-500 line-clamp-2">
+                  {resource.description}
+                </p>
               )}
             </div>
             <ExternalLink className="mt-0.5 w-4 h-4 text-gray-500" />
@@ -1050,9 +1052,9 @@ const NewResourceForm = ({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea 
+                <Textarea
                   placeholder="Brief description of this resource (optional)"
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -1154,9 +1156,9 @@ const EditResourceForm = ({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea 
+                <Textarea
                   placeholder="Brief description of this resource (optional)"
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -1314,123 +1316,129 @@ const ProjectView = ({ project }: { project: Project }) => {
   return (
     <main className="mt-6">
       <Card>
-        <CardHeader className="pb-4">
-          <CardTitle>
-            <h2 className="heading-3 mt-0">{project.title}</h2>
-          </CardTitle>
-          {project.description && (
-            <CardDescription>{project.description}</CardDescription>
-          )}
-        </CardHeader>
-        <CardContent>
-          <Tabs
-            defaultValue={currentTab}
-            className="w-[400px]"
-            onValueChange={(value) =>
-              handleTabChange(value as "pitches" | "tasks" | "resources")
-            }
-          >
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="pitches">Pitch</TabsTrigger>
-              <TabsTrigger value="tasks">Tasks</TabsTrigger>
-              <TabsTrigger value="resources">Resources</TabsTrigger>
-            </TabsList>
+        <Collapsible>
+          <CollapsibleTrigger>
+            <CardHeader className="pb-6">
+              <CardTitle>
+                <h2 className="heading-3 mt-0">{project.title}</h2>
+              </CardTitle>
+              {project.description && (
+                <CardDescription>{project.description}</CardDescription>
+              )}
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
+              <Tabs
+                defaultValue={currentTab}
+                className="w-[400px]"
+                onValueChange={(value) =>
+                  handleTabChange(value as "pitches" | "tasks" | "resources")
+                }
+              >
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="pitches">Pitch</TabsTrigger>
+                  <TabsTrigger value="tasks">Tasks</TabsTrigger>
+                  <TabsTrigger value="resources">Resources</TabsTrigger>
+                </TabsList>
 
-            <TabsContent value="pitches">
-              <div>
-                {!project.pitch && !showNewPitchForm ? (
-                  <Button
-                    onClick={() => setShowNewPitchForm(true)}
-                    variant="outline"
-                  >
-                    + Create Project Pitch
-                  </Button>
-                ) : showNewPitchForm ? (
-                  <NewPitchForm
-                    projectId={project.id}
-                    onCancel={() => setShowNewPitchForm(false)}
-                  />
-                ) : project.pitch ? (
+                <TabsContent value="pitches">
                   <div>
-                    <PitchItem
-                      pitch={project.pitch}
-                      onDelete={() => handleDeletePitch(project.pitch!.id)}
-                    />
+                    {!project.pitch && !showNewPitchForm ? (
+                      <Button
+                        onClick={() => setShowNewPitchForm(true)}
+                        variant="outline"
+                      >
+                        + Create Project Pitch
+                      </Button>
+                    ) : showNewPitchForm ? (
+                      <NewPitchForm
+                        projectId={project.id}
+                        onCancel={() => setShowNewPitchForm(false)}
+                      />
+                    ) : project.pitch ? (
+                      <div>
+                        <PitchItem
+                          pitch={project.pitch}
+                          onDelete={() => handleDeletePitch(project.pitch!.id)}
+                        />
+                      </div>
+                    ) : (
+                      <p className="paragraph">
+                        No pitch yet. Create one to get started!
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <p className="paragraph">
-                    No pitch yet. Create one to get started!
-                  </p>
-                )}
-              </div>
-            </TabsContent>
+                </TabsContent>
 
-            <TabsContent value="tasks">
-              <div className="mt-4">
-                <div className="flex justify-between gap-2">
-                  <Button disabled variant="outline">
-                    <Plus className="w-4 h-4" />
-                    Add Task
-                  </Button>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="hide-completed"
-                      checked={hideCompletedTasks}
-                      onCheckedChange={handleHideCompletedChange}
-                    />
-                    <label
-                      htmlFor="hide-completed"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Hide completed tasks
-                    </label>
-                  </div>
-                </div>
+                <TabsContent value="tasks">
+                  <div className="mt-4">
+                    <div className="flex justify-between gap-2">
+                      <Button disabled variant="outline">
+                        <Plus className="w-4 h-4" />
+                        Add Task
+                      </Button>
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="hide-completed"
+                          checked={hideCompletedTasks}
+                          onCheckedChange={handleHideCompletedChange}
+                        />
+                        <label
+                          htmlFor="hide-completed"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Hide completed tasks
+                        </label>
+                      </div>
+                    </div>
 
-                <Table className="mt-4">
-                  {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-                  {/* <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[100px]">Task</TableHead>
-                    </TableRow>
-                  </TableHeader> */}
-                  <TableBody>
-                    {filteredTasks && filteredTasks.length > 0 ? (
-                      <>
-                        {filteredTasks.map((task: Task) => (
-                          <TableRow key={task.id}>
-                            <TableCell className="bg-white">
-                              <TaskItem key={task.id} task={task} />
+                    <Table className="mt-4">
+                      {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+                      {/* <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">Task</TableHead>
+                      </TableRow>
+                    </TableHeader> */}
+                      <TableBody>
+                        {filteredTasks && filteredTasks.length > 0 ? (
+                          <>
+                            {filteredTasks.map((task: Task) => (
+                              <TableRow key={task.id}>
+                                <TableCell className="bg-white">
+                                  <TaskItem key={task.id} task={task} />
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </>
+                        ) : (
+                          <TableRow>
+                            <TableCell>
+                              <p className="text-sm text-gray-500">
+                                {project.tasks && project.tasks.length > 0
+                                  ? "All tasks are completed and/or hidden."
+                                  : "No tasks yet"}
+                              </p>
                             </TableCell>
                           </TableRow>
-                        ))}
-                      </>
-                    ) : (
-                      <TableRow>
-                        <TableCell>
-                          <p className="text-sm text-gray-500">
-                            {project.tasks && project.tasks.length > 0
-                              ? "All tasks are completed and/or hidden."
-                              : "No tasks yet"}
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    <TableRow>
-                      <TableCell className="bg-white pt-4">
-                        <NewTaskForm projectId={project.id} />
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            </TabsContent>
+                        )}
+                        <TableRow>
+                          <TableCell className="bg-white pt-4">
+                            <NewTaskForm projectId={project.id} />
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
+                </TabsContent>
 
-            <TabsContent value="resources">
-              <ResourcesSection project={project} />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
+                <TabsContent value="resources">
+                  <ResourcesSection project={project} />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </CollapsibleContent>
+        </Collapsible>
       </Card>
     </main>
   );
