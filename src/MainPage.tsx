@@ -953,7 +953,7 @@ const ResourceItem = ({
             <div className="flex flex-col">
               <p className="text-sm hover:underline">{resource.title}</p>
               {resource.description && (
-                <p className="text-sm text-gray-500">{resource.description}</p>
+                <p className="text-sm text-gray-500 line-clamp-2">{resource.description}</p>
               )}
             </div>
             <ExternalLink className="mt-0.5 w-4 h-4 text-gray-500" />
