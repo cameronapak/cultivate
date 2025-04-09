@@ -78,6 +78,14 @@ interface Project extends BaseProject {
   resources?: Resource[];
 }
 
+// New Project form schema
+const projectFormSchema = z.object({
+  title: z.string().min(2, { message: "Project title must be at least 2 characters." }),
+  description: z.string().optional(),
+});
+
+type ProjectFormValues = z.infer<typeof projectFormSchema>;
+
 export const MainPage = () => {
   const { data: projects, isLoading, error } = useQuery(getProjects);
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
@@ -157,67 +165,74 @@ export const MainPage = () => {
 };
 
 const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
-  const formRef = useRef<HTMLFormElement>(null);
+  const form = useForm<ProjectFormValues>({
+    resolver: zodResolver(projectFormSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
+  });
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  async function onSubmit(values: ProjectFormValues) {
     try {
-      const formData = new FormData(event.currentTarget);
-
       await createProject({
-        title: formData.get("title") as string,
-        description: formData.get("description") as string,
+        title: values.title,
+        description: values.description || "",
       });
-
-      formRef.current?.reset();
-      onCancel();
+      form.reset();
     } catch (err: any) {
       window.alert("Error: " + err.message);
     }
-  };
+  }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="heading-4">Create New Project</h2>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <h2 className="heading-4">Create New Project</h2>
+        
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Project Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Give your project a clear title" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Brief overview of the project" {...field} />
+              </FormControl>
+              <FormDescription>
+                Optional description for this project
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Project Title *
-            <Input
-              name="title"
-              required
-              placeholder="Give your project a clear title"
-              className="mt-1"
-            />
-          </label>
+        <div className="flex gap-2">
+          <PopoverClose asChild>
+            <Button type="submit">Create Project</Button>
+          </PopoverClose>
+          <PopoverClose asChild>
+            <Button type="button" onClick={() => form.reset()} variant="outline">
+              Cancel
+            </Button>
+          </PopoverClose>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Description
-            <Input
-              name="description"
-              placeholder="Brief overview of the project"
-              className="mt-1"
-            />
-          </label>
-        </div>
-      </div>
-
-      <div className="flex gap-2">
-        <PopoverClose asChild>
-          <Button type="submit" variant="default">
-            Create Project
-          </Button>
-        </PopoverClose>
-        <PopoverClose asChild>
-          <Button type="button" onClick={onCancel} variant="outline">
-            Cancel
-          </Button>
-        </PopoverClose>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 };
 
