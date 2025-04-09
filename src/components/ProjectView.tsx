@@ -12,7 +12,7 @@ import {
   deleteResource,
   deleteTask,
 } from "wasp/client/operations";
-import { Trash, Pencil, ExternalLink, Plus } from "lucide-react";
+import { Trash, Pencil, ExternalLink, Plus, Trash2, Settings2Icon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -41,7 +41,6 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
-import { Switch } from "../components/ui/switch";
 import { Table, TableBody, TableCell, TableRow } from "../components/ui/table";
 import { getFaviconFromUrl } from "../lib/utils";
 import {
@@ -61,8 +60,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../components/ui/dialog";
-import { Trash2 } from "lucide-react";
+import { CircleCheckIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Toggle } from "./ui/toggle";
+import { Switch } from "./ui/switch";
 
 const EditTaskForm = ({
   task,
@@ -869,21 +870,25 @@ export const ProjectView = ({ project }: { project: Project }) => {
           <div className="mt-4 space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex justify-between gap-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="hide-completed"
-                      checked={hideCompletedTasks}
-                      onCheckedChange={handleHideCompletedChange}
-                    />
-                    <label
-                      htmlFor="hide-completed"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Hide completed tasks
-                    </label>
-                  </div>
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <Settings2Icon className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="flex items-center justify-between space-x-2">
+                      <label htmlFor="hide-completed" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Hide Completed Tasks
+                      </label>
+                      <Switch
+                        id="hide-completed"
+                        checked={hideCompletedTasks}
+                        onCheckedChange={handleHideCompletedChange}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </CardHeader>
               <CardContent>
                 <Table>
