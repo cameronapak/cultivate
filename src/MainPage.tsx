@@ -102,14 +102,17 @@ export const MainPage = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="heading-1">Projects</h1>
 
-          {!showNewProjectForm ? (
-            <Button onClick={() => setShowNewProjectForm(true)} variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Create New Project
-            </Button>
-          ) : (
-            <NewProjectForm onCancel={() => setShowNewProjectForm(false)} />
-          )}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <Plus className="w-4 h-4 mr-2" />
+                Create New Project
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <NewProjectForm onCancel={() => {}} />
+            </PopoverContent>
+          </Popover>
         </div>
 
         {isLoading && <p>Loading projects...</p>}
@@ -174,8 +177,8 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
   };
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 max-w-md">
-      <h2 className="heading-2">Create New Project</h2>
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+      <h2 className="heading-4">Create New Project</h2>
 
       <div className="space-y-4">
         <div>
@@ -203,12 +206,16 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
       </div>
 
       <div className="flex gap-2">
-        <Button type="submit" variant="default">
-          Create Project
-        </Button>
-        <Button type="button" onClick={onCancel} variant="outline">
-          Cancel
-        </Button>
+        <PopoverClose asChild>
+          <Button type="submit" variant="default">
+            Create Project
+          </Button>
+        </PopoverClose>
+        <PopoverClose asChild>
+          <Button type="button" onClick={onCancel} variant="outline">
+            Cancel
+          </Button>
+        </PopoverClose>
       </div>
     </form>
   );
