@@ -58,7 +58,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items?.map((subItem: any) => (
+                      {item.items?.sort((a: any, b: any) => a.title.localeCompare(b.title))?.map((subItem: any) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton isActive={subItem.isActive} asChild>
                             <a href={subItem.url}>
