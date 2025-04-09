@@ -46,7 +46,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
                     <SidebarMenuSub>
                       {item.items?.map((subItem: any) => (
                         <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
+                          <SidebarMenuSubButton isActive={subItem.isActive} asChild>
                             <a href={subItem.url}>
                               <span>{subItem.title}</span>
                             </a>
