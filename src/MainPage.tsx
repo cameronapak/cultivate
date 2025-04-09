@@ -98,7 +98,7 @@ export const MainPage = () => {
           },
         ]}
       />
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto p-6">
         <div className="flex justify-between items-center mb-8">
           <h1 className="heading-1">Projects</h1>
 
