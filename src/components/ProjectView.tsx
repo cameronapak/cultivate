@@ -12,7 +12,7 @@ import {
   deleteResource,
   deleteTask,
 } from "wasp/client/operations";
-import { Trash, Pencil, ExternalLink, Plus, Trash2, Settings2Icon } from "lucide-react";
+import { Trash, Pencil, ExternalLink, Plus, Trash2, Settings2Icon, CheckIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -873,7 +873,8 @@ export const ProjectView = ({ project }: { project: Project }) => {
                 <div className="grid grid-cols-[1fr_auto] gap-2">
                   <div className="flex flex-col gap-1">
                     <CardTitle>Tasks</CardTitle>
-                    <CardDescription>
+                    <CardDescription className="flex items-center gap-1">
+                      <CircleCheckIcon className="w-4 h-4" />
                       {project.tasks?.filter((task) => !task.complete).length} of{" "}
                       {project.tasks?.length} tasks
                     </CardDescription>
