@@ -851,99 +851,93 @@ const ProjectView = ({ project }: { project: Project }) => {
   return (
     <main className="mt-6">
       <Card>
-        <Collapsible>
-          <CollapsibleTrigger>
-            <CardHeader className="pb-6">
-              <CardTitle>
-                {project.title}
-              </CardTitle>
-              {project.description && (
-                <CardDescription className="text-start">{project.description}</CardDescription>
-              )}
-            </CardHeader>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <CardContent>
-              <Tabs
-                defaultValue={currentTab}
-                className="w-[400px]"
-                onValueChange={(value) =>
-                  handleTabChange(value as "tasks" | "resources")
-                }
-              >
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="tasks">Tasks</TabsTrigger>
-                  <TabsTrigger value="resources">Resources</TabsTrigger>
-                </TabsList>
+        <CardHeader className="pb-6">
+          <CardTitle>
+            {project.title}
+          </CardTitle>
+          {project.description && (
+            <CardDescription className="text-start">{project.description}</CardDescription>
+          )}
+        </CardHeader>
+        <CardContent>
+          <Tabs
+            defaultValue={currentTab}
+            className="w-[400px]"
+            onValueChange={(value) =>
+              handleTabChange(value as "tasks" | "resources")
+            }
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="resources">Resources</TabsTrigger>
+            </TabsList>
 
-                <TabsContent value="tasks">
-                  <div className="mt-4">
-                    <div className="flex justify-between gap-2">
-                      <Button disabled variant="outline">
-                        <Plus className="w-4 h-4" />
-                        Add Task
-                      </Button>
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          id="hide-completed"
-                          checked={hideCompletedTasks}
-                          onCheckedChange={handleHideCompletedChange}
-                        />
-                        <label
-                          htmlFor="hide-completed"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Hide completed tasks
-                        </label>
-                      </div>
-                    </div>
+            <TabsContent value="tasks">
+              <div className="mt-4">
+                <div className="flex justify-between gap-2">
+                  <Button disabled variant="outline">
+                    <Plus className="w-4 h-4" />
+                    Add Task
+                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hide-completed"
+                      checked={hideCompletedTasks}
+                      onCheckedChange={handleHideCompletedChange}
+                    />
+                    <label
+                      htmlFor="hide-completed"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Hide completed tasks
+                    </label>
+                  </div>
+                </div>
 
-                    <Table className="mt-4">
-                      {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-                      {/* <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[100px]">Task</TableHead>
-                      </TableRow>
-                    </TableHeader> */}
-                      <TableBody>
-                        {filteredTasks && filteredTasks.length > 0 ? (
-                          <>
-                            {filteredTasks.map((task: Task) => (
-                              <TableRow key={task.id}>
-                                <TableCell className="bg-white">
-                                  <TaskItem key={task.id} task={task} />
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </>
-                        ) : (
-                          <TableRow>
-                            <TableCell>
-                              <p className="text-sm text-gray-500">
-                                {project.tasks && project.tasks.length > 0
-                                  ? "All tasks are completed and/or hidden."
-                                  : "No tasks yet"}
-                              </p>
+                <Table className="mt-4">
+                  {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+                  {/* <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">Task</TableHead>
+                  </TableRow>
+                </TableHeader> */}
+                  <TableBody>
+                    {filteredTasks && filteredTasks.length > 0 ? (
+                      <>
+                        {filteredTasks.map((task: Task) => (
+                          <TableRow key={task.id}>
+                            <TableCell className="bg-white">
+                              <TaskItem key={task.id} task={task} />
                             </TableCell>
                           </TableRow>
-                        )}
-                        <TableRow>
-                          <TableCell className="bg-white pt-4">
-                            <NewTaskForm projectId={project.id} />
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </div>
-                </TabsContent>
+                        ))}
+                      </>
+                    ) : (
+                      <TableRow>
+                        <TableCell>
+                          <p className="text-sm text-gray-500">
+                            {project.tasks && project.tasks.length > 0
+                              ? "All tasks are completed and/or hidden."
+                              : "No tasks yet"}
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    <TableRow>
+                      <TableCell className="bg-white pt-4">
+                        <NewTaskForm projectId={project.id} />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+            </TabsContent>
 
-                <TabsContent value="resources">
-                  <ResourcesSection project={project} />
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </CollapsibleContent>
-        </Collapsible>
+            <TabsContent value="resources">
+              <ResourcesSection project={project} />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
       </Card>
     </main>
   );
@@ -954,10 +948,8 @@ const ProjectsList = ({ projects }: { projects: Project[] }) => {
     return <div className="paragraph">No projects yet. Create one above!</div>;
 
   return (
-    <div>
-      {projects.map((project) => (
-        <ProjectView project={project} key={project.id} />
-      ))}
+    <div className="relative gap-4 mt-6">
+      <ProjectView project={projects[0]} />
     </div>
   );
 };
