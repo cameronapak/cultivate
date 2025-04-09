@@ -25,6 +25,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormLabel,
 } from "../components/ui/form";
 import {
   Card,
@@ -705,6 +706,75 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   );
 };
 
+const AboutForm = ({ project, onSave }: { project: Project; onSave: () => void }) => {
+  const formSchema = z.object({
+    title: z.string().min(1, { message: 'Project title is required' }),
+    description: z.string().optional(),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: project.title,
+      description: project.description || '',
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await updateProject({
+        id: project.id,
+        title: values.title,
+        description: values.description,
+      });
+      toast.success('Project updated successfully');
+      onSave();
+    } catch (err: any) {
+      toast.error('Error updating project: ' + err.message);
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Project Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter project title" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Enter project description" 
+                  className="min-h-[100px]"
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit">Save Changes</Button>
+      </form>
+    </Form>
+  );
+};
+
 export const ProjectView = ({ project }: { project: Project }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
@@ -768,7 +838,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
         defaultValue={currentTab}
         className="w-[400px]"
         onValueChange={(value) =>
-          handleTabChange(value as "tasks" | "resources")
+          handleTabChange(value as "tasks" | "resources" | "about")
         }
       >
         <TabsList className="grid w-full grid-cols-3">
@@ -833,40 +903,50 @@ export const ProjectView = ({ project }: { project: Project }) => {
         </TabsContent>
 
         <TabsContent value="about">
-          <div className="mt-4">
-            <p className="text-sm text-gray-500">
-              {project.description}
-            </p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="mt-4" variant="outline" size="sm">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Project
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Are you absolutely sure?</DialogTitle>
-                  <DialogDescription>
-                    This action cannot be undone. This will permanently delete the project
-                    "{project.title}" and all of its tasks and resources.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">
-                      Cancel
+          <div className="mt-4 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Project Details</CardTitle>
+                <CardDescription>Update your project information</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AboutForm project={project} onSave={() => {}} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Danger Zone</CardTitle>
+                <CardDescription>Irreversible destructive actions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Project
                     </Button>
-                  </DialogClose>
-                  <Button 
-                    variant="destructive" 
-                    onClick={handleDelete}
-                  >
-                    Delete
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Are you absolutely sure?</DialogTitle>
+                      <DialogDescription>
+                        This action cannot be undone. This will permanently delete the project
+                        "{project.title}" and all of its tasks and resources.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </DialogClose>
+                      <Button variant="destructive" onClick={handleDelete}>
+                        Delete
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>
