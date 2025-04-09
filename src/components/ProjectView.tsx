@@ -936,7 +936,24 @@ export const ProjectView = ({ project }: { project: Project }) => {
         </TabsContent>
 
         <TabsContent value="resources">
-          <ResourcesSection project={project} />
+          <div className="mt-4 space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <div className="flex flex-col gap-1">
+                    <CardTitle>Resources</CardTitle>
+                    <CardDescription className="flex items-center gap-1">
+                      <ExternalLink className="w-4 h-4" />
+                      {project.resources?.length || 0} resource(s)
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ResourcesSection project={project} />
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="about">
