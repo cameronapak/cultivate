@@ -756,119 +756,113 @@ export const ProjectView = ({ project }: { project: Project }) => {
 
   return (
     <main>
-      <Card>
-        <CardHeader className="pb-6">
-          <CardTitle>{project.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs
-            defaultValue={currentTab}
-            className="w-[400px]"
-            onValueChange={(value) =>
-              handleTabChange(value as "tasks" | "resources")
-            }
-          >
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="tasks">Tasks</TabsTrigger>
-              <TabsTrigger value="resources">Resources</TabsTrigger>
-              <TabsTrigger value="about">About</TabsTrigger>
-            </TabsList>
+      <h1 className="text-2xl font-bold pb-6">{project.title}</h1>
+      <Tabs
+        defaultValue={currentTab}
+        className="w-[400px]"
+        onValueChange={(value) =>
+          handleTabChange(value as "tasks" | "resources")
+        }
+      >
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
+          <TabsTrigger value="about">About</TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="tasks">
-              <div className="mt-4">
-                <div className="flex justify-between gap-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="hide-completed"
-                      checked={hideCompletedTasks}
-                      onCheckedChange={handleHideCompletedChange}
-                    />
-                    <label
-                      htmlFor="hide-completed"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Hide completed tasks
-                    </label>
-                  </div>
-                </div>
+        <TabsContent value="tasks">
+          <div className="mt-4">
+            <div className="flex justify-between gap-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="hide-completed"
+                  checked={hideCompletedTasks}
+                  onCheckedChange={handleHideCompletedChange}
+                />
+                <label
+                  htmlFor="hide-completed"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Hide completed tasks
+                </label>
+              </div>
+            </div>
 
-                <Table className="mt-4">
-                  <TableBody>
-                    {filteredTasks && filteredTasks.length > 0 ? (
-                      <>
-                        {filteredTasks.map((task: Task) => (
-                          <TableRow key={task.id}>
-                            <TableCell className="bg-white">
-                              <TaskItem key={task.id} task={task} />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </>
-                    ) : (
-                      <TableRow>
-                        <TableCell>
-                          <p className="text-sm text-gray-500">
-                            {project.tasks && project.tasks.length > 0
-                              ? "All tasks are completed and/or hidden."
-                              : "No tasks yet"}
-                          </p>
+            <Table className="mt-4">
+              <TableBody>
+                {filteredTasks && filteredTasks.length > 0 ? (
+                  <>
+                    {filteredTasks.map((task: Task) => (
+                      <TableRow key={task.id}>
+                        <TableCell className="bg-white">
+                          <TaskItem key={task.id} task={task} />
                         </TableCell>
                       </TableRow>
-                    )}
-                    <TableRow>
-                      <TableCell className="bg-white pt-4">
-                        <NewTaskForm projectId={project.id} />
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            </TabsContent>
+                    ))}
+                  </>
+                ) : (
+                  <TableRow>
+                    <TableCell>
+                      <p className="text-sm text-gray-500">
+                        {project.tasks && project.tasks.length > 0
+                          ? "All tasks are completed and/or hidden."
+                          : "No tasks yet"}
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                )}
+                <TableRow>
+                  <TableCell className="bg-white pt-4">
+                    <NewTaskForm projectId={project.id} />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
 
-            <TabsContent value="resources">
-              <ResourcesSection project={project} />
-            </TabsContent>
+        <TabsContent value="resources">
+          <ResourcesSection project={project} />
+        </TabsContent>
 
-            <TabsContent value="about">
-              <div className="mt-4">
-                <p className="text-sm text-gray-500">
-                  {project.description}
-                </p>
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="mt-4" variant="outline" size="sm">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Project
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Are you absolutely sure?</DialogTitle>
-                    <DialogDescription>
-                      This action cannot be undone. This will permanently delete the project
-                      "{project.title}" and all of its tasks and resources.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="outline">
-                        Cancel
-                      </Button>
-                    </DialogClose>
-                    <Button 
-                      variant="destructive" 
-                      onClick={handleDelete}
-                    >
-                      Delete
+        <TabsContent value="about">
+          <div className="mt-4">
+            <p className="text-sm text-gray-500">
+              {project.description}
+            </p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="mt-4" variant="outline" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you absolutely sure?</DialogTitle>
+                  <DialogDescription>
+                    This action cannot be undone. This will permanently delete the project
+                    "{project.title}" and all of its tasks and resources.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">
+                      Cancel
                     </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+                  </DialogClose>
+                  <Button 
+                    variant="destructive" 
+                    onClick={handleDelete}
+                  >
+                    Delete
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </TabsContent>
+      </Tabs>
     </main>
   );
 }; 
