@@ -907,7 +907,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                       <>
                         {filteredTasks.map((task: Task) => (
                           <TableRow key={task.id}>
-                            <TableCell className="bg-white">
+                            <TableCell>
                               <TaskItem key={task.id} task={task} />
                             </TableCell>
                           </TableRow>
