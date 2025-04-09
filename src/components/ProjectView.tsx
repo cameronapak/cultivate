@@ -34,15 +34,15 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
 import { Switch } from "../components/ui/switch";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "../components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "../components/ui/table";
 import { getFaviconFromUrl } from "../lib/utils";
 import {
   Popover,
@@ -126,7 +126,11 @@ const EditTaskForm = ({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea className="text-gray-500" placeholder="Task description" {...field} />
+                <Textarea
+                  className="text-gray-500"
+                  placeholder="Task description"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -152,7 +156,9 @@ const TaskItem = ({ task }: { task: Task }) => {
   const handleStatusChange = async (complete: boolean) => {
     try {
       await updateTaskStatus({ id: task.id, complete });
-      toast.success(`"${task.title}" ${complete ? 'completed' : 'marked as todo'}`);
+      toast.success(
+        `"${task.title}" ${complete ? "completed" : "marked as todo"}`
+      );
     } catch (err: any) {
       toast.error("Error updating task: " + err.message);
     }
@@ -283,7 +289,11 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea className="text-gray-500" placeholder="Task description (optional)" {...field} />
+                <Textarea
+                  className="text-gray-500"
+                  placeholder="Task description (optional)"
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -706,9 +716,15 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   );
 };
 
-const AboutForm = ({ project, onSave }: { project: Project; onSave: () => void }) => {
+const AboutForm = ({
+  project,
+  onSave,
+}: {
+  project: Project;
+  onSave: () => void;
+}) => {
   const formSchema = z.object({
-    title: z.string().min(1, { message: 'Project title is required' }),
+    title: z.string().min(1, { message: "Project title is required" }),
     description: z.string().optional(),
   });
 
@@ -716,7 +732,7 @@ const AboutForm = ({ project, onSave }: { project: Project; onSave: () => void }
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: project.title,
-      description: project.description || '',
+      description: project.description || "",
     },
   });
 
@@ -727,10 +743,10 @@ const AboutForm = ({ project, onSave }: { project: Project; onSave: () => void }
         title: values.title,
         description: values.description,
       });
-      toast.success('Project updated successfully');
+      toast.success("Project updated successfully");
       onSave();
     } catch (err: any) {
-      toast.error('Error updating project: ' + err.message);
+      toast.error("Error updating project: " + err.message);
     }
   }
 
@@ -758,10 +774,10 @@ const AboutForm = ({ project, onSave }: { project: Project; onSave: () => void }
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Enter project description" 
+                <Textarea
+                  placeholder="Enter project description"
                   className="min-h-[100px]"
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -784,7 +800,9 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const hideCompletedTasks = searchParams.get("hideCompleted") === "true";
   const activeTab = searchParams.get("tab");
   const currentTab =
-    activeTab === "tasks" || activeTab === "resources" || activeTab === "about" ? activeTab : "tasks";
+    activeTab === "tasks" || activeTab === "resources" || activeTab === "about"
+      ? activeTab
+      : "tasks";
 
   const handleHideCompletedChange = (hide: boolean) => {
     const newParams = new URLSearchParams(searchParams);
@@ -848,53 +866,58 @@ export const ProjectView = ({ project }: { project: Project }) => {
         </TabsList>
 
         <TabsContent value="tasks">
-          <div className="mt-4">
-            <div className="flex justify-between gap-2">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="hide-completed"
-                  checked={hideCompletedTasks}
-                  onCheckedChange={handleHideCompletedChange}
-                />
-                <label
-                  htmlFor="hide-completed"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Hide completed tasks
-                </label>
-              </div>
-            </div>
-
-            <Table className="mt-4">
-              <TableBody>
-                {filteredTasks && filteredTasks.length > 0 ? (
-                  <>
-                    {filteredTasks.map((task: Task) => (
-                      <TableRow key={task.id}>
-                        <TableCell className="bg-white">
-                          <TaskItem key={task.id} task={task} />
+          <div className="mt-4 space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between gap-2">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hide-completed"
+                      checked={hideCompletedTasks}
+                      onCheckedChange={handleHideCompletedChange}
+                    />
+                    <label
+                      htmlFor="hide-completed"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Hide completed tasks
+                    </label>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableBody>
+                    {filteredTasks && filteredTasks.length > 0 ? (
+                      <>
+                        {filteredTasks.map((task: Task) => (
+                          <TableRow key={task.id}>
+                            <TableCell className="bg-white">
+                              <TaskItem key={task.id} task={task} />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </>
+                    ) : (
+                      <TableRow>
+                        <TableCell>
+                          <p className="text-sm text-gray-500">
+                            {project.tasks && project.tasks.length > 0
+                              ? "All tasks are completed and/or hidden."
+                              : "No tasks yet"}
+                          </p>
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </>
-                ) : (
-                  <TableRow>
-                    <TableCell>
-                      <p className="text-sm text-gray-500">
-                        {project.tasks && project.tasks.length > 0
-                          ? "All tasks are completed and/or hidden."
-                          : "No tasks yet"}
-                      </p>
-                    </TableCell>
-                  </TableRow>
-                )}
-                <TableRow>
-                  <TableCell className="bg-white pt-4">
-                    <NewTaskForm projectId={project.id} />
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                    )}
+                    <TableRow>
+                      <TableCell className="bg-white p-0 pt-4">
+                        <NewTaskForm projectId={project.id} />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
 
@@ -907,7 +930,9 @@ export const ProjectView = ({ project }: { project: Project }) => {
             <Card>
               <CardHeader>
                 <CardTitle>Project Details</CardTitle>
-                <CardDescription>Update your project information</CardDescription>
+                <CardDescription>
+                  Update your project information
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <AboutForm project={project} onSave={() => {}} />
@@ -917,7 +942,9 @@ export const ProjectView = ({ project }: { project: Project }) => {
             <Card>
               <CardHeader>
                 <CardTitle>Danger Zone</CardTitle>
-                <CardDescription>Irreversible destructive actions</CardDescription>
+                <CardDescription>
+                  Irreversible destructive actions
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Dialog>
@@ -931,8 +958,9 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <DialogHeader>
                       <DialogTitle>Are you absolutely sure?</DialogTitle>
                       <DialogDescription>
-                        This action cannot be undone. This will permanently delete the project
-                        "{project.title}" and all of its tasks and resources.
+                        This action cannot be undone. This will permanently
+                        delete the project "{project.title}" and all of its
+                        tasks and resources.
                       </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -952,4 +980,4 @@ export const ProjectView = ({ project }: { project: Project }) => {
       </Tabs>
     </main>
   );
-}; 
+};
