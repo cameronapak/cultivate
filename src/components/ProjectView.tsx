@@ -875,8 +875,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <CardTitle>Tasks</CardTitle>
                     <CardDescription className="flex items-center gap-1">
                       <CircleCheckIcon className="w-4 h-4" />
-                      {project.tasks?.filter((task) => !task.complete).length} of{" "}
-                      {project.tasks?.length} tasks
+                      {project.tasks?.filter((task) => !task.complete).length} tasks remaining
                     </CardDescription>
                   </div>
                   <Popover>
