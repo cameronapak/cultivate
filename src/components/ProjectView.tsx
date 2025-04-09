@@ -193,7 +193,7 @@ const TaskItem = ({ task }: { task: Task }) => {
   return (
     <div className={`group task-item ${task.complete ? "completed" : ""}`}>
       <div className="flex items-center space-x-2 justify-between">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-start space-x-2">
           <Checkbox
             id={task.id.toString()}
             checked={task.complete}
@@ -202,7 +202,7 @@ const TaskItem = ({ task }: { task: Task }) => {
           <div className="flex flex-col">
             <label
               htmlFor={task.id.toString()}
-              className="pointer-events-none text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               {task.title}
             </label>
