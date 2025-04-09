@@ -933,7 +933,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button onClick={() => setIsAddingResource(true)} variant="outline">
+                      <Button size="sm" onClick={() => setIsAddingResource(true)} variant="outline">
                         <Plus className="w-4 h-4" />
                         Add Resource
                       </Button>
