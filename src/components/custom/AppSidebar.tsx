@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ArrowUpCircleIcon, ChevronRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +22,21 @@ import {
 export function AppSidebar({ items }: { items: { isActive: boolean, title: string, icon: any, items: { title: string, url: string }[] }[] }) {
   return (
     <Sidebar>
-      <SidebarHeader />
+       <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <a href="/">
+                <ArrowUpCircleIcon className="h-5 w-5" />
+                <span className="text-base font-semibold">Acme Inc.</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           {/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
