@@ -741,7 +741,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
   }
 
   return (
-    <main className="mt-6">
+    <main>
       <Card>
         <CardHeader className="pb-6">
           <CardTitle>
