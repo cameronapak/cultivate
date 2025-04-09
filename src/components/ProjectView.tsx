@@ -123,7 +123,7 @@ const EditTaskForm = ({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea placeholder="Task description" {...field} />
+                <Textarea className="text-gray-500" placeholder="Task description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -238,7 +238,6 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
         projectId,
       });
       form.reset();
-      setIsAdding(false);
     } catch (err: any) {
       window.alert("Error creating task: " + err.message);
     }
@@ -278,7 +277,7 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Task description (optional)" {...field} />
+                <Textarea className="text-gray-500" placeholder="Task description (optional)" {...field} />
               </FormControl>
             </FormItem>
           )}
