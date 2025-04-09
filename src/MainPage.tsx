@@ -858,7 +858,7 @@ const ProjectView = ({ project }: { project: Project }) => {
                 <h2 className="heading-3 mt-0">{project.title}</h2>
               </CardTitle>
               {project.description && (
-                <CardDescription>{project.description}</CardDescription>
+                <CardDescription className="text-start">{project.description}</CardDescription>
               )}
             </CardHeader>
           </CollapsibleTrigger>
