@@ -1,4 +1,4 @@
-import { ArrowUpCircleIcon, ChevronRight } from "lucide-react";
+import { RouteIcon, ChevronRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -30,7 +30,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="/">
-                <ArrowUpCircleIcon className="h-5 w-5" />
+                <RouteIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Pitchboard</span>
               </a>
             </SidebarMenuButton>
