@@ -31,9 +31,7 @@ export const ProjectPage = () => {
   } = useQuery(getProject, { projectId: parsedProjectId });
   const { data: projects } = useQuery(getProjects);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-  if (!project) return <div>Project not found</div>;
+  if (isLoading || error || !project) return null;
 
   return (
     <SidebarProvider>

@@ -707,7 +707,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const hideCompletedTasks = searchParams.get("hideCompleted") === "true";
   const activeTab = searchParams.get("tab");
   const currentTab =
-    activeTab === "tasks" || activeTab === "resources" ? activeTab : "tasks";
+    activeTab === "tasks" || activeTab === "resources" || activeTab === "about" ? activeTab : "tasks";
 
   const handleHideCompletedChange = (hide: boolean) => {
     const newParams = new URLSearchParams(searchParams);
@@ -719,7 +719,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
     setSearchParams(newParams);
   };
 
-  const handleTabChange = (tab: "tasks" | "resources") => {
+  const handleTabChange = (tab: "tasks" | "resources" | "about") => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set("tab", tab);
     setSearchParams(newParams);
@@ -759,9 +759,6 @@ export const ProjectView = ({ project }: { project: Project }) => {
       <Card>
         <CardHeader className="pb-6">
           <CardTitle>{project.title}</CardTitle>
-          {project.description && (
-            <CardDescription className="text-start">{project.description}</CardDescription>
-          )}
         </CardHeader>
         <CardContent>
           <Tabs
@@ -771,9 +768,10 @@ export const ProjectView = ({ project }: { project: Project }) => {
               handleTabChange(value as "tasks" | "resources")
             }
           >
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="tasks">Tasks</TabsTrigger>
               <TabsTrigger value="resources">Resources</TabsTrigger>
+              <TabsTrigger value="about">About</TabsTrigger>
             </TabsList>
 
             <TabsContent value="tasks">
@@ -829,6 +827,14 @@ export const ProjectView = ({ project }: { project: Project }) => {
 
             <TabsContent value="resources">
               <ResourcesSection project={project} />
+            </TabsContent>
+
+            <TabsContent value="about">
+              <div className="mt-4">
+                <p className="text-sm text-gray-500">
+                  {project.description}
+                </p>
+              </div>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="mt-4" variant="outline" size="sm">
