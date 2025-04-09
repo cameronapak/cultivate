@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Project, Task, Resource } from "../types";
 import {
   deleteProject,
@@ -50,6 +50,17 @@ import {
 } from "../components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { FormEvent, useRef } from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
+import { Trash2 } from "lucide-react";
 
 const EditTaskForm = ({
   task,
@@ -690,6 +701,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
 export const ProjectView = ({ project }: { project: Project }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
+  const navigate = useNavigate();
 
   // Initialize from URL query parameters
   const hideCompletedTasks = searchParams.get("hideCompleted") === "true";
@@ -717,8 +729,10 @@ export const ProjectView = ({ project }: { project: Project }) => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
       try {
         await deleteProject({ id: project.id });
+        navigate("/");
       } catch (err: any) {
-        window.alert("Error deleting project: " + err.message);
+        console.error("Error deleting project:", err);
+        alert(`Failed to delete project: ${err.message}`);
       }
     }
   };
@@ -815,6 +829,36 @@ export const ProjectView = ({ project }: { project: Project }) => {
 
             <TabsContent value="resources">
               <ResourcesSection project={project} />
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="mt-4" variant="outline" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Project
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Are you absolutely sure?</DialogTitle>
+                    <DialogDescription>
+                      This action cannot be undone. This will permanently delete the project
+                      "{project.title}" and all of its tasks and resources.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button 
+                      variant="destructive" 
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
           </Tabs>
         </CardContent>
