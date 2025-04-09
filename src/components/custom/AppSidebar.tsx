@@ -25,7 +25,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
       <SidebarHeader />
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
+          {/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
           <SidebarMenu>
             {items.map((item: any) => (
               <Collapsible
