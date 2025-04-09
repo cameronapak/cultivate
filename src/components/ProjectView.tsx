@@ -61,6 +61,7 @@ import {
   DialogTrigger,
 } from "../components/ui/dialog";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const EditTaskForm = ({
   task,
@@ -91,9 +92,10 @@ const EditTaskForm = ({
         title: form.getValues("title"),
         description: form.getValues("description"),
       });
+      toast.success("Task updated successfully");
       onSave();
     } catch (err: any) {
-      window.alert("Error updating task: " + err.message);
+      toast.error("Error updating task: " + err.message);
     }
   };
 
@@ -149,8 +151,9 @@ const TaskItem = ({ task }: { task: Task }) => {
   const handleStatusChange = async (complete: boolean) => {
     try {
       await updateTaskStatus({ id: task.id, complete });
+      toast.success(`"${task.title}" ${complete ? 'completed' : 'marked as todo'}`);
     } catch (err: any) {
-      window.alert("Error updating task: " + err.message);
+      toast.error("Error updating task: " + err.message);
     }
   };
 
@@ -158,9 +161,10 @@ const TaskItem = ({ task }: { task: Task }) => {
     try {
       if (confirm("Are you sure you want to delete this task?")) {
         await deleteTask({ id: task.id });
+        toast.success("Task deleted successfully");
       }
     } catch (err: any) {
-      window.alert("Error deleting task: " + err.message);
+      toast.error("Error deleting task: " + err.message);
     }
   };
 
@@ -237,9 +241,10 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
         description: values.description,
         projectId,
       });
+      toast.success("Task created successfully");
       form.reset();
     } catch (err: any) {
-      window.alert("Error creating task: " + err.message);
+      toast.error("Error creating task: " + err.message);
     }
   }
 
@@ -322,10 +327,10 @@ const EditProjectForm = ({
         title: formData.get("title") as string,
         description: formData.get("description") as string,
       });
-
+      toast.success("Project updated successfully");
       onSave();
     } catch (err: any) {
-      window.alert("Error: " + err.message);
+      toast.error("Error updating project: " + err.message);
     }
   };
 
@@ -454,10 +459,11 @@ const NewResourceForm = ({
         description: values.description,
         projectId,
       });
+      toast.success("Resource added successfully");
       form.reset();
       onSave();
     } catch (err: any) {
-      window.alert("Error creating resource: " + err.message);
+      toast.error("Error creating resource: " + err.message);
     }
   }
 
@@ -559,9 +565,10 @@ const EditResourceForm = ({
         url: values.url,
         description: values.description,
       });
+      toast.success("Resource updated successfully");
       onSave();
     } catch (err: any) {
-      window.alert("Error updating resource: " + err.message);
+      toast.error("Error updating resource: " + err.message);
     }
   }
 
@@ -637,8 +644,9 @@ const ResourcesSection = ({ project }: { project: Project }) => {
     if (confirm("Are you sure you want to delete this resource?")) {
       try {
         await deleteResource({ id: resourceId });
+        toast.success("Resource deleted successfully");
       } catch (err: any) {
-        window.alert("Error deleting resource: " + err.message);
+        toast.error("Error deleting resource: " + err.message);
       }
     }
   };
@@ -728,10 +736,10 @@ export const ProjectView = ({ project }: { project: Project }) => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
       try {
         await deleteProject({ id: project.id });
+        toast.success("Project deleted successfully");
         navigate("/");
       } catch (err: any) {
-        console.error("Error deleting project:", err);
-        alert(`Failed to delete project: ${err.message}`);
+        toast.error("Error deleting project: " + err.message);
       }
     }
   };

@@ -11,6 +11,7 @@ import { Folder } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Project } from "./types";
 import { Separator } from "./components/ui/separator";
+import { Toaster } from "./components/ui/sonner";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -36,6 +37,7 @@ export const ProjectPage = () => {
 
   return (
     <SidebarProvider>
+      <Toaster />
       <AppSidebar
         items={[
           {
