@@ -870,25 +870,34 @@ export const ProjectView = ({ project }: { project: Project }) => {
           <div className="mt-4 space-y-6">
             <Card>
               <CardHeader>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <Settings2Icon className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80">
-                    <div className="flex items-center justify-between space-x-2">
-                      <label htmlFor="hide-completed" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        Hide Completed Tasks
-                      </label>
-                      <Switch
-                        id="hide-completed"
-                        checked={hideCompletedTasks}
-                        onCheckedChange={handleHideCompletedChange}
-                      />
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <div className="flex flex-col gap-1">
+                    <CardTitle>Tasks</CardTitle>
+                    <CardDescription>
+                      {project.tasks?.filter((task) => !task.complete).length} of{" "}
+                      {project.tasks?.length} tasks
+                    </CardDescription>
+                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="icon">
+                        <Settings2Icon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="flex items-center justify-between space-x-2">
+                        <label htmlFor="hide-completed" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          Hide Completed Tasks
+                        </label>
+                        <Switch
+                          id="hide-completed"
+                          checked={hideCompletedTasks}
+                          onCheckedChange={handleHideCompletedChange}
+                        />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
