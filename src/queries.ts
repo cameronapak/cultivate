@@ -19,9 +19,27 @@ import {
   type UpdateTask
 } from 'wasp/server/operations'
 
+// Define our own GetProject type since we need to include related entities
+type GetProject<Input, Output> = (args: Input, context: any) => Output | Promise<Output>
+
 export const getProjects: GetProjects<void, Project[]> = async (args, context) => {
   return context.entities.Project.findMany({
     orderBy: { id: 'asc' },
+    include: { 
+      tasks: true,
+      pitch: true,
+      resources: true
+    }
+  })
+}
+
+type GetProjectInput = {
+  projectId: number
+}
+
+export const getProject: GetProject<GetProjectInput, Project> = async (args, context) => {
+  return context.entities.Project.findUnique({
+    where: { id: args.projectId },
     include: { 
       tasks: true,
       pitch: true,

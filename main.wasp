@@ -10,6 +10,11 @@ page MainPage {
   component: import { MainPage } from "@src/MainPage"
 }
 
+route ProjectRoute { path: "/projects/:projectId", to: ProjectPage }
+page ProjectPage {
+  component: import { ProjectPage } from "@src/ProjectPage"
+}
+
 query getProjects {
   // Specifies where the implementation for the query function is.
   // The path `@src/queries` resolves to `src/queries.ts`.
@@ -17,6 +22,11 @@ query getProjects {
   fn: import { getProjects } from "@src/queries",
   // Tell Wasp that this query reads from the `Task` entity. Wasp will
   // automatically update the results of this query when tasks are modified.
+  entities: [Project, Task, Pitch, Resource]
+}
+
+query getProject {
+  fn: import { getProject } from "@src/queries",
   entities: [Project, Task, Pitch, Resource]
 }
 

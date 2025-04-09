@@ -1,14 +1,7 @@
-import { FormEvent, useRef, useState, useEffect } from "react";
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Project, Task, Resource } from "../types";
 import {
-  Project as BaseProject,
-  Task as BaseTask,
-  Resource as BaseResource,
-} from "wasp/entities";
-import { useSearchParams, Link } from "react-router-dom";
-import {
-  getProjects,
-  useQuery,
-  createProject,
   deleteProject,
   createTask,
   updateTaskStatus,
@@ -19,200 +12,44 @@ import {
   deleteResource,
   deleteTask,
 } from "wasp/client/operations";
-import { Trash, Pencil, ExternalLink, Plus, Folder } from "lucide-react";
-import "./Main.css";
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import { Textarea } from "./components/ui/textarea";
+import { Trash, Pencil, ExternalLink, Plus } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Textarea } from "../components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
-} from "./components/ui/form";
-import {
-  SidebarProvider,
-} from "./components/ui/sidebar";
+} from "../components/ui/form";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
-} from "./components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { Checkbox } from "./components/ui/checkbox";
-import { Switch } from "./components/ui/switch";
+} from "../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Checkbox } from "../components/ui/checkbox";
+import { Switch } from "../components/ui/switch";
 import {
   Table,
-  TableCaption,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
-} from "./components/ui/table";
-import { getFaviconFromUrl } from "./lib/utils";
+} from "../components/ui/table";
+import { getFaviconFromUrl } from "../lib/utils";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-} from "./components/ui/popover";
+} from "../components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
-import { AppSidebar } from "./components/custom/AppSidebar";
-
-// Extended types with relationships
-interface Task extends BaseTask {}
-
-interface Resource extends BaseResource {}
-
-interface Project extends BaseProject {
-  tasks?: Task[];
-  resources?: Resource[];
-}
-
-export const MainPage = () => {
-  const { data: projects, isLoading, error } = useQuery(getProjects);
-  const [showNewProjectForm, setShowNewProjectForm] = useState(false);
-
-  return (
-    <SidebarProvider>
-      <AppSidebar
-        items={[
-          {
-            isActive: true,
-            title: "Projects",
-            icon: Folder,
-            items:
-              projects?.map((project) => ({
-                title: project.title,
-                url: `/projects/${project.id}`,
-              })) || [],
-          },
-        ]}
-      />
-      <div className="container mx-auto px-6 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="heading-1">Projects</h1>
-
-          {!showNewProjectForm ? (
-            <Button onClick={() => setShowNewProjectForm(true)} variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Create New Project
-            </Button>
-          ) : (
-            <NewProjectForm onCancel={() => setShowNewProjectForm(false)} />
-          )}
-        </div>
-
-        {isLoading && <p>Loading projects...</p>}
-        {error && <p className="text-red-500">Error: {error.message}</p>}
-        
-        {projects && projects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(projects as Project[]).map((project) => (
-              <Link key={project.id} to={`/projects/${project.id}`} className="no-underline">
-                <Card className="h-full hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle>{project.title}</CardTitle>
-                    {project.description && (
-                      <CardDescription>{project.description}</CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2 text-sm text-gray-500">
-                      <span>{project.tasks?.length || 0} tasks</span>
-                      <span>•</span>
-                      <span>{project.resources?.length || 0} resources</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          !isLoading && (
-            <div className="text-center py-12">
-              <p className="text-xl text-gray-500 mb-4">No projects yet</p>
-              <Button onClick={() => setShowNewProjectForm(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Project
-              </Button>
-            </div>
-          )
-        )}
-      </div>
-    </SidebarProvider>
-  );
-};
-
-const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      const formData = new FormData(event.currentTarget);
-
-      await createProject({
-        title: formData.get("title") as string,
-        description: formData.get("description") as string,
-      });
-
-      formRef.current?.reset();
-      onCancel();
-    } catch (err: any) {
-      window.alert("Error: " + err.message);
-    }
-  };
-
-  return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 max-w-md">
-      <h2 className="heading-2">Create New Project</h2>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Project Title *
-            <Input
-              name="title"
-              required
-              placeholder="Give your project a clear title"
-              className="mt-1"
-            />
-          </label>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Description
-            <Input
-              name="description"
-              placeholder="Brief overview of the project"
-              className="mt-1"
-            />
-          </label>
-        </div>
-      </div>
-
-      <div className="flex gap-2">
-        <Button type="submit" variant="default">
-          Create Project
-        </Button>
-        <Button type="button" onClick={onCancel} variant="outline">
-          Cancel
-        </Button>
-      </div>
-    </form>
-  );
-};
+import { FormEvent, useRef } from "react";
 
 const EditTaskForm = ({
   task,
@@ -817,7 +654,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       {project.resources && project.resources.length > 0 ? (
         <Table className="mt-4">
           <TableBody>
-            {project.resources.map((resource) =>
+            {project.resources.map((resource: Resource) =>
               editingResourceId === resource.id ? (
                 <TableRow key={resource.id}>
                   <TableCell colSpan={2} className="bg-white">
@@ -850,7 +687,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   );
 };
 
-const ProjectView = ({ project }: { project: Project }) => {
+export const ProjectView = ({ project }: { project: Project }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -888,7 +725,7 @@ const ProjectView = ({ project }: { project: Project }) => {
 
   // Filter tasks based on the hideCompletedTasks state
   const filteredTasks = project.tasks?.filter(
-    (task) => !hideCompletedTasks || !task.complete
+    (task: Task) => !hideCompletedTasks || !task.complete
   );
 
   if (isEditing) {
@@ -907,11 +744,11 @@ const ProjectView = ({ project }: { project: Project }) => {
     <main className="mt-6">
       <Card>
         <CardHeader className="pb-6">
-          <CardTitle>{project.title}</CardTitle>
+          <CardTitle>
+            <h2 className="heading-3 mt-0">{project.title}</h2>
+          </CardTitle>
           {project.description && (
-            <CardDescription className="text-start">
-              {project.description}
-            </CardDescription>
+            <CardDescription className="text-start">{project.description}</CardDescription>
           )}
         </CardHeader>
         <CardContent>
@@ -930,10 +767,6 @@ const ProjectView = ({ project }: { project: Project }) => {
             <TabsContent value="tasks">
               <div className="mt-4">
                 <div className="flex justify-between gap-2">
-                  <Button disabled variant="outline">
-                    <Plus className="w-4 h-4" />
-                    Add Task
-                  </Button>
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="hide-completed"
@@ -950,12 +783,6 @@ const ProjectView = ({ project }: { project: Project }) => {
                 </div>
 
                 <Table className="mt-4">
-                  {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-                  {/* <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">Task</TableHead>
-                </TableRow>
-              </TableHeader> */}
                   <TableBody>
                     {filteredTasks && filteredTasks.length > 0 ? (
                       <>
@@ -996,13 +823,4 @@ const ProjectView = ({ project }: { project: Project }) => {
       </Card>
     </main>
   );
-};
-
-const ProjectsList = ({ projects }: { projects: Project[] }) => {
-  if (!projects?.length)
-    return <div className="paragraph">No projects yet. Create one above!</div>;
-
-  return (
-    <ProjectView project={projects[1]} />
-  );
-};
+}; 
