@@ -647,7 +647,6 @@ const EditResourceForm = ({
 };
 
 const ResourcesSection = ({ project }: { project: Project }) => {
-  const [isAddingResource, setIsAddingResource] = useState(false);
   const [editingResourceId, setEditingResourceId] = useState<number | null>(
     null
   );
@@ -664,25 +663,9 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   };
 
   return (
-    <div className="mt-4">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button onClick={() => setIsAddingResource(true)} variant="outline">
-            <Plus className="w-4 h-4" />
-            Add Resource
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent>
-          <NewResourceForm
-            projectId={project.id}
-            onSave={() => setIsAddingResource(false)}
-            onCancel={() => setIsAddingResource(false)}
-          />
-        </PopoverContent>
-      </Popover>
-
+    <div>
       {project.resources && project.resources.length > 0 ? (
-        <Table className="mt-4">
+        <Table>
           <TableBody>
             {project.resources.map((resource: Resource) =>
               editingResourceId === resource.id ? (
@@ -795,6 +778,7 @@ const AboutForm = ({
 export const ProjectView = ({ project }: { project: Project }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
+  const [isAddingResource, setIsAddingResource] = useState(false);
   const navigate = useNavigate();
 
   // Initialize from URL query parameters
@@ -947,6 +931,21 @@ export const ProjectView = ({ project }: { project: Project }) => {
                       {project.resources?.length || 0} resource(s)
                     </CardDescription>
                   </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button onClick={() => setIsAddingResource(true)} variant="outline">
+                        <Plus className="w-4 h-4" />
+                        Add Resource
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <NewResourceForm
+                        projectId={project.id}
+                        onSave={() => setIsAddingResource(false)}
+                        onCancel={() => setIsAddingResource(false)}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </CardHeader>
               <CardContent>
