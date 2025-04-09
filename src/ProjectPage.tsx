@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useQuery, getProject } from "wasp/client/operations";
 import { ProjectView } from "./components/ProjectView";
 import {
@@ -22,6 +22,7 @@ import {
 
 export const ProjectPage = () => {
   const { projectId } = useParams();
+  const [searchParams] = useSearchParams();
   const parsedProjectId = parseInt(projectId || "0", 10);
 
   const {
@@ -57,7 +58,9 @@ export const ProjectPage = () => {
           <Breadcrumb className="flex-1">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/">Projects</BreadcrumbLink>
+                <BreadcrumbLink asChild>
+                  <Link to={`/${window.location.search}`}>Projects</Link>
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>

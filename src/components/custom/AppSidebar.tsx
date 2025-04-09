@@ -18,6 +18,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../../components/ui/collapsible";
+import { Link, useSearchParams } from 'react-router-dom';
 
 export function AppSidebar({ items }: { items: { isActive: boolean, title: string, icon: any, items: { title: string, url: string }[] }[] }) {
   return (
@@ -29,10 +30,10 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="/">
+              <Link to={"/" + window.location.search}>
                 <RouteIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Pitchboard</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -61,9 +62,9 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
                       {item.items?.sort((a: any, b: any) => a.title.localeCompare(b.title))?.map((subItem: any) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton isActive={subItem.isActive} asChild>
-                            <a href={subItem.url}>
+                            <Link to={subItem.url + window.location.search}>
                               <span>{subItem.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
