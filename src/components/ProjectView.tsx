@@ -744,6 +744,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
     <main>
       <Card>
         <CardHeader className="pb-6">
+          <CardTitle>{project.title}</CardTitle>
           {project.description && (
             <CardDescription className="text-start">{project.description}</CardDescription>
           )}
