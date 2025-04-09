@@ -403,7 +403,7 @@ const ResourceItem = ({
   }
 
   return (
-    <TableRow className="w-full">
+    <TableRow className="w-full group">
       <TableCell className="flex justify-between w-full">
         <a
           href={resource.url}
@@ -426,7 +426,7 @@ const ResourceItem = ({
             <ExternalLink className="mt-0.5 w-4 h-4 text-gray-500" />
           </div>
         </a>
-        <div className="flex">
+        <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
           <Button onClick={onEdit} variant="ghost" size="icon">
             <Pencil className="w-4 h-4" />
           </Button>
