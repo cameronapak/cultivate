@@ -19,7 +19,7 @@ import {
   deleteResource,
   deleteTask,
 } from "wasp/client/operations";
-import { Trash, Pencil, ExternalLink, Plus } from "lucide-react";
+import { Trash, Pencil, ExternalLink, Plus, Folder } from "lucide-react";
 import "./Main.css";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -36,6 +36,9 @@ import {
   FormLabel,
   FormMessage,
 } from "./components/ui/form";
+import {
+  SidebarProvider,
+} from "./components/ui/sidebar";
 import {
   Card,
   CardContent,
@@ -56,11 +59,6 @@ import {
   TableHeader,
   TableRow,
 } from "./components/ui/table";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "./components/ui/collapsible";
 import { getFaviconFromUrl } from "./lib/utils";
 import {
   Popover,
@@ -68,6 +66,7 @@ import {
   PopoverContent,
 } from "./components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
+import { AppSidebar } from "./components/custom/AppSidebar";
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -84,23 +83,34 @@ export const MainPage = () => {
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
 
   return (
-    <div className="container mx-auto px-6 py-12">
-      <div className="flex justify-between items-center">
-        <h1 className="heading-1">Projects</h1>
+    <SidebarProvider>
+      <AppSidebar items={[{
+        isActive: true,
+        title: "Projects",
+        icon: Folder,
+        items: projects?.map((project) => ({
+          title: project.title,
+          url: `/projects/${project.id}`,
+        })) || []
+      }]} />
+      <div className="container mx-auto px-6 py-12">
+        <div className="flex justify-between items-center">
+          <h1 className="heading-1">Projects</h1>
 
-        {!showNewProjectForm ? (
-          <Button onClick={() => setShowNewProjectForm(true)} variant="outline">
-            Create New Project
-          </Button>
-        ) : (
-          <NewProjectForm onCancel={() => setShowNewProjectForm(false)} />
-        )}
+          {!showNewProjectForm ? (
+            <Button onClick={() => setShowNewProjectForm(true)} variant="outline">
+              Create New Project
+            </Button>
+          ) : (
+            <NewProjectForm onCancel={() => setShowNewProjectForm(false)} />
+          )}
+        </div>
+
+        {projects && <ProjectsList projects={projects as Project[]} />}
+        {isLoading && "Loading..."}
+        {error && "Error: " + error}
       </div>
-
-      {projects && <ProjectsList projects={projects as Project[]} />}
-      {isLoading && "Loading..."}
-      {error && "Error: " + error}
-    </div>
+    </SidebarProvider>
   );
 };
 
@@ -852,11 +862,11 @@ const ProjectView = ({ project }: { project: Project }) => {
     <main className="mt-6">
       <Card>
         <CardHeader className="pb-6">
-          <CardTitle>
-            {project.title}
-          </CardTitle>
+          <CardTitle>{project.title}</CardTitle>
           {project.description && (
-            <CardDescription className="text-start">{project.description}</CardDescription>
+            <CardDescription className="text-start">
+              {project.description}
+            </CardDescription>
           )}
         </CardHeader>
         <CardContent>
@@ -897,10 +907,10 @@ const ProjectView = ({ project }: { project: Project }) => {
                 <Table className="mt-4">
                   {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
                   {/* <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">Task</TableHead>
-                  </TableRow>
-                </TableHeader> */}
+                <TableRow>
+                  <TableHead className="w-[100px]">Task</TableHead>
+                </TableRow>
+              </TableHeader> */}
                   <TableBody>
                     {filteredTasks && filteredTasks.length > 0 ? (
                       <>
@@ -948,8 +958,6 @@ const ProjectsList = ({ projects }: { projects: Project[] }) => {
     return <div className="paragraph">No projects yet. Create one above!</div>;
 
   return (
-    <div className="relative gap-4 mt-6">
-      <ProjectView project={projects[0]} />
-    </div>
+    <ProjectView project={projects[1]} />
   );
 };
