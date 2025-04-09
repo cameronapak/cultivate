@@ -179,7 +179,7 @@ const TaskItem = ({ task }: { task: Task }) => {
   }
 
   return (
-    <div className={`task-item ${task.complete ? "completed" : ""}`}>
+    <div className={`group task-item ${task.complete ? "completed" : ""}`}>
       <div className="flex items-center space-x-2 justify-between">
         <div className="flex items-center space-x-2">
           <Checkbox
@@ -201,7 +201,7 @@ const TaskItem = ({ task }: { task: Task }) => {
             )}
           </div>
         </div>
-        <div className="flex">
+        <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
           <Button onClick={handleEdit} variant="ghost" size="icon">
             <Pencil className="w-4 h-4" />
           </Button>
