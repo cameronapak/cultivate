@@ -10,6 +10,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "../ui/command";
+import { DialogTitle } from "../ui/dialog";
 import { Project } from "../../types";
 import { Folder, Eye, EyeOff, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
@@ -60,6 +61,7 @@ export function CommandMenu() {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
+      <DialogTitle className="sr-only">Command Menu</DialogTitle>
       <CommandInput placeholder="Type a command or search..." />
       <CommandGroup heading="This Project">
         <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
