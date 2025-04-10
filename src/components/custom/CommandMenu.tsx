@@ -11,13 +11,11 @@ import {
   CommandSeparator,
 } from "../ui/command";
 import { Project } from "../../types";
-import { CheckSquare, Folder, Link2, Info } from "lucide-react";
+import { Folder } from "lucide-react";
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
-  const { projectId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { data: projects } = useQuery(getProjects);
 
   React.useEffect(() => {
@@ -31,15 +29,6 @@ export function CommandMenu() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const handleTabChange = React.useCallback(
-    (tab: string) => {
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set("tab", tab);
-      setSearchParams(newParams);
-    },
-    [searchParams, setSearchParams]
-  );
-
   const runCommand = React.useCallback((command: () => void) => {
     setOpen(false);
     command();
@@ -48,30 +37,6 @@ export function CommandMenu() {
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
-      <CommandGroup heading="Current Project">
-        {projectId && (
-          <>
-            <CommandItem
-              onSelect={() => runCommand(() => handleTabChange("tasks"))}
-            >
-              <CheckSquare className="mr-2 h-4 w-4" />
-              Tasks
-            </CommandItem>
-            <CommandItem
-              onSelect={() => runCommand(() => handleTabChange("resources"))}
-            >
-              <Link2 className="mr-2 h-4 w-4" />
-              Resources
-            </CommandItem>
-            <CommandItem
-              onSelect={() => runCommand(() => handleTabChange("about"))}
-            >
-              <Info className="mr-2 h-4 w-4" />
-              About
-            </CommandItem>
-          </>
-        )}
-      </CommandGroup>
       <CommandList>
         <CommandSeparator />
         <CommandEmpty>No results found.</CommandEmpty>
