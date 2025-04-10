@@ -15,6 +15,11 @@ page ProjectPage {
   component: import { ProjectPage } from "@src/ProjectPage"
 }
 
+route InboxRoute { path: "/inbox", to: InboxPage }
+page InboxPage {
+  component: import { InboxPage } from "@src/InboxPage"
+}
+
 query getProjects {
   // Specifies where the implementation for the query function is.
   // The path `@src/queries` resolves to `src/queries.ts`.

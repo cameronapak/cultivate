@@ -1,11 +1,10 @@
-import { RouteIcon, ChevronRight } from "lucide-react";
+import { RouteIcon, ChevronRight, InboxIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarHeader,
-  SidebarGroupLabel,
   SidebarMenuButton,
   SidebarMenu,
   SidebarMenuItem,
@@ -39,6 +38,18 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link to={"/inbox" + window.location.search}>
+                  <InboxIcon className="h-5 w-5" />
+                  <span className="text-base font-semibold">Inbox</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
         <SidebarGroup>
           {/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
           <SidebarMenu>
