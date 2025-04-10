@@ -779,7 +779,7 @@ const AboutForm = ({
 export const ProjectView = ({ project }: { project: Project }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
-  const [isAddingResource, setIsAddingResource] = useState(false);
+  const [_, setIsAddingResource] = useState(false);
   const navigate = useNavigate();
 
   // Initialize from URL query parameters
@@ -815,19 +815,17 @@ export const ProjectView = ({ project }: { project: Project }) => {
   }, []);
 
   const handleHideCompletedChange = (hide: boolean) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (hide) {
-      newParams.set("hideCompleted", "true");
-    } else {
-      newParams.delete("hideCompleted");
-    }
-    setSearchParams(newParams);
+    setSearchParams((prev) => {
+      prev.set("hideCompleted", hide ? "true" : "false");
+      return prev;
+    });
   };
 
   const handleTabChange = (tab: "tasks" | "resources" | "about") => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set("tab", tab);
-    setSearchParams(newParams);
+    setSearchParams((prev) => {
+      prev.set("tab", tab);
+      return prev;
+    });
   };
 
   const handleDelete = async () => {

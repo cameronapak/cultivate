@@ -74,7 +74,7 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [_, setSearchParams] = useSearchParams();
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.

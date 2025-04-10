@@ -911,19 +911,17 @@ const ProjectView = ({ project }: { project: Project }) => {
     activeTab === "tasks" || activeTab === "resources" ? activeTab : "tasks";
 
   const handleHideCompletedChange = (hide: boolean) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (hide) {
-      newParams.set("hideCompleted", "true");
-    } else {
-      newParams.delete("hideCompleted");
-    }
-    setSearchParams(newParams);
+    setSearchParams((prev) => {
+      prev.set("hideCompleted", hide ? "true" : "false");
+      return prev;
+    });
   };
 
-  const handleTabChange = (tab: "tasks" | "resources") => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set("tab", tab);
-    setSearchParams(newParams);
+  const handleTabChange = (tab: "tasks" | "resources" | "about") => {
+    setSearchParams((prev) => {
+      prev.set("tab", tab);
+      return prev;
+    });
   };
 
   const handleDelete = async () => {

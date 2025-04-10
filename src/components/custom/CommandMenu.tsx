@@ -40,23 +40,17 @@ export function CommandMenu() {
   }, []);
 
   const toggleHideCompleted = () => {
-    const newParams = new URLSearchParams(searchParams);
-    if (hideCompletedTasks) {
-      newParams.delete("hideCompleted");
-    } else {
-      newParams.set("hideCompleted", "true");
-    }
-    setSearchParams(newParams);
+    setSearchParams((prev) => {
+      prev.set("hideCompleted", hideCompletedTasks ? "true" : "false");
+      return prev;
+    });
   };
 
   const toggleHideSidebar = () => {
-    const newParams = new URLSearchParams(searchParams);
-    if (hideSidebar) {
-      newParams.delete("hideSidebar");
-    } else {
-      newParams.set("hideSidebar", "true");
-    }
-    setSearchParams(newParams);
+    setSearchParams((prev) => {
+      prev.set("hideSidebar", hideSidebar ? "true" : "false");
+      return prev;
+    });
   };
 
   return (

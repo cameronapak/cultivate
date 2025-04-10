@@ -24,7 +24,7 @@ import {
 export const ProjectPage = () => {
   const { projectId } = useParams();
   const parsedProjectId = parseInt(projectId || "0", 10);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const hideSidebar = searchParams.get("hideSidebar") === "true";
 
   const {
