@@ -12,18 +12,24 @@ import {
 } from "../ui/command";
 import { DialogTitle } from "../ui/dialog";
 import { Project } from "../../types";
-import { Folder, Eye, EyeOff, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import {
+  Folder,
+  Eye,
+  EyeOff,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const { data: projects } = useQuery(getProjects);
-  const { 
-    isSidebarHidden, 
+  const {
+    isSidebarHidden,
     hideCompletedTasks,
     toggleSidebar,
-    toggleHideCompleted 
+    toggleHideCompleted,
   } = useLayoutState();
 
   React.useEffect(() => {
@@ -46,25 +52,30 @@ export function CommandMenu() {
     <CommandDialog open={open} onOpenChange={setOpen}>
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
       <CommandInput placeholder="Type a command or search..." />
-      <CommandGroup heading="This Project">
-        <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
-          {hideCompletedTasks ? (
-            <Eye className="mr-2 h-4 w-4" />
-          ) : (
-            <EyeOff className="mr-2 h-4 w-4" />
-          )}
-          {hideCompletedTasks ? "Show completed tasks" : "Hide completed tasks"}
-        </CommandItem>
-        <CommandItem onSelect={() => runCommand(toggleSidebar)}>
-          {isSidebarHidden ? (
-            <PanelLeftOpen className="mr-2 h-4 w-4" />
-          ) : (
-            <PanelLeftClose className="mr-2 h-4 w-4" />
-          )}
-          {isSidebarHidden ? "Show sidebar" : "Hide sidebar"}
-        </CommandItem>
-      </CommandGroup>
       <CommandList>
+        <CommandGroup heading="Actions">
+          <CommandItem onSelect={() => runCommand(toggleSidebar)}>
+            {isSidebarHidden ? (
+              <PanelLeftOpen className="mr-2 h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="mr-2 h-4 w-4" />
+            )}
+            {isSidebarHidden ? "Show sidebar" : "Hide sidebar"}
+          </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="This Project">
+          <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
+            {hideCompletedTasks ? (
+              <Eye className="mr-2 h-4 w-4" />
+            ) : (
+              <EyeOff className="mr-2 h-4 w-4" />
+            )}
+            {hideCompletedTasks
+              ? "Show completed tasks"
+              : "Hide completed tasks"}
+          </CommandItem>
+        </CommandGroup>
         <CommandSeparator />
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Projects">
