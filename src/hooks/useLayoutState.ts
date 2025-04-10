@@ -10,32 +10,35 @@ export function useLayoutState() {
   const isSidebarHidden = searchParams.get('hideSidebar') === 'true'
   const hideCompletedTasks = searchParams.get('hideCompleted') === 'true'
 
-  const setTab = useCallback((tab: TabType) => {
+  // Helper to preserve all existing params when updating
+  const updateParams = useCallback((updates: Record<string, string>) => {
     setSearchParams(prev => {
       const newParams = new URLSearchParams(prev)
-      newParams.set('tab', tab)
+      // Apply all updates
+      Object.entries(updates).forEach(([key, value]) => {
+        newParams.set(key, value)
+      })
       return newParams
     }, { replace: true })
   }, [setSearchParams])
 
+  const setTab = useCallback((tab: TabType) => {
+    updateParams({ tab })
+  }, [updateParams])
+
   const toggleSidebar = useCallback(() => {
-    setSearchParams(prev => {
-      const newParams = new URLSearchParams(prev)
-      // Preserve the current tab when toggling sidebar
-      const currentTab = prev.get('tab') || 'tasks'
-      newParams.set('tab', currentTab)
-      newParams.set('hideSidebar', (!isSidebarHidden).toString())
-      return newParams
-    }, { replace: true })
-  }, [isSidebarHidden, setSearchParams])
+    updateParams({
+      hideSidebar: (!isSidebarHidden).toString(),
+      // Preserve current tab
+      tab: currentTab
+    })
+  }, [isSidebarHidden, currentTab, updateParams])
 
   const toggleHideCompleted = useCallback(() => {
-    setSearchParams(prev => {
-      const newParams = new URLSearchParams(prev)
-      newParams.set('hideCompleted', (!hideCompletedTasks).toString())
-      return newParams
-    }, { replace: true })
-  }, [hideCompletedTasks, setSearchParams])
+    updateParams({
+      hideCompleted: (!hideCompletedTasks).toString()
+    })
+  }, [hideCompletedTasks, updateParams])
 
   return {
     currentTab,
