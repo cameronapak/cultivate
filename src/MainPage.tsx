@@ -67,6 +67,7 @@ import { PopoverClose } from "@radix-ui/react-popover";
 import { AppSidebar } from "./components/custom/AppSidebar";
 import { Separator } from "./components/ui/separator";
 import { Breadcrumb, BreadcrumbLink, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage } from "./components/ui/breadcrumb";
+import { CommandMenu } from "./components/custom/CommandMenu";
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -94,6 +95,7 @@ export const MainPage = () => {
 
   return (
     <SidebarProvider>
+      <CommandMenu />
       <AppSidebar
         items={[
           {
