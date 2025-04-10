@@ -92,9 +92,11 @@ type ProjectFormValues = z.infer<typeof projectFormSchema>;
 export const MainPage = () => {
   const { data: projects, isLoading, error } = useQuery(getProjects);
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const hideSidebar = searchParams.get("hideSidebar") === "true";
 
   return (
-    <SidebarProvider>
+    <SidebarProvider open={!hideSidebar}>
       <CommandMenu />
       <AppSidebar
         items={[

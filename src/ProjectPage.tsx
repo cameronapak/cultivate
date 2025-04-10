@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useQuery, getProject } from "wasp/client/operations";
 import { ProjectView } from "./components/ProjectView";
 import {
@@ -24,6 +24,8 @@ import {
 export const ProjectPage = () => {
   const { projectId } = useParams();
   const parsedProjectId = parseInt(projectId || "0", 10);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const hideSidebar = searchParams.get("hideSidebar") === "true";
 
   const {
     data: project,
@@ -35,7 +37,7 @@ export const ProjectPage = () => {
   if (isLoading || error || !project) return null;
 
   return (
-    <SidebarProvider>
+    <SidebarProvider open={!hideSidebar}>
       <Toaster />
       <CommandMenu />
       <AppSidebar

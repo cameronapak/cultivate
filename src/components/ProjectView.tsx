@@ -64,6 +64,7 @@ import { CircleCheckIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "./ui/switch";
 import React from "react";
+import { Kbd } from "./custom/Kbd";
 
 const EditTaskForm = ({
   task,
@@ -871,21 +872,15 @@ export const ProjectView = ({ project }: { project: Project }) => {
         <TabsList className="group grid w-full grid-cols-3">
           <TabsTrigger value="tasks" className="relative flex items-center gap-2">
             Tasks
-            <kbd className="absolute right-1 top-1 bottom-0 group-hover:opacity-100 opacity-0 transition-opacity duration-300 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-              <span className="text-xs">1</span>
-            </kbd>
+            <Kbd>1</Kbd>
           </TabsTrigger>
           <TabsTrigger value="resources" className="relative flex items-center gap-2">
             Resources
-            <kbd className="absolute right-1 top-1 bottom-0 group-hover:opacity-100 opacity-0 transition-opacity duration-300 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-              <span className="text-xs">2</span>
-            </kbd>
+            <Kbd>2</Kbd>
           </TabsTrigger>
           <TabsTrigger value="about" className="relative flex items-center gap-2">
             About
-            <kbd className="absolute right-1 top-1 bottom-0 group-hover:opacity-100 opacity-0 transition-opacity duration-300 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-              <span className="text-xs">3</span>
-            </kbd>
+            <Kbd>3</Kbd>
           </TabsTrigger>
         </TabsList>
 

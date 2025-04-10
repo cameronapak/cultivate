@@ -11,7 +11,7 @@ import {
   CommandSeparator,
 } from "../ui/command";
 import { Project } from "../../types";
-import { Folder, Eye, EyeOff } from "lucide-react";
+import { Folder, Eye, EyeOff, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
@@ -20,6 +20,7 @@ export function CommandMenu() {
   const { data: projects } = useQuery(getProjects);
   
   const hideCompletedTasks = searchParams.get("hideCompleted") === "true";
+  const hideSidebar = searchParams.get("hideSidebar") === "true";
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -47,6 +48,16 @@ export function CommandMenu() {
     setSearchParams(newParams);
   };
 
+  const toggleHideSidebar = () => {
+    const newParams = new URLSearchParams(searchParams);
+    if (hideSidebar) {
+      newParams.delete("hideSidebar");
+    } else {
+      newParams.set("hideSidebar", "true");
+    }
+    setSearchParams(newParams);
+  };
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
@@ -58,6 +69,14 @@ export function CommandMenu() {
             <EyeOff className="mr-2 h-4 w-4" />
           )}
           {hideCompletedTasks ? "Show completed tasks" : "Hide completed tasks"}
+        </CommandItem>
+        <CommandItem onSelect={() => runCommand(toggleHideSidebar)}>
+          {hideSidebar ? (
+            <PanelLeftOpen className="mr-2 h-4 w-4" />
+          ) : (
+            <PanelLeftClose className="mr-2 h-4 w-4" />
+          )}
+          {hideSidebar ? "Show sidebar" : "Hide sidebar"}
         </CommandItem>
       </CommandGroup>
       <CommandList>

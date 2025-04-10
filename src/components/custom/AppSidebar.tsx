@@ -18,7 +18,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../../components/ui/collapsible";
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export function AppSidebar({ items }: { items: { isActive: boolean, title: string, icon: any, items: { title: string, url: string }[] }[] }) {
   return (
