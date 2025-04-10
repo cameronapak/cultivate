@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from "react-router-dom";
-import type { Project, Task, Resource } from 'wasp/entities';
-import {
-  useQuery,
-  getTasks,
-  getProject,
-  getResources,
-} from 'wasp/client/operations';
+import type { Project as BaseProject, Task, Resource, Pitch } from 'wasp/entities';
 import {
   deleteTask,
   updateTask,
@@ -14,6 +8,12 @@ import {
   createResource,
   updateResource,
   deleteResource,
+  updateProject,
+  deleteProject,
+  updateTaskStatus,
+  getProject,
+  getProjectTasks,
+  getProjectResources
 } from 'wasp/client/operations';
 import { Trash, Pencil, ExternalLink, Plus, Trash2, Settings2Icon, CheckIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -70,6 +70,7 @@ import React from "react";
 import { Kbd } from "./custom/Kbd";
 import { useTabShortcuts } from '../hooks/useKeyboardShortcuts';
 import { useLayoutState } from '../hooks/useLayoutState'
+import { Project } from '../types'
 
 const EditTaskForm = ({
   task,
@@ -780,6 +781,12 @@ const AboutForm = ({
     </Form>
   );
 };
+
+type ProjectWithRelations = Project & {
+  tasks?: Task[]
+  resources?: Resource[]
+  pitch?: Pitch
+}
 
 export const ProjectView = ({ project }: { project: Project }) => {
   const [isEditing, setIsEditing] = useState(false)

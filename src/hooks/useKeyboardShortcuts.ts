@@ -66,7 +66,7 @@ export function useCommandMenuShortcuts(setOpen: (open: boolean) => void) {
       key: 'k',
       ctrlKey: true,
       metaKey: true,
-      handler: () => setOpen((open) => !open),
+      handler: () => setOpen(!open),
       description: 'Toggle command menu',
     },
   ]);
