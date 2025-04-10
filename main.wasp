@@ -45,6 +45,11 @@ query getProjectResources {
   entities: [Project, Resource]
 }
 
+query getInboxTasks {
+  fn: import { getInboxTasks } from "@src/queries",
+  entities: [Task]
+}
+
 action createProject {
   fn: import { createProject } from "@src/queries",
   entities: [Project]
@@ -108,4 +113,9 @@ action updateResource {
 action deleteResource {
   fn: import { deleteResource } from "@src/queries",
   entities: [Resource]
+}
+
+action moveTask {
+  fn: import { moveTask } from "@src/queries",
+  entities: [Task, Project]
 }

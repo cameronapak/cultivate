@@ -16,7 +16,9 @@ import {
   type UpdateResource,
   type DeleteResource,
   type DeleteTask,
-  type UpdateTask
+  type UpdateTask,
+  type MoveTask,
+  type GetInboxTasks,
 } from 'wasp/server/operations'
 
 // Define our own GetProject type since we need to include related entities
@@ -42,8 +44,8 @@ export const getProject: GetProject<GetProjectInput, Project> = async (args, con
     where: { id: args.projectId },
     include: { 
       tasks: true,
-      pitch: true,
-      resources: true
+      resources: true,
+      pitch: true
     }
   })
 }
@@ -178,10 +180,19 @@ export const deletePitch: DeletePitch<DeletePitchPayload, Pitch> = async (
   })
 }
 
+export const getInboxTasks: GetInboxTasks<void, Task[]> = async (_args, context) => {
+  return context.entities.Task.findMany({
+    where: {
+      projectId: null
+    }
+  })
+}
+
+// Update CreateTaskPayload to make projectId optional
 type CreateTaskPayload = {
   title: string
   description?: string
-  projectId: number
+  projectId?: number // Make projectId optional
 }
 
 export const createTask: CreateTask<CreateTaskPayload, Task> = async (
@@ -192,7 +203,10 @@ export const createTask: CreateTask<CreateTaskPayload, Task> = async (
     data: {
       title: args.title,
       description: args.description,
-      project: { connect: { id: args.projectId } }
+      // Only connect to project if projectId is provided
+      ...(args.projectId && {
+        project: { connect: { id: args.projectId } }
+      })
     }
   })
 }
@@ -344,5 +358,29 @@ export const deleteResource: DeleteResource<DeleteResourcePayload, Resource> = a
 ) => {
   return context.entities.Resource.delete({
     where: { id: args.id }
+  })
+}
+
+// Add operation to move task to/from inbox
+type MoveTaskPayload = {
+  id: number
+  projectId: number | null // null means move to inbox
+}
+
+type MoveTaskArgs = {
+  taskId: number
+  projectId: number | null
+}
+
+export const moveTask: MoveTask<MoveTaskArgs, Task> = async (args, context) => {
+  return context.entities.Task.update({
+    where: { id: args.taskId },
+    data: {
+      project: args.projectId ? {
+        connect: { id: args.projectId }
+      } : {
+        disconnect: true
+      }
+    }
   })
 }

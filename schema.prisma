@@ -45,8 +45,8 @@ model Task {
   status      String   @default("TODO") // Using String instead of enum
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   Int
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   Int?
 }
 
 model Resource {
