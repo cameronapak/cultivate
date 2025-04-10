@@ -839,6 +839,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
       <h1 className="text-2xl font-bold pb-6">{project.title}</h1>
       <Tabs
         defaultValue={currentTab}
+        value={currentTab}
         className="w-[400px]"
         onValueChange={(value) =>
           handleTabChange(value as "tasks" | "resources" | "about")

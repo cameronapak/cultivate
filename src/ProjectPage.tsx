@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useQuery, getProject } from "wasp/client/operations";
 import { ProjectView } from "./components/ProjectView";
 import {
@@ -7,6 +7,7 @@ import {
   SidebarTrigger,
 } from "./components/ui/sidebar";
 import { AppSidebar } from "./components/custom/AppSidebar";
+import { CommandMenu } from "./components/custom/CommandMenu";
 import { Folder } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Project } from "./types";
@@ -20,10 +21,8 @@ import {
   BreadcrumbSeparator,
   BreadcrumbLink,
 } from "./components/ui/breadcrumb";
-
 export const ProjectPage = () => {
   const { projectId } = useParams();
-  const [searchParams] = useSearchParams();
   const parsedProjectId = parseInt(projectId || "0", 10);
 
   const {
@@ -38,6 +37,7 @@ export const ProjectPage = () => {
   return (
     <SidebarProvider>
       <Toaster />
+      <CommandMenu />
       <AppSidebar
         items={[
           {
