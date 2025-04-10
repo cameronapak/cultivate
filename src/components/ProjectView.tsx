@@ -1,17 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Project, Task, Resource } from "../types";
+import type { Project, Task, Resource } from 'wasp/entities';
 import {
-  deleteProject,
-  createTask,
-  updateTaskStatus,
+  useQuery,
+  getTasks,
+  getProject,
+  getResources,
+} from 'wasp/client/operations';
+import {
+  deleteTask,
   updateTask,
-  updateProject,
+  createTask,
   createResource,
   updateResource,
   deleteResource,
-  deleteTask,
-} from "wasp/client/operations";
+} from 'wasp/client/operations';
 import { Trash, Pencil, ExternalLink, Plus, Trash2, Settings2Icon, CheckIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -65,6 +68,8 @@ import { toast } from "sonner";
 import { Switch } from "./ui/switch";
 import React from "react";
 import { Kbd } from "./custom/Kbd";
+import { useTabShortcuts } from '../hooks/useKeyboardShortcuts';
+import { useLayoutState } from '../hooks/useLayoutState'
 
 const EditTaskForm = ({
   task,
@@ -777,56 +782,30 @@ const AboutForm = ({
 };
 
 export const ProjectView = ({ project }: { project: Project }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [isEditing, setIsEditing] = useState(false);
-  const [_, setIsAddingResource] = useState(false);
-  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false)
+  const [_, setIsAddingResource] = useState(false)
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { currentTab, setTab } = useLayoutState()
 
   // Initialize from URL query parameters
-  const hideCompletedTasks = searchParams.get("hideCompleted") === "true";
-  const activeTab = searchParams.get("tab");
-  const currentTab =
-    activeTab === "tasks" || activeTab === "resources" || activeTab === "about"
-      ? activeTab
-      : "tasks";
-
-  React.useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      // Skip if user is typing in an input or textarea
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
-      }
-
-      switch (e.key) {
-        case '1':
-          handleTabChange('tasks');
-          break;
-        case '2':
-          handleTabChange('resources');
-          break;
-        case '3':
-          handleTabChange('about');
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  const hideCompletedTasks = searchParams.get('hideCompleted') === 'true'
 
   const handleHideCompletedChange = (hide: boolean) => {
     setSearchParams((prev) => {
-      prev.set("hideCompleted", hide ? "true" : "false");
-      return prev;
-    });
-  };
+      const newParams = new URLSearchParams(prev)
+      newParams.set('hideCompleted', hide ? 'true' : 'false')
+      return newParams
+    }, { replace: true })
+  }
 
-  const handleTabChange = (tab: "tasks" | "resources" | "about") => {
-    setSearchParams((prev) => {
-      prev.set("tab", tab);
-      return prev;
-    });
-  };
+  // Use the new hook for tab management
+  const handleTabChange = (tab: 'tasks' | 'resources' | 'about') => {
+    setTab(tab)
+  }
+
+  // Use the new hook for tab shortcuts
+  useTabShortcuts(handleTabChange)
 
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
@@ -864,7 +843,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
         value={currentTab}
         className="w-[400px]"
         onValueChange={(value) =>
-          handleTabChange(value as "tasks" | "resources" | "about")
+          handleTabChange(value as 'tasks' | 'resources' | 'about')
         }
       >
         <TabsList className="group grid w-full grid-cols-3">

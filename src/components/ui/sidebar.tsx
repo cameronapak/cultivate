@@ -5,6 +5,7 @@ import { PanelLeft } from "lucide-react"
 import { useSearchParams } from "react-router-dom"
 
 import { useIsMobile } from "../../hooks/use-mobile"
+import { useLayoutState } from "../../hooks/useLayoutState"
 import { cn } from "../../lib/utils"
 import { Button } from "./button"
 import { Input } from "./input"
@@ -74,12 +75,12 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
-    const [_, setSearchParams] = useSearchParams();
+    const { isSidebarHidden, toggleSidebar: toggleLayoutSidebar } = useLayoutState()
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
-    const open = openProp ?? _open
+    const open = openProp ?? !isSidebarHidden // Sync with URL state
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === "function" ? value(open) : value
@@ -95,13 +96,10 @@ const SidebarProvider = React.forwardRef<
       [setOpenProp, open]
     )
 
-    const toggleSidebar = React.useCallback(() => { 
-      // Update the url params
-      setSearchParams((prev) => {
-        prev.set("hideSidebar", open ? "true" : "false")
-        return prev
-      })
-    }, [isMobile, setOpen, setOpenMobile])
+    const toggleSidebar = React.useCallback(() => {
+      toggleLayoutSidebar()
+      setOpen(!open)
+    }, [open, setOpen, toggleLayoutSidebar])
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
