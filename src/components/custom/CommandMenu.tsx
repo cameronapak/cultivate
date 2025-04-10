@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery, getProjects } from "wasp/client/operations";
 import {
   CommandDialog,
@@ -13,15 +13,18 @@ import {
 import { DialogTitle } from "../ui/dialog";
 import { Project } from "../../types";
 import { Folder, Eye, EyeOff, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { useLayoutState } from "../../hooks/useLayoutState";
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { data: projects } = useQuery(getProjects);
-  
-  const hideCompletedTasks = searchParams.get("hideCompleted") === "true";
-  const hideSidebar = searchParams.get("hideSidebar") === "true";
+  const { 
+    isSidebarHidden, 
+    hideCompletedTasks,
+    toggleSidebar,
+    toggleHideCompleted 
+  } = useLayoutState();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -39,20 +42,6 @@ export function CommandMenu() {
     command();
   }, []);
 
-  const toggleHideCompleted = () => {
-    setSearchParams((prev) => {
-      prev.set("hideCompleted", hideCompletedTasks ? "true" : "false");
-      return prev;
-    });
-  };
-
-  const toggleHideSidebar = () => {
-    setSearchParams((prev) => {
-      prev.set("hideSidebar", hideSidebar ? "true" : "false");
-      return prev;
-    });
-  };
-
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
@@ -66,13 +55,13 @@ export function CommandMenu() {
           )}
           {hideCompletedTasks ? "Show completed tasks" : "Hide completed tasks"}
         </CommandItem>
-        <CommandItem onSelect={() => runCommand(toggleHideSidebar)}>
-          {hideSidebar ? (
+        <CommandItem onSelect={() => runCommand(toggleSidebar)}>
+          {isSidebarHidden ? (
             <PanelLeftOpen className="mr-2 h-4 w-4" />
           ) : (
             <PanelLeftClose className="mr-2 h-4 w-4" />
           )}
-          {hideSidebar ? "Show sidebar" : "Hide sidebar"}
+          {isSidebarHidden ? "Show sidebar" : "Hide sidebar"}
         </CommandItem>
       </CommandGroup>
       <CommandList>

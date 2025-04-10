@@ -8,6 +8,7 @@ export function useLayoutState() {
 
   const currentTab = searchParams.get('tab') as TabType || 'tasks'
   const isSidebarHidden = searchParams.get('hideSidebar') === 'true'
+  const hideCompletedTasks = searchParams.get('hideCompleted') === 'true'
 
   const setTab = useCallback((tab: TabType) => {
     setSearchParams(prev => {
@@ -28,10 +29,20 @@ export function useLayoutState() {
     }, { replace: true })
   }, [isSidebarHidden, setSearchParams])
 
+  const toggleHideCompleted = useCallback(() => {
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev)
+      newParams.set('hideCompleted', (!hideCompletedTasks).toString())
+      return newParams
+    }, { replace: true })
+  }, [hideCompletedTasks, setSearchParams])
+
   return {
     currentTab,
     isSidebarHidden,
+    hideCompletedTasks,
     setTab,
-    toggleSidebar
+    toggleSidebar,
+    toggleHideCompleted
   }
 } 

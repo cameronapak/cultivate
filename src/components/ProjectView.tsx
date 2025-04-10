@@ -785,21 +785,8 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [_, setIsAddingResource] = useState(false)
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const { currentTab, setTab } = useLayoutState()
+  const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } = useLayoutState()
 
-  // Initialize from URL query parameters
-  const hideCompletedTasks = searchParams.get('hideCompleted') === 'true'
-
-  const handleHideCompletedChange = (hide: boolean) => {
-    setSearchParams((prev) => {
-      const newParams = new URLSearchParams(prev)
-      newParams.set('hideCompleted', hide ? 'true' : 'false')
-      return newParams
-    }, { replace: true })
-  }
-
-  // Use the new hook for tab management
   const handleTabChange = (tab: 'tasks' | 'resources' | 'about') => {
     setTab(tab)
   }
@@ -810,19 +797,19 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
       try {
-        await deleteProject({ id: project.id });
-        toast.success("Project deleted successfully");
-        navigate("/");
+        await deleteProject({ id: project.id })
+        toast.success("Project deleted successfully")
+        navigate("/")
       } catch (err: any) {
-        toast.error("Error deleting project: " + err.message);
+        toast.error("Error deleting project: " + err.message)
       }
     }
-  };
+  }
 
   // Filter tasks based on the hideCompletedTasks state
   const filteredTasks = project.tasks?.filter(
-    (task: Task) => !hideCompletedTasks || !task.complete
-  );
+    (task) => !hideCompletedTasks || !task.complete
+  )
 
   if (isEditing) {
     return (
@@ -887,7 +874,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                         <Switch
                           id="hide-completed"
                           checked={hideCompletedTasks}
-                          onCheckedChange={handleHideCompletedChange}
+                          onCheckedChange={toggleHideCompleted}
                         />
                       </div>
                     </PopoverContent>
