@@ -8,6 +8,12 @@ import { Checkbox } from './components/ui/checkbox'
 import { Trash2, MoveRight } from 'lucide-react'
 import { getProjects } from 'wasp/client/operations'
 import {
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+} from './components/ui/table'
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -131,52 +137,61 @@ export function InboxPage() {
               {isLoading && <div>Loading...</div>}
               {error && <div className="text-red-500">Error: {error.message}</div>}
 
-              <div className="space-y-4">
-                {tasks?.map((task: Task) => (
-                  <div
-                    key={task.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        checked={task.complete}
-                        onCheckedChange={() => handleToggleTask(task.id, task.complete)}
-                      />
-                      <span className={task.complete ? 'line-through text-gray-500' : ''}>
-                        {task.title}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoveRight className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {projects?.map((project) => (
-                            <DropdownMenuItem
-                              key={project.id}
-                              onClick={() => handleMoveTask(task.id, project.id)}
+              <div className="rounded-md border">
+                <Table>
+                  <TableBody>
+                    {tasks?.map((task: Task) => (
+                      <TableRow key={task.id}>
+                        <TableCell className="w-12">
+                          <Checkbox
+                            checked={task.complete}
+                            onCheckedChange={() => handleToggleTask(task.id, task.complete)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <span className={task.complete ? 'line-through text-gray-500' : ''}>
+                            {task.title}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoveRight className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {projects?.map((project) => (
+                                  <DropdownMenuItem
+                                    key={project.id}
+                                    onClick={() => handleMoveTask(task.id, project.id)}
+                                  >
+                                    Move to {project.title}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteTask(task.id)}
                             >
-                              Move to {project.title}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteTask(task.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-                {tasks?.length === 0 && !isLoading && (
-                  <div className="text-center text-gray-500">No tasks in inbox</div>
-                )}
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {tasks?.length === 0 && !isLoading && (
+                      <TableRow>
+                        <TableCell colSpan={3} className="text-center text-gray-500">
+                          No tasks in inbox
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </div>
             </div>
           </div>
