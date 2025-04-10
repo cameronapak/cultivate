@@ -120,7 +120,7 @@ export function InboxPage() {
         <div className="container mx-auto p-6">
           <div>
             <div className="flex items-center mb-4">
-              <h2 className="text-2xl font-bold">Inbox Tasks</h2>
+              <h2 className="text-2xl font-bold">Inbox</h2>
             </div>
             <div>
               <div className="flex gap-2 mb-6">
