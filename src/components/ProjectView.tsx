@@ -62,8 +62,8 @@ import {
 } from "../components/ui/dialog";
 import { CircleCheckIcon } from "lucide-react";
 import { toast } from "sonner";
-import { Toggle } from "./ui/toggle";
 import { Switch } from "./ui/switch";
+import React from "react";
 
 const EditTaskForm = ({
   task,
@@ -789,6 +789,30 @@ export const ProjectView = ({ project }: { project: Project }) => {
       ? activeTab
       : "tasks";
 
+  React.useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Skip if user is typing in an input or textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      switch (e.key) {
+        case '1':
+          handleTabChange('tasks');
+          break;
+        case '2':
+          handleTabChange('resources');
+          break;
+        case '3':
+          handleTabChange('about');
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
   const handleHideCompletedChange = (hide: boolean) => {
     const newParams = new URLSearchParams(searchParams);
     if (hide) {
@@ -838,17 +862,31 @@ export const ProjectView = ({ project }: { project: Project }) => {
     <main>
       <h1 className="text-2xl font-bold pb-6">{project.title}</h1>
       <Tabs
-        defaultValue={currentTab}
         value={currentTab}
         className="w-[400px]"
         onValueChange={(value) =>
           handleTabChange(value as "tasks" | "resources" | "about")
         }
       >
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
-          <TabsTrigger value="about">About</TabsTrigger>
+        <TabsList className="group grid w-full grid-cols-3">
+          <TabsTrigger value="tasks" className="relative flex items-center gap-2">
+            Tasks
+            <kbd className="absolute right-1 top-1 bottom-0 group-hover:opacity-100 opacity-0 transition-opacity duration-300 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+              <span className="text-xs">1</span>
+            </kbd>
+          </TabsTrigger>
+          <TabsTrigger value="resources" className="relative flex items-center gap-2">
+            Resources
+            <kbd className="absolute right-1 top-1 bottom-0 group-hover:opacity-100 opacity-0 transition-opacity duration-300 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+              <span className="text-xs">2</span>
+            </kbd>
+          </TabsTrigger>
+          <TabsTrigger value="about" className="relative flex items-center gap-2">
+            About
+            <kbd className="absolute right-1 top-1 bottom-0 group-hover:opacity-100 opacity-0 transition-opacity duration-300 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+              <span className="text-xs">3</span>
+            </kbd>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="tasks">
