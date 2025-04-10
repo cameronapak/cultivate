@@ -11,12 +11,15 @@ import {
   CommandSeparator,
 } from "../ui/command";
 import { Project } from "../../types";
-import { Folder } from "lucide-react";
+import { Folder, Eye, EyeOff } from "lucide-react";
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: projects } = useQuery(getProjects);
+  
+  const hideCompletedTasks = searchParams.get("hideCompleted") === "true";
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -34,9 +37,29 @@ export function CommandMenu() {
     command();
   }, []);
 
+  const toggleHideCompleted = () => {
+    const newParams = new URLSearchParams(searchParams);
+    if (hideCompletedTasks) {
+      newParams.delete("hideCompleted");
+    } else {
+      newParams.set("hideCompleted", "true");
+    }
+    setSearchParams(newParams);
+  };
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
+      <CommandGroup heading="This Project">
+        <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
+          {hideCompletedTasks ? (
+            <Eye className="mr-2 h-4 w-4" />
+          ) : (
+            <EyeOff className="mr-2 h-4 w-4" />
+          )}
+          {hideCompletedTasks ? "Show completed tasks" : "Hide completed tasks"}
+        </CommandItem>
+      </CommandGroup>
       <CommandList>
         <CommandSeparator />
         <CommandEmpty>No results found.</CommandEmpty>
