@@ -889,7 +889,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
           </TableBody>
         </Table>
       ) : (
-        <p className="paragraph">
+        <p className="paragraph text-sm text-gray-500">
           No resources yet. Add links to helpful websites, documents, and other
           references.
         </p>
