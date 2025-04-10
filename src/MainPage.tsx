@@ -172,10 +172,17 @@ export const MainPage = () => {
             !isLoading && (
               <div className="text-center py-12">
                 <p className="text-xl text-gray-500 mb-4">No projects yet</p>
-                <Button onClick={() => setShowNewProjectForm(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Your First Project
-                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create New Project
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <NewProjectForm onCancel={() => {}} />
+                  </PopoverContent>
+                </Popover>
               </div>
             )
           )}
