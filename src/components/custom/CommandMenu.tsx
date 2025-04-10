@@ -83,7 +83,7 @@ export function CommandMenu() {
             <CommandItem
               key={project.id}
               onSelect={() =>
-                runCommand(() => navigate(`/projects/${project.id}`))
+                runCommand(() => navigate(`/projects/${project.id}${window.location.search}`))
               }
             >
               <Folder className="mr-2 h-4 w-4" />
