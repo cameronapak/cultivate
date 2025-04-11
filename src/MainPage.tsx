@@ -4,7 +4,7 @@ import {
   Task as BaseTask,
   Resource as BaseResource,
 } from "wasp/entities";
-import { useSearchParams, Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   getProjects,
   useQuery,
@@ -36,7 +36,6 @@ import {
   FormLabel,
   FormMessage,
 } from "./components/ui/form";
-import { SidebarProvider, SidebarTrigger, SidebarInset } from "./components/ui/sidebar";
 import {
   Card,
   CardContent,
@@ -64,10 +63,7 @@ import {
   PopoverContent,
 } from "./components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
-import { AppSidebar } from "./components/custom/AppSidebar";
-import { Separator } from "./components/ui/separator";
-import { Breadcrumb, BreadcrumbLink, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage } from "./components/ui/breadcrumb";
-import { CommandMenu } from "./components/custom/CommandMenu";
+import { Layout } from "./components/Layout";
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -91,44 +87,59 @@ type ProjectFormValues = z.infer<typeof projectFormSchema>;
 
 export const MainPage = () => {
   const { data: projects, isLoading, error } = useQuery(getProjects);
-  const [showNewProjectForm, setShowNewProjectForm] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const hideSidebar = searchParams.get("hideSidebar") === "true";
 
   return (
-    <SidebarProvider open={!hideSidebar}>
-      <CommandMenu />
-      <AppSidebar
-        items={[
-          {
-            isActive: true,
-            title: "Projects",
-            icon: Folder,
-            items:
-              projects?.map((project) => ({
-                title: project.title,
-                url: `/projects/${project.id}`,
-              })) || [],
-          },
-        ]}
-      />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbPage>Projects</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </header>
-        <div className="container mx-auto p-6">
-          <div className="flex justify-between items-center mb-8">
+    <Layout breadcrumbItems={[{ title: "Projects" }]}>
+      <div className="flex justify-between items-center mb-8">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">
+              <Plus className="w-4 h-4 mr-2" />
+              Create New Project
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <NewProjectForm onCancel={() => {}} />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {isLoading && <p>Loading projects...</p>}
+      {error && <p className="text-red-500">Error: {error.message}</p>}
+
+      {projects && projects.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {(projects as Project[]).map((project) => (
+            <Link
+              key={project.id}
+              to={`/projects/${project.id}`}
+              className="no-underline"
+            >
+              <Card className="h-full hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <CardTitle>{project.title}</CardTitle>
+                  {project.description && (
+                    <CardDescription>{project.description}</CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2 text-sm text-gray-500">
+                    <span>{project.tasks?.length || 0} tasks</span>
+                    <span>•</span>
+                    <span>{project.resources?.length || 0} resources</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        !isLoading && (
+          <div className="text-center py-12">
+            <p className="text-xl text-gray-500 mb-4">No projects yet</p>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline">
+                <Button>
                   <Plus className="w-4 h-4 mr-2" />
                   Create New Project
                 </Button>
@@ -138,57 +149,9 @@ export const MainPage = () => {
               </PopoverContent>
             </Popover>
           </div>
-
-          {isLoading && <p>Loading projects...</p>}
-          {error && <p className="text-red-500">Error: {error.message}</p>}
-
-          {projects && projects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {(projects as Project[]).map((project) => (
-                <Link
-                  key={project.id}
-                  to={`/projects/${project.id}`}
-                  className="no-underline"
-                >
-                  <Card className="h-full hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <CardTitle>{project.title}</CardTitle>
-                      {project.description && (
-                        <CardDescription>{project.description}</CardDescription>
-                      )}
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex gap-2 text-sm text-gray-500">
-                        <span>{project.tasks?.length || 0} tasks</span>
-                        <span>•</span>
-                        <span>{project.resources?.length || 0} resources</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            !isLoading && (
-              <div className="text-center py-12">
-                <p className="text-xl text-gray-500 mb-4">No projects yet</p>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create New Project
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80">
-                    <NewProjectForm onCancel={() => {}} />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            )
-          )}
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        )
+      )}
+    </Layout>
   );
 };
 

@@ -19,25 +19,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './components/ui/dropdown-menu'
-import { useSearchParams } from 'react-router-dom'
-import { SidebarProvider, SidebarInset, SidebarTrigger } from './components/ui/sidebar'
-import { AppSidebar } from './components/custom/AppSidebar'
-import { CommandMenu } from './components/custom/CommandMenu'
-import { Folder } from 'lucide-react'
-import { Separator } from './components/ui/separator'
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbPage,
-} from './components/ui/breadcrumb'
+import { Layout } from './components/Layout'
 
 export function InboxPage() {
   const { data: tasks, isLoading, error } = useQuery(getInboxTasks)
   const { data: projects } = useQuery(getProjects)
   const [newTaskTitle, setNewTaskTitle] = useState('')
-  const [searchParams] = useSearchParams()
-  const hideSidebar = searchParams.get('hideSidebar') === 'true'
 
   const handleCreateTask = async () => {
     if (!newTaskTitle.trim()) return
@@ -89,114 +76,84 @@ export function InboxPage() {
   }
 
   return (
-    <SidebarProvider open={!hideSidebar}>
-      <CommandMenu />
-      <AppSidebar
-        items={[
-          {
-            isActive: true,
-            title: "Projects",
-            icon: Folder,
-            items:
-              projects?.map((project) => ({
-                title: project.title,
-                url: `/projects/${project.id}`,
-              })) || [],
-          },
-        ]}
-      />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbPage>Inbox</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </header>
-        <div className="container mx-auto p-6">
-          <div>
-            <div className="flex items-center mb-4">
-              <h2 className="text-2xl font-bold">Inbox</h2>
-            </div>
-            <div>
-              <div className="flex gap-2 mb-6">
-                <Input
-                  type="text"
-                  placeholder="Add a new task..."
-                  value={newTaskTitle}
-                  onChange={(e) => setNewTaskTitle(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                />
-                <Button onClick={handleCreateTask}>Add Task</Button>
-              </div>
+    <Layout breadcrumbItems={[{ title: 'Inbox' }]}>
+      <div>
+        <div className="flex items-center mb-4">
+          <h2 className="text-2xl font-bold">Inbox</h2>
+        </div>
+        <div>
+          <div className="flex gap-2 mb-6">
+            <Input
+              type="text"
+              placeholder="Add a new task..."
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              onKeyPress={handleKeyPress}
+            />
+            <Button onClick={handleCreateTask}>Add Task</Button>
+          </div>
 
-              {isLoading && <div>Loading...</div>}
-              {error && <div className="text-red-500">Error: {error.message}</div>}
+          {isLoading && <div>Loading...</div>}
+          {error && <div className="text-red-500">Error: {error.message}</div>}
 
-              <div className="rounded-md border">
-                <Table>
-                  <TableBody>
-                    {tasks?.map((task: Task) => (
-                      <TableRow key={task.id}>
-                        <TableCell className="w-12">
-                          <Checkbox
-                            checked={task.complete}
-                            onCheckedChange={() => handleToggleTask(task.id, task.complete)}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <span className={task.complete ? 'line-through text-gray-500' : ''}>
-                            {task.title}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoveRight className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                {projects?.map((project) => (
-                                  <DropdownMenuItem
-                                    key={project.id}
-                                    onClick={() => handleMoveTask(task.id, project.id)}
-                                  >
-                                    Move to {project.title}
-                                  </DropdownMenuItem>
-                                ))}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteTask(task.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
+          <div className="rounded-md border">
+            <Table>
+              <TableBody>
+                {tasks?.map((task: Task) => (
+                  <TableRow key={task.id}>
+                    <TableCell className="w-12">
+                      <Checkbox
+                        checked={task.complete}
+                        onCheckedChange={() => handleToggleTask(task.id, task.complete)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <span className={task.complete ? 'line-through text-gray-500' : ''}>
+                        {task.title}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoveRight className="h-4 w-4" />
                             </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {tasks?.length === 0 && !isLoading && (
-                      <TableRow>
-                        <TableCell colSpan={3} className="text-center text-gray-500">
-                          No tasks in inbox
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {projects?.map((project) => (
+                              <DropdownMenuItem
+                                key={project.id}
+                                onClick={() => handleMoveTask(task.id, project.id)}
+                              >
+                                Move to {project.title}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteTask(task.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {tasks?.length === 0 && !isLoading && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center text-gray-500">
+                      No tasks in inbox
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+      </div>
+    </Layout>
   )
 } 
