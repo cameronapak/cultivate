@@ -384,3 +384,40 @@ export const moveTask: MoveTask<MoveTaskArgs, Task> = async (args, context) => {
     }
   })
 }
+
+export const getDocument = async (args: { documentId: number }, context: any) => {
+  return context.entities.Document.findUnique({
+    where: { id: args.documentId }
+  })
+}
+
+export const getDocuments = async (args: {}, context: any) => {
+  return context.entities.Document.findMany({
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+export const createDocument = async (args: { title: string; content: string }, context: any) => {
+  return context.entities.Document.create({
+    data: {
+      title: args.title,
+      content: args.content
+    }
+  })
+}
+
+export const updateDocument = async (args: { id: number; title: string; content: string }, context: any) => {
+  return context.entities.Document.update({
+    where: { id: args.id },
+    data: {
+      title: args.title,
+      content: args.content
+    }
+  })
+}
+
+export const deleteDocument = async (args: { id: number }, context: any) => {
+  return context.entities.Document.delete({
+    where: { id: args.id }
+  })
+}

@@ -20,6 +20,11 @@ page InboxPage {
   component: import { InboxPage } from "@src/InboxPage"
 }
 
+route DocumentRoute { path: "/documents/:documentId", to: DocumentPage }
+page DocumentPage {
+  component: import { DocumentPage } from "@src/DocumentPage"
+}
+
 query getProjects {
   // Specifies where the implementation for the query function is.
   // The path `@src/queries` resolves to `src/queries.ts`.
@@ -53,6 +58,16 @@ query getProjectResources {
 query getInboxTasks {
   fn: import { getInboxTasks } from "@src/queries",
   entities: [Task]
+}
+
+query getDocument {
+  fn: import { getDocument } from "@src/queries",
+  entities: [Document]
+}
+
+query getDocuments {
+  fn: import { getDocuments } from "@src/queries",
+  entities: [Document]
 }
 
 action createProject {
@@ -123,4 +138,19 @@ action deleteResource {
 action moveTask {
   fn: import { moveTask } from "@src/queries",
   entities: [Task, Project]
+}
+
+action createDocument {
+  fn: import { createDocument } from "@src/queries",
+  entities: [Document]
+}
+
+action updateDocument {
+  fn: import { updateDocument } from "@src/queries",
+  entities: [Document]
+}
+
+action deleteDocument {
+  fn: import { deleteDocument } from "@src/queries",
+  entities: [Document]
 }
