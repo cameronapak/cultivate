@@ -1,33 +1,37 @@
-import { ReactNode } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { SidebarProvider, SidebarInset, SidebarTrigger } from './ui/sidebar'
-import { AppSidebar } from './custom/AppSidebar'
-import { CommandMenu } from './custom/CommandMenu'
-import { Separator } from './ui/separator'
+import { Fragment, ReactNode } from "react";
+import { useSearchParams } from "react-router-dom";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
+import { AppSidebar } from "./custom/AppSidebar";
+import { CommandMenu } from "./custom/CommandMenu";
+import { Separator } from "./ui/separator";
 import {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from './ui/breadcrumb'
-import { Folder } from 'lucide-react'
-import { getProjects } from 'wasp/client/operations'
-import { useQuery } from 'wasp/client/operations'
+} from "./ui/breadcrumb";
+import { Folder } from "lucide-react";
+import { getProjects } from "wasp/client/operations";
+import { useQuery } from "wasp/client/operations";
 
 interface LayoutProps {
-  children: ReactNode
+  children: ReactNode;
   breadcrumbItems?: {
-    title: string
-    url?: string
-  }[]
-  activeProjectId?: number
+    title: string;
+    url?: string;
+  }[];
+  activeProjectId?: number;
 }
 
-export function Layout({ children, breadcrumbItems = [], activeProjectId }: LayoutProps) {
-  const [searchParams] = useSearchParams()
-  const hideSidebar = searchParams.get('hideSidebar') === 'true'
-  const { data: projects } = useQuery(getProjects)
+export function Layout({
+  children,
+  breadcrumbItems = [],
+  activeProjectId,
+}: LayoutProps) {
+  const [searchParams] = useSearchParams();
+  const hideSidebar = searchParams.get("hideSidebar") === "true";
+  const { data: projects } = useQuery(getProjects);
 
   return (
     <SidebarProvider open={!hideSidebar}>
@@ -36,7 +40,7 @@ export function Layout({ children, breadcrumbItems = [], activeProjectId }: Layo
         items={[
           {
             isActive: true,
-            title: 'Projects',
+            title: "Projects",
             icon: Folder,
             items:
               projects?.map((project) => ({
@@ -54,24 +58,22 @@ export function Layout({ children, breadcrumbItems = [], activeProjectId }: Layo
           <Breadcrumb>
             <BreadcrumbList>
               {breadcrumbItems.map((item, index) => (
-                <BreadcrumbItem key={index}>
-                  {item.url ? (
-                    <a href={item.url}>{item.title}</a>
-                  ) : (
-                    <>
-                      {index > 0 && <BreadcrumbSeparator />}
+                <Fragment key={index}>
+                  {index > 0 && <BreadcrumbSeparator />}
+                  <BreadcrumbItem>
+                    {item.url ? (
+                      <a href={item.url}>{item.title}</a>
+                    ) : (
                       <BreadcrumbPage>{item.title}</BreadcrumbPage>
-                    </>
-                  )}
-                </BreadcrumbItem>
+                    )}
+                  </BreadcrumbItem>
+                </Fragment>
               ))}
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="container mx-auto p-6">
-          {children}
-        </div>
+        <div className="container mx-auto p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
-  )
-} 
+  );
+}
