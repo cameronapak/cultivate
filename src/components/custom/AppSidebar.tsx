@@ -1,4 +1,4 @@
-import { RouteIcon, ChevronRight, InboxIcon, FileIcon } from "lucide-react";
+import { RouteIcon, ChevronRight, InboxIcon, BookOpen } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -54,7 +54,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={currentPath === "/documents"}>
                 <Link to={"/documents" + window.location.search}>
-                  <FileIcon className="h-5 w-5" />
+                  <BookOpen className="h-5 w-5" />
                   <span>Docs</span>
                 </Link>
               </SidebarMenuButton>

@@ -18,6 +18,8 @@ import {
   EyeOff,
   PanelLeftClose,
   PanelLeftOpen,
+  BookOpen,
+  InboxIcon,
 } from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
 
@@ -56,22 +58,43 @@ export function CommandMenu() {
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
-        {isProjectPage && (
-          <CommandGroup heading="This Project">
+        <CommandSeparator />
+        <CommandGroup heading="Pages">
+          <CommandItem
+            onSelect={() =>
+              runCommand(() => {
+                navigate(`/inbox`);
+              })
+            }
+          >
+            <InboxIcon className="mr-2 h-4 w-4" />
+            Open Inbox
+          </CommandItem>
+          <CommandItem
+            onSelect={() =>
+              runCommand(() => {
+                navigate(`/documents`);
+              })
+            }
+          >
+            <BookOpen className="mr-2 h-4 w-4" />
+            Open Docs
+          </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Actions">
+          {isProjectPage && (
             <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
               {hideCompletedTasks ? (
                 <Eye className="mr-2 h-4 w-4" />
-            ) : (
-              <EyeOff className="mr-2 h-4 w-4" />
-            )}
-            {hideCompletedTasks
-              ? "Show completed tasks"
-              : "Hide completed tasks"}
+              ) : (
+                <EyeOff className="mr-2 h-4 w-4" />
+              )}
+              {hideCompletedTasks
+                ? "Show completed tasks"
+                : "Hide completed tasks"}
             </CommandItem>
-          </CommandGroup>
-        )}
-        <CommandSeparator />
-        <CommandGroup heading="Actions">
+          )}
           <CommandItem onSelect={() => runCommand(toggleSidebar)}>
             {isSidebarHidden ? (
               <PanelLeftOpen className="mr-2 h-4 w-4" />
@@ -88,7 +111,9 @@ export function CommandMenu() {
             <CommandItem
               key={project.id}
               onSelect={() =>
-                runCommand(() => navigate(`/projects/${project.id}${window.location.search}`))
+                runCommand(() =>
+                  navigate(`/projects/${project.id}${window.location.search}`)
+                )
               }
             >
               <Folder className="mr-2 h-4 w-4" />
