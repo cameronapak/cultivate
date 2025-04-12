@@ -55,7 +55,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
               <SidebarMenuButton asChild isActive={currentPath === "/documents"}>
                 <Link to={"/documents" + window.location.search}>
                   <FileIcon className="h-5 w-5" />
-                  <span>Documents</span>
+                  <span>Docs</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
