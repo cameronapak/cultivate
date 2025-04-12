@@ -2,7 +2,7 @@ app shapeUp {
   wasp: {
     version: "^0.16.2"
   },
-  title: "shape-up"
+  title: "Pitchboard"
 }
 
 route RootRoute { path: "/", to: MainPage }
