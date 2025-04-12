@@ -45,7 +45,12 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
 import { Switch } from "../components/ui/switch";
 import {
@@ -65,6 +70,7 @@ import {
 } from "../components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { Layout } from "../components/Layout";
+import { toast } from "sonner";
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -91,59 +97,60 @@ export const MainPage = () => {
 
   return (
     <Layout breadcrumbItems={[{ title: "Projects" }]}>
-      <div className="flex justify-between items-center mb-8">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Create New Project
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80">
-            <NewProjectForm onCancel={() => {}} />
-          </PopoverContent>
-        </Popover>
-      </div>
-
       {isLoading && <p>Loading projects...</p>}
       {error && <p className="text-red-500">Error: {error.message}</p>}
 
       {projects && projects.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {(projects as Project[]).map((project) => (
-            <Link
-              key={project.id}
-              to={"/projects/:projectId"}
-              params={{ projectId: project.id }}
-              className="no-underline"
-            >
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <CardTitle>{project.title}</CardTitle>
-                  {project.description && (
-                    <CardDescription>{project.description}</CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2 text-sm text-gray-500">
-                    <span>{project.tasks?.length || 0} tasks</span>
-                    <span>•</span>
-                    <span>{project.resources?.length || 0} resources</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        !isLoading && (
-          <div className="text-center py-12">
-            <p className="text-xl text-gray-500 mb-4">No projects yet</p>
+        <>
+          <div className="flex justify-between items-center mb-8">
             <Popover>
               <PopoverTrigger asChild>
-                <Button>
+                <Button variant="outline">
                   <Plus className="w-4 h-4 mr-2" />
                   Create New Project
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <NewProjectForm onCancel={() => {}} />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(projects as Project[]).map((project) => (
+              <Link
+                key={project.id}
+                to={"/projects/:projectId"}
+                params={{ projectId: project.id }}
+                className="no-underline"
+              >
+                <Card className="h-full hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <CardTitle>{project.title}</CardTitle>
+                    {project.description && (
+                      <CardDescription>{project.description}</CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex gap-2 text-sm text-gray-500">
+                      <span>{project.tasks?.length || 0} tasks</span>
+                      <span>•</span>
+                      <span>{project.resources?.length || 0} resources</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </>
+      ) : (
+        !isLoading && (
+          <div className="text-center flex flex-col items-center py-12">
+            <Folder className="w-12 h-12 text-muted-foreground mb-4" />
+            <h1 className="text-2xl text-muted-foreground mb-4">Create your first project</h1>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline">
+                  Get Started
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -172,6 +179,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
         title: values.title,
         description: values.description || "",
       });
+      toast.success(`Created project "${values.title}"`);
       form.reset();
     } catch (err: any) {
       window.alert("Error: " + err.message);
@@ -181,8 +189,6 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <h2 className="heading-4">Create New Project</h2>
-
         <FormField
           control={form.control}
           name="title"
@@ -191,6 +197,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
               <FormLabel>Project Title</FormLabel>
               <FormControl>
                 <Input
+                  required
                   placeholder="Give your project a clear title"
                   {...field}
                 />
@@ -207,20 +214,17 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="Brief overview of the project" {...field} />
+                <Textarea placeholder="Brief overview of the project. Can be edited later." {...field} />
               </FormControl>
               <FormDescription>
-                Optional description for this project
+                Optional
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="flex gap-2">
-          <PopoverClose asChild>
-            <Button type="submit">Create Project</Button>
-          </PopoverClose>
+        <div className="grid grid-cols-2 gap-2">
           <PopoverClose asChild>
             <Button
               type="button"
@@ -230,6 +234,7 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
               Cancel
             </Button>
           </PopoverClose>
+          <Button type="submit">Create</Button>
         </div>
       </form>
     </Form>
