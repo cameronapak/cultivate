@@ -209,13 +209,22 @@ const TaskItem = ({ task }: { task: Task }) => {
           <div className="flex flex-col">
             <label
               htmlFor={task.id.toString()}
-              className="pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className={`pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${task.complete ? "line-through text-gray-500" : ""}`}
             >
               {task.title}
             </label>
-            {task.description && (
+            {task.description && !task.complete && (
               <p className="text-sm text-gray-500 line-clamp-1">
                 {task.description}
+              </p>
+            )}
+            {task.complete && (
+              <p className="text-sm text-gray-500 line-clamp-1">
+                Completed {task.updatedAt.toLocaleDateString('en', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
               </p>
             )}
           </div>
