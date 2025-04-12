@@ -18,7 +18,7 @@ export function DocumentPage() {
   return (
     <Layout 
       breadcrumbItems={[
-        { title: 'Documents', url: '/documents' },
+        { title: 'Docs', url: '/documents' },
         { title: document.title }
       ]}
     >

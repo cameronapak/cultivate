@@ -38,7 +38,7 @@ export const CreateDocumentPage = () => {
   };
 
   return (
-    <Layout breadcrumbItems={[{ title: "New Document" }]}>
+    <Layout breadcrumbItems={[{ title: "Docs", url: "/documents" }, { title: "New" }]}>
       <div>
         <form
           onSubmit={handleSubmit}
