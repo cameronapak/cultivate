@@ -1,4 +1,4 @@
-import { RouteIcon, ChevronRight, InboxIcon } from "lucide-react";
+import { RouteIcon, ChevronRight, InboxIcon, FileIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +20,8 @@ import {
 import { Link } from 'react-router-dom';
 
 export function AppSidebar({ items }: { items: { isActive: boolean, title: string, icon: any, items: { title: string, url: string }[] }[] }) {
+  // Get the current path
+  const currentPath = window.location.pathname;
   return (
     <Sidebar>
        <SidebarHeader>
@@ -41,10 +43,18 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
         <SidebarGroup>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild isActive={currentPath === "/inbox"}>
                 <Link to={"/inbox" + window.location.search}>
                   <InboxIcon className="h-5 w-5" />
-                  <span className="text-base font-semibold">Inbox</span>
+                  <span>Inbox</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={currentPath === "/documents"}>
+                <Link to={"/documents" + window.location.search}>
+                  <FileIcon className="h-5 w-5" />
+                  <span>Documents</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
