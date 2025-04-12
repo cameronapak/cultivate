@@ -30,10 +30,6 @@ export const CreateDocumentPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log({
-        title,
-        content,
-      });
       const newDocument = await createDocument({ title, content });
       navigate(`/documents/${newDocument.id}`);
     } catch (error) {
