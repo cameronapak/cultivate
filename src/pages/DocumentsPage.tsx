@@ -12,13 +12,20 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Button } from "../components/ui/button";
-import { BadgeCheck, Plus } from "lucide-react";
+import { BadgeCheck, Plus, File } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "../components/ui/tooltip";
+import {
+  EmptyStateRoot,
+  EmptyStateDescription,
+  EmptyStateTitle,
+  EmptyStateAction,
+  EmptyStateIcon,
+} from "../components/custom/EmptyStateView";
 
 export function DocumentsPage() {
   const navigate = useNavigate();
@@ -26,6 +33,30 @@ export function DocumentsPage() {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
+
+  if (documents?.length === 0) {
+    return (
+      <Layout breadcrumbItems={[{ title: "Docs" }]}>
+        <EmptyStateRoot className="mx-auto">
+          <EmptyStateIcon>
+            <File />
+          </EmptyStateIcon>
+          <EmptyStateTitle>Create your first document</EmptyStateTitle>
+          <EmptyStateDescription>
+            Get things out of your head and organized.
+          </EmptyStateDescription>
+          <EmptyStateAction>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/documents/new")}
+            >
+              New Document
+            </Button>
+          </EmptyStateAction>
+        </EmptyStateRoot>
+      </Layout>
+    );
+  }
 
   return (
     <Layout breadcrumbItems={[{ title: "Docs" }]}>
@@ -59,9 +90,7 @@ export function DocumentsPage() {
                       <TooltipTrigger>
                         <BadgeCheck className="w-4 h-4 text-primary" />
                       </TooltipTrigger>
-                      <TooltipContent>
-                        Published
-                      </TooltipContent>
+                      <TooltipContent>Published</TooltipContent>
                     </Tooltip>
                   ) : (
                     <Badge
