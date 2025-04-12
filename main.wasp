@@ -25,6 +25,11 @@ page DocumentPage {
   component: import { DocumentPage } from "@src/DocumentPage"
 }
 
+route CreateDocumentRoute { path: "/documents/new", to: CreateDocumentPage }
+page CreateDocumentPage {
+  component: import { CreateDocumentPage } from "@src/CreateDocumentPage"
+}
+
 query getProjects {
   // Specifies where the implementation for the query function is.
   // The path `@src/queries` resolves to `src/queries.ts`.
