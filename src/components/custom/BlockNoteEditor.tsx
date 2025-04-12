@@ -64,7 +64,7 @@ const BlockNoteEditorComponent = forwardRef<HTMLDivElement, BlockNoteEditorProps
 
     return (
       <div id={id} ref={containerRef} className={`block-note-editor-container ${className || ""}`}>
-        <BlockNoteView editable={editable} editor={editor} theme="light" />
+        <BlockNoteView autoFocus={true} editable={editable} editor={editor} theme="light" />
       </div>
     );
   }
