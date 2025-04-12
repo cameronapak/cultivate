@@ -11,15 +11,29 @@ interface BlockNoteEditorProps {
   name?: string;
   id?: string;
   debounceDelay?: number;
+  initialContent?: string;
+  editable?: boolean;
 }
 
 const BlockNoteEditorComponent = forwardRef<HTMLDivElement, BlockNoteEditorProps>(
-  ({ onChange, value, placeholder, className, name, id, debounceDelay = 500, ...props }, ref) => {
+  ({ onChange, value, placeholder, className, name, id, debounceDelay = 500, initialContent, editable = true, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Creates a new editor instance with default settings
     const editor = useCreateBlockNote();
+
+    // For initialization; on mount, convert the initial Markdown to blocks and replace the default editor's content
+    React.useEffect(() => {
+      async function loadInitialHTML() {
+        const blocks = await editor.tryParseMarkdownToBlocks(initialContent || "");
+        editor.replaceBlocks(editor.document, blocks);
+      }
+
+      if (initialContent) {
+        loadInitialHTML();
+      }
+    }, [editor, initialContent]);
 
     // Debounced onChange handler
     useEffect(() => {
@@ -50,7 +64,7 @@ const BlockNoteEditorComponent = forwardRef<HTMLDivElement, BlockNoteEditorProps
 
     return (
       <div id={id} ref={containerRef} className={`block-note-editor-container ${className || ""}`}>
-        <BlockNoteView editor={editor} theme="light" />
+        <BlockNoteView editable={editable} editor={editor} theme="light" />
       </div>
     );
   }
