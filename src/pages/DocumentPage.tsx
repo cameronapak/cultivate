@@ -12,20 +12,70 @@ import { Button } from "../components/ui/button";
 import { BadgeCheck, BadgeX, Pencil, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../components/ui/dialog";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogTrigger,
+} from "../components/ui/alert-dialog";
 import "../client/blocknote.css";
 import { Badge } from "../components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../components/ui/tooltip";
+
+function DeleteDocumentWithAlertDialog({
+  id,
+  children,
+}: {
+  id: number;
+  children: React.ReactNode;
+}) {
+  const navigate = useNavigate();
+  const handleDelete = async () => {
+    try {
+      await deleteDocument({ id: id });
+      navigate("/documents");
+      toast.success("Document deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete document:", error);
+      toast.error("Failed to delete document");
+    }
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Document</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete this document? This action cannot be
+            undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={handleDelete}
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 export function DocumentPage() {
   const { documentId } = useParams();
-  const navigate = useNavigate();
   const parsedDocumentId = parseInt(documentId || "0", 10);
   const {
     data: document,
@@ -34,7 +84,6 @@ export function DocumentPage() {
   } = useQuery(getDocument, { documentId: parsedDocumentId });
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState<any>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
@@ -55,31 +104,35 @@ export function DocumentPage() {
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      await deleteDocument({ id: document.id });
-      navigate("/documents");
-      toast.success("Document deleted successfully");
-    } catch (error) {
-      console.error("Failed to delete document:", error);
-      toast.error("Failed to delete document");
-    }
-  };
-
   const handleUpdatePublishedStatus = async (published: boolean) => {
     try {
-      if (window.confirm("Are you sure you want to " + (published ? "publish" : "unpublish") + " this document?")) {
+      if (
+        window.confirm(
+          "Are you sure you want to " +
+            (published ? "publish" : "unpublish") +
+            " this document?"
+        )
+      ) {
         await updateDocument({
           id: document.id,
           title: document.title,
           content: document.content,
           isPublished: published,
         });
-        toast.success("Document " + (published ? "published" : "unpublished") + " successfully");
+        toast.success(
+          "Document " +
+            (published ? "published" : "unpublished") +
+            " successfully"
+        );
       }
     } catch (error) {
-      console.error("Failed to " + (published ? "publish" : "unpublish") + " document:", error);
-      toast.error("Failed to " + (published ? "publish" : "unpublish") + " document");
+      console.error(
+        "Failed to " + (published ? "publish" : "unpublish") + " document:",
+        error
+      );
+      toast.error(
+        "Failed to " + (published ? "publish" : "unpublish") + " document"
+      );
     }
   };
 
@@ -99,12 +152,13 @@ export function DocumentPage() {
                 <TooltipTrigger>
                   <BadgeCheck className="w-5 h-5 text-muted-foreground" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Published
-                </TooltipContent>
+                <TooltipContent>Published</TooltipContent>
               </Tooltip>
             ) : (
-              <Badge variant="secondary" className="text-muted-foreground font-normal">
+              <Badge
+                variant="secondary"
+                className="text-muted-foreground font-normal"
+              >
                 Draft
               </Badge>
             )}
@@ -124,20 +178,30 @@ export function DocumentPage() {
                 >
                   <Pencil className="w-4 h-4" />
                 </Button>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="hover:text-destructive"
-                  onClick={() => setShowDeleteDialog(true)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <DeleteDocumentWithAlertDialog id={document.id}>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="hover:text-destructive"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </DeleteDocumentWithAlertDialog>
                 {document.isPublished ? (
-                  <Button className="hover:text-destructive" size="icon" variant="outline" onClick={() => handleUpdatePublishedStatus(false)}>
+                  <Button
+                    className="hover:text-destructive"
+                    size="icon"
+                    variant="outline"
+                    onClick={() => handleUpdatePublishedStatus(false)}
+                  >
                     <BadgeX className="w-4 h-4" />
                   </Button>
                 ) : (
-                  <Button size="icon" variant="outline" onClick={() => handleUpdatePublishedStatus(true)}>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => handleUpdatePublishedStatus(true)}
+                  >
                     <BadgeCheck className="w-4 h-4" />
                   </Button>
                 )}
@@ -153,29 +217,6 @@ export function DocumentPage() {
           />
         </div>
       </div>
-
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Document</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this document? This action cannot
-              be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </Layout>
   );
 }
