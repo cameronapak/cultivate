@@ -20,6 +20,11 @@ page InboxPage {
   component: import { InboxPage } from "@src/InboxPage"
 }
 
+route DocumentsRoute { path: "/documents", to: DocumentsPage }
+page DocumentsPage {
+  component: import { DocumentsPage } from "@src/DocumentsPage"
+}
+
 route DocumentRoute { path: "/documents/:documentId", to: DocumentPage }
 page DocumentPage {
   component: import { DocumentPage } from "@src/DocumentPage"
