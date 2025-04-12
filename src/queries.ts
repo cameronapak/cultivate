@@ -1,4 +1,5 @@
 import { Project, Task, Pitch, Resource } from 'wasp/entities'
+import { HttpError } from 'wasp/server'
 import { 
   type GetProjects, 
   type CreateProject, 
@@ -398,6 +399,10 @@ export const getDocuments = async (args: {}, context: any) => {
 }
 
 export const createDocument = async (args: { title: string; content: string }, context: any) => {
+  if (!args.title || !args.content) {
+    throw new HttpError(400, "Title and content are required");
+  }
+
   return context.entities.Document.create({
     data: {
       title: args.title,

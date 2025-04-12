@@ -25,7 +25,6 @@ export const ProjectPage = () => {
       ]}
       activeProjectId={parsedProjectId}
     >
-      <Toaster />
       <ProjectView project={project as Project} />
     </Layout>
   )

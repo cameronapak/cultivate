@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "./custom/AppSidebar";
 import { CommandMenu } from "./custom/CommandMenu";
 import { Separator } from "./ui/separator";
+import { Toaster } from "sonner";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -36,6 +37,7 @@ export function Layout({
   return (
     <SidebarProvider open={!hideSidebar}>
       <CommandMenu />
+      <Toaster />
       <AppSidebar
         items={[
           {
