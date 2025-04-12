@@ -138,7 +138,7 @@ export const MainPage = () => {
                     )}
                   </CardHeader>
                   <CardContent>
-                    <div className="flex gap-2 text-sm text-gray-500">
+                    <div className="flex gap-2 text-sm text-muted-foreground">
                       <span>{project.tasks?.length || 0} tasks</span>
                       <span>•</span>
                       <span>{project.resources?.length || 0} resources</span>
@@ -387,7 +387,7 @@ const TaskItem = ({ task }: { task: Task }) => {
               {task.title}
             </label>
             {task.description && (
-              <p className="text-sm text-gray-500 line-clamp-1">
+              <p className="text-sm text-muted-foreground line-clamp-1">
                 {task.description}
               </p>
             )}
@@ -594,12 +594,12 @@ const ResourceItem = ({
             <div className="flex flex-col">
               <p className="text-sm hover:underline">{resource.title}</p>
               {resource.description && (
-                <p className="text-sm text-gray-500 line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-2">
                   {resource.description}
                 </p>
               )}
             </div>
-            <ExternalLink className="mt-0.5 w-4 h-4 text-gray-500" />
+            <ExternalLink className="mt-0.5 w-4 h-4 text-muted-foreground" />
           </div>
         </a>
         <div className="flex">
@@ -881,7 +881,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
           </TableBody>
         </Table>
       ) : (
-        <p className="paragraph text-sm text-gray-500">
+        <p className="paragraph text-sm text-muted-foreground">
           No resources yet. Add links to helpful websites, documents, and other
           references.
         </p>
@@ -1008,7 +1008,7 @@ const ProjectView = ({ project }: { project: Project }) => {
                     ) : (
                       <TableRow>
                         <TableCell>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-muted-foreground">
                             {project.tasks && project.tasks.length > 0
                               ? "All tasks are completed and/or hidden."
                               : "No tasks yet"}

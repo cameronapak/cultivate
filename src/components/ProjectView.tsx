@@ -135,7 +135,7 @@ const EditTaskForm = ({
             <FormItem>
               <FormControl>
                 <Textarea
-                  className="text-gray-500"
+                  className="text-muted-foreground"
                   placeholder="Task description"
                   {...field}
                 />
@@ -209,17 +209,17 @@ const TaskItem = ({ task }: { task: Task }) => {
           <div className="flex flex-col">
             <label
               htmlFor={task.id.toString()}
-              className={`pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${task.complete ? "line-through text-gray-500" : ""}`}
+              className={`pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${task.complete ? "line-through text-muted-foreground" : ""}`}
             >
               {task.title}
             </label>
             {task.description && !task.complete && (
-              <p className="text-sm text-gray-500 line-clamp-1">
+              <p className="text-sm text-muted-foreground line-clamp-1">
                 {task.description}
               </p>
             )}
             {task.complete && (
-              <p className="text-sm text-gray-500 line-clamp-1">
+              <p className="text-sm text-muted-foreground line-clamp-1">
                 Completed {task.updatedAt.toLocaleDateString('en', {
                   year: 'numeric',
                   month: 'long',
@@ -307,7 +307,7 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
             <FormItem>
               <FormControl>
                 <Textarea
-                  className="text-gray-500"
+                  className="text-muted-foreground"
                   placeholder="Task description (optional)"
                   {...field}
                 />
@@ -434,12 +434,12 @@ const ResourceItem = ({
             <div className="flex flex-col">
               <p className="text-sm hover:underline">{resource.title}</p>
               {resource.description && (
-                <p className="text-sm text-gray-500 line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-2">
                   {resource.description}
                 </p>
               )}
             </div>
-            <ExternalLink className="mt-0.5 w-4 h-4 text-gray-500" />
+            <ExternalLink className="mt-0.5 w-4 h-4 text-muted-foreground" />
           </div>
         </a>
         <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
@@ -707,7 +707,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
           </TableBody>
         </Table>
       ) : (
-        <p className="paragraph text-sm text-gray-500">
+        <p className="paragraph text-sm text-muted-foreground">
           No resources yet. Add links to helpful websites, documents, and other
           references.
         </p>
@@ -912,7 +912,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     ) : (
                       <TableRow>
                         <TableCell>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-muted-foreground">
                             {project.tasks && project.tasks.length > 0
                               ? "All tasks are completed and/or hidden."
                               : "No tasks yet"}

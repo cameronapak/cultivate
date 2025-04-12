@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu'
 import { Layout } from '../components/Layout'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip'
 
 export function InboxPage() {
   const { data: tasks, isLoading, error } = useQuery(getInboxTasks)
@@ -87,10 +88,10 @@ export function InboxPage() {
       <div>
         <div className="flex flex-col gap-2 items-start mb-4">
           <h2 className="text-2xl font-medium">Inbox</h2>
-          <p className="text-sm text-gray-500">Tasks fade away the longer they sit in the inbox</p>
+          <p className="text-sm text-muted-foreground">Tasks fade away the longer they sit in the inbox</p>
         </div>
         <div>
-          <div className="flex gap-2 mb-6">
+          <div className="flex gap-4 mb-6">
             <Input
               autoFocus={true}
               type="text"
@@ -117,30 +118,41 @@ export function InboxPage() {
                       />
                     </TableCell>
                     <TableCell>
-                      <span className={`mr-2 ${task.complete ? 'line-through text-gray-500' : ''}`}>
+                      <span className={`mr-2 ${task.complete ? 'line-through text-muted-foreground' : ''}`}>
                         {task.title}
                       </span>
-                      <span className="text-xs text-gray-500">  
+                      <span className="text-xs text-muted-foreground">  
                         {getDaysAgo(task.createdAt) ? getDaysAgo(task.createdAt) + ' day' + (getDaysAgo(task.createdAt) > 1 ? 's' : '') + ' ago' : 'new'}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoveRight className="h-4 w-4" />
-                            </Button>
+                          <DropdownMenuTrigger>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoveRight className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                Move to a project
+                              </TooltipContent>
+                            </Tooltip>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            {projects?.map((project) => (
+                            {projects?.length ? projects?.map((project) => (
                               <DropdownMenuItem
                                 key={project.id}
                                 onClick={() => handleMoveTask(task.id, project.id)}
                               >
                                 Move to {project.title}
                               </DropdownMenuItem>
-                            ))}
+                            )) : (
+                              <DropdownMenuItem className="text-muted-foreground">
+                                No projects found
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                         <Button
@@ -156,7 +168,7 @@ export function InboxPage() {
                 ))}
                 {tasks?.length === 0 && !isLoading && (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center text-gray-500">
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
                       You've reached Inbox Zero 🍹
                     </TableCell>
                   </TableRow>
