@@ -79,7 +79,7 @@ export function InboxPage() {
     <Layout breadcrumbItems={[{ title: 'Inbox' }]}>
       <div>
         <div className="flex items-center mb-4">
-          <h2 className="text-2xl font-bold">Inbox</h2>
+          <h2 className="text-2xl font-medium">Inbox</h2>
         </div>
         <div>
           <div className="flex gap-2 mb-6">
@@ -96,12 +96,12 @@ export function InboxPage() {
           {isLoading && <div>Loading...</div>}
           {error && <div className="text-red-500">Error: {error.message}</div>}
 
-          <div className="rounded-md border">
+          <div>
             <Table>
               <TableBody>
                 {tasks?.map((task: Task) => (
                   <TableRow key={task.id}>
-                    <TableCell className="w-12">
+                    <TableCell className="w-8">
                       <Checkbox
                         checked={task.complete}
                         onCheckedChange={() => handleToggleTask(task.id, task.complete)}
