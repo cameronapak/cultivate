@@ -75,11 +75,19 @@ export function InboxPage() {
     }
   }
 
+  const getDaysAgo = (date: Date) => {
+    const today = new Date()
+    const diffTime = today.getTime() - date.getTime()
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+
   return (
     <Layout breadcrumbItems={[{ title: 'Inbox' }]}>
       <div>
-        <div className="flex items-center mb-4">
+        <div className="flex flex-col gap-2 items-start mb-4">
           <h2 className="text-2xl font-medium">Inbox</h2>
+          <p className="text-sm text-gray-500">Tasks fade away the longer they sit in the inbox</p>
         </div>
         <div>
           <div className="flex gap-2 mb-6">
@@ -101,7 +109,7 @@ export function InboxPage() {
             <Table>
               <TableBody>
                 {tasks?.map((task: Task) => (
-                  <TableRow key={task.id}>
+                  <TableRow key={task.id} style={{ opacity: Math.max(0.1, 1 - (getDaysAgo(task.createdAt) * 0.33)) }}>
                     <TableCell className="w-8">
                       <Checkbox
                         checked={task.complete}
@@ -109,8 +117,11 @@ export function InboxPage() {
                       />
                     </TableCell>
                     <TableCell>
-                      <span className={task.complete ? 'line-through text-gray-500' : ''}>
+                      <span className={`mr-2 ${task.complete ? 'line-through text-gray-500' : ''}`}>
                         {task.title}
+                      </span>
+                      <span className="text-xs text-gray-500">  
+                        {getDaysAgo(task.createdAt) ? getDaysAgo(task.createdAt) + ' day' + (getDaysAgo(task.createdAt) > 1 ? 's' : '') + ' ago' : 'new'}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
