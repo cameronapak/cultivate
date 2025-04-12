@@ -398,7 +398,7 @@ export const getDocuments = async (args: {}, context: any) => {
   })
 }
 
-export const createDocument = async (args: { title: string; content: string }, context: any) => {
+export const createDocument = async (args: { title: string; content: string, isPublished?: boolean }, context: any) => {
   if (!args.title || !args.content) {
     throw new HttpError(400, "Title and content are required");
   }
@@ -406,17 +406,19 @@ export const createDocument = async (args: { title: string; content: string }, c
   return context.entities.Document.create({
     data: {
       title: args.title,
-      content: args.content
+      content: args.content,
+      isPublished: args.isPublished || false
     }
   })
 }
 
-export const updateDocument = async (args: { id: number; title: string; content: string }, context: any) => {
+export const updateDocument = async (args: { id: number; title: string; content: string, isPublished?: boolean }, context: any) => {
   return context.entities.Document.update({
     where: { id: args.id },
     data: {
       title: args.title,
-      content: args.content
+      content: args.content,
+      isPublished: args.isPublished || false
     }
   })
 }
