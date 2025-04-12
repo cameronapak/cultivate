@@ -12,8 +12,8 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Button } from "../components/ui/button";
-import { Plus } from "lucide-react";
-
+import { BadgeCheck, Plus } from "lucide-react";
+import { Badge } from "../components/ui/badge";
 export function DocumentsPage() {
   const navigate = useNavigate();
   const { data: documents, isLoading, error } = useQuery(getDocuments);
@@ -36,7 +36,6 @@ export function DocumentsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Created</TableHead>
               <TableHead>Updated</TableHead>
             </TableRow>
           </TableHeader>
@@ -47,12 +46,21 @@ export function DocumentsPage() {
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => navigate(`/documents/${document.id}`)}
               >
-                <TableCell className="font-medium">{document.title}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {new Date(document.createdAt).toLocaleDateString()}
+                <TableCell className="font-medium flex items-center gap-2">
+                  {document.title}
+                  {document.isPublished ? (
+                    <BadgeCheck className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <Badge
+                      variant="secondary"
+                      className="text-muted-foreground font-normal"
+                    >
+                      Draft
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {new Date(document.updatedAt).toLocaleDateString()}
+                  {new Date(document.createdAt).toLocaleDateString()}
                 </TableCell>
               </TableRow>
             ))}

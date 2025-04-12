@@ -9,7 +9,7 @@ import {
 } from "wasp/client/operations";
 import { BlockNoteEditor } from "../components/custom/BlockNoteEditor";
 import { Button } from "../components/ui/button";
-import { Pencil, Save, Trash2 } from "lucide-react";
+import { BadgeCheck, BadgeX, Pencil, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "../components/ui/dialog";
 import "../client/blocknote.css";
+import { Badge } from "../components/ui/badge";
 
 export function DocumentPage() {
   const { documentId } = useParams();
@@ -64,6 +65,23 @@ export function DocumentPage() {
     }
   };
 
+  const handleUpdatePublishedStatus = async (published: boolean) => {
+    try {
+      if (window.confirm("Are you sure you want to " + (published ? "publish" : "unpublish") + " this document?")) {
+        await updateDocument({
+          id: document.id,
+          title: document.title,
+          content: document.content,
+          isPublished: published,
+        });
+        toast.success("Document " + (published ? "published" : "unpublished") + " successfully");
+      }
+    } catch (error) {
+      console.error("Failed to " + (published ? "publish" : "unpublish") + " document:", error);
+      toast.error("Failed to " + (published ? "publish" : "unpublish") + " document");
+    }
+  };
+
   return (
     <Layout
       breadcrumbItems={[
@@ -73,7 +91,16 @@ export function DocumentPage() {
     >
       <div className="max-w-xl mx-auto">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-medium">{document.title}</h1>
+          <h1 className="text-2xl font-medium flex items-center gap-2">
+            {document.title}
+            {document.isPublished ? (
+              <BadgeCheck className="w-5 h-5 text-muted-foreground" />
+            ) : (
+              <Badge variant="secondary" className="text-muted-foreground font-normal">
+                Draft
+              </Badge>
+            )}
+          </h1>
           <div className="flex gap-2">
             {isEditing ? (
               <Button size="default" onClick={handleSave}>
@@ -97,6 +124,15 @@ export function DocumentPage() {
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
+                {document.isPublished ? (
+                  <Button className="hover:text-destructive" size="icon" variant="outline" onClick={() => handleUpdatePublishedStatus(false)}>
+                    <BadgeX className="w-4 h-4" />
+                  </Button>
+                ) : (
+                  <Button size="icon" variant="outline" onClick={() => handleUpdatePublishedStatus(true)}>
+                    <BadgeCheck className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             )}
           </div>
