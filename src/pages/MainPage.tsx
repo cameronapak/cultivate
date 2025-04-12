@@ -71,6 +71,13 @@ import {
 import { PopoverClose } from "@radix-ui/react-popover";
 import { Layout } from "../components/Layout";
 import { toast } from "sonner";
+import { 
+  EmptyStateRoot,
+  EmptyStateIcon,
+  EmptyStateTitle,
+  EmptyStateDescription,
+  EmptyStateAction,
+} from "../components/custom/EmptyStateView";
 
 // Extended types with relationships
 interface Task extends BaseTask {}
@@ -144,20 +151,25 @@ export const MainPage = () => {
         </>
       ) : (
         !isLoading && (
-          <div className="text-center flex flex-col items-center py-12">
-            <Folder className="w-12 h-12 text-muted-foreground mb-4" />
-            <h1 className="text-2xl text-muted-foreground mb-4">Create your first project</h1>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline">
-                  Get Started
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <NewProjectForm onCancel={() => {}} />
-              </PopoverContent>
-            </Popover>
-          </div>
+          <EmptyStateRoot className="mx-auto">
+            <EmptyStateIcon>
+              <Folder />
+            </EmptyStateIcon>
+            <EmptyStateTitle>Create your first project</EmptyStateTitle>
+            <EmptyStateDescription>
+              Create projects to organize your tasks and resources.
+            </EmptyStateDescription>
+            <EmptyStateAction>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline">Get Started</Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <NewProjectForm onCancel={() => {}} />
+                </PopoverContent>
+              </Popover>
+            </EmptyStateAction>
+          </EmptyStateRoot>
         )
       )}
     </Layout>
@@ -214,11 +226,12 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Brief overview of the project. Can be edited later." {...field} />
+                <Textarea
+                  placeholder="Brief overview of the project. Can be edited later."
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
-                Optional
-              </FormDescription>
+              <FormDescription>Optional</FormDescription>
               <FormMessage />
             </FormItem>
           )}
