@@ -21,6 +21,7 @@ import {
 } from "../components/ui/dialog";
 import "../client/blocknote.css";
 import { Badge } from "../components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../components/ui/tooltip";
 
 export function DocumentPage() {
   const { documentId } = useParams();
@@ -94,7 +95,14 @@ export function DocumentPage() {
           <h1 className="text-2xl font-medium flex items-center gap-2">
             {document.title}
             {document.isPublished ? (
-              <BadgeCheck className="w-5 h-5 text-muted-foreground" />
+              <Tooltip>
+                <TooltipTrigger>
+                  <BadgeCheck className="w-5 h-5 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  Published
+                </TooltipContent>
+              </Tooltip>
             ) : (
               <Badge variant="secondary" className="text-muted-foreground font-normal">
                 Draft

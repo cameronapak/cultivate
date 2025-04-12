@@ -14,6 +14,12 @@ import {
 import { Button } from "../components/ui/button";
 import { BadgeCheck, Plus } from "lucide-react";
 import { Badge } from "../components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../components/ui/tooltip";
+
 export function DocumentsPage() {
   const navigate = useNavigate();
   const { data: documents, isLoading, error } = useQuery(getDocuments);
@@ -49,7 +55,14 @@ export function DocumentsPage() {
                 <TableCell className="font-medium flex items-center gap-2">
                   {document.title}
                   {document.isPublished ? (
-                    <BadgeCheck className="w-4 h-4 text-muted-foreground" />
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <BadgeCheck className="w-4 h-4 text-primary" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Published
+                      </TooltipContent>
+                    </Tooltip>
                   ) : (
                     <Badge
                       variant="secondary"
