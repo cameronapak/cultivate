@@ -92,7 +92,7 @@ export function CommandMenu() {
               }
             >
               <Folder className="mr-2 h-4 w-4" />
-              {project.title}
+              Open "{project.title}"
             </CommandItem>
           ))}
         </CommandGroup>
