@@ -1,4 +1,4 @@
-import { RouteIcon, ChevronRight, InboxIcon, BookOpen } from "lucide-react";
+import { RouteIcon, ChevronRight, InboxIcon, BookOpen, Plus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -76,7 +76,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items?.sort((a: any, b: any) => a.title.localeCompare(b.title))?.map((subItem: any) => (
+                      {item.items.length ? item.items?.sort((a: any, b: any) => a.title.localeCompare(b.title))?.map((subItem: any) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton isActive={subItem.isActive} asChild>
                             <Link to={subItem.url}>
@@ -84,7 +84,16 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
                             </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
-                      ))}
+                      )) : (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={currentPath === "/"}>
+                            <Link to={"/"}>
+                              <Plus className="h-5 w-5" />
+                              <span>New Project</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
