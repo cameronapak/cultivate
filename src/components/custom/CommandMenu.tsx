@@ -48,11 +48,29 @@ export function CommandMenu() {
     command();
   }, []);
 
+  // Determine if the command menu is open on a project page
+  const isProjectPage = window.location.pathname.includes("/projects/");
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
+        {isProjectPage && (
+          <CommandGroup heading="This Project">
+            <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
+              {hideCompletedTasks ? (
+                <Eye className="mr-2 h-4 w-4" />
+            ) : (
+              <EyeOff className="mr-2 h-4 w-4" />
+            )}
+            {hideCompletedTasks
+              ? "Show completed tasks"
+              : "Hide completed tasks"}
+            </CommandItem>
+          </CommandGroup>
+        )}
+        <CommandSeparator />
         <CommandGroup heading="Actions">
           <CommandItem onSelect={() => runCommand(toggleSidebar)}>
             {isSidebarHidden ? (
@@ -61,19 +79,6 @@ export function CommandMenu() {
               <PanelLeftClose className="mr-2 h-4 w-4" />
             )}
             {isSidebarHidden ? "Show sidebar" : "Hide sidebar"}
-          </CommandItem>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="This Project">
-          <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
-            {hideCompletedTasks ? (
-              <Eye className="mr-2 h-4 w-4" />
-            ) : (
-              <EyeOff className="mr-2 h-4 w-4" />
-            )}
-            {hideCompletedTasks
-              ? "Show completed tasks"
-              : "Hide completed tasks"}
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />
