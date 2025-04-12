@@ -99,7 +99,7 @@ export function InboxPage() {
               onChange={(e) => setNewTaskTitle(e.target.value)}
               onKeyPress={handleKeyPress}
             />
-            <Button onClick={handleCreateTask}>Add Task</Button>
+            <Button variant="outline" onClick={handleCreateTask}>Add Task</Button>
           </div>
 
           {isLoading && <div>Loading...</div>}
@@ -157,7 +157,7 @@ export function InboxPage() {
                 {tasks?.length === 0 && !isLoading && (
                   <TableRow>
                     <TableCell colSpan={3} className="text-center text-gray-500">
-                      No tasks in inbox
+                      You've reached Inbox Zero 🍹
                     </TableCell>
                   </TableRow>
                 )}
