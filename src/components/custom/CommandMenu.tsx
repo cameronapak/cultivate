@@ -58,6 +58,28 @@ export function CommandMenu() {
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
+        <CommandGroup heading="Actions">
+          {isProjectPage && (
+            <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
+              {hideCompletedTasks ? (
+                <Eye className="mr-2 h-4 w-4" />
+              ) : (
+                <EyeOff className="mr-2 h-4 w-4" />
+              )}
+              {hideCompletedTasks
+                ? "Show completed tasks"
+                : "Hide completed tasks"}
+            </CommandItem>
+          )}
+          <CommandItem onSelect={() => runCommand(toggleSidebar)}>
+            {isSidebarHidden ? (
+              <PanelLeftOpen className="mr-2 h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="mr-2 h-4 w-4" />
+            )}
+            {isSidebarHidden ? "Show sidebar" : "Hide sidebar"}
+          </CommandItem>
+        </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Pages">
           <CommandItem
@@ -79,29 +101,6 @@ export function CommandMenu() {
           >
             <BookOpen className="mr-2 h-4 w-4" />
             Open Docs
-          </CommandItem>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Actions">
-          {isProjectPage && (
-            <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
-              {hideCompletedTasks ? (
-                <Eye className="mr-2 h-4 w-4" />
-              ) : (
-                <EyeOff className="mr-2 h-4 w-4" />
-              )}
-              {hideCompletedTasks
-                ? "Show completed tasks"
-                : "Hide completed tasks"}
-            </CommandItem>
-          )}
-          <CommandItem onSelect={() => runCommand(toggleSidebar)}>
-            {isSidebarHidden ? (
-              <PanelLeftOpen className="mr-2 h-4 w-4" />
-            ) : (
-              <PanelLeftClose className="mr-2 h-4 w-4" />
-            )}
-            {isSidebarHidden ? "Show sidebar" : "Hide sidebar"}
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />
