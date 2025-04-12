@@ -74,6 +74,70 @@ function DeleteDocumentWithAlertDialog({
   );
 }
 
+function PublishDocumentWithAlertDialog({
+  id,
+  title,
+  content,
+  isPublished,
+  children,
+}: {
+  id: number;
+  title: string;
+  content: any;
+  isPublished: boolean;
+  children: React.ReactNode;
+}) {
+  const handlePublish = async () => {
+    try {
+      await updateDocument({
+        id,
+        title,
+        content,
+        isPublished: !isPublished,
+      });
+      toast.success(
+        `Document ${isPublished ? "unpublished" : "published"} successfully`
+      );
+    } catch (error) {
+      console.error(
+        `Failed to ${isPublished ? "unpublish" : "publish"} document:`,
+        error
+      );
+      toast.error(`Failed to ${isPublished ? "unpublish" : "publish"} document`);
+    }
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {isPublished ? "Unpublish Document" : "Publish Document"}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to {isPublished ? "unpublish" : "publish"} this document?
+            {isPublished 
+              ? " Unpublish puts it back in draft mode."
+              : " Publishing shows that the document is completed."}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className={isPublished 
+              ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
+              : ""}
+            onClick={handlePublish}
+          >
+            {isPublished ? "Unpublish" : "Publish"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 export function DocumentPage() {
   const { documentId } = useParams();
   const parsedDocumentId = parseInt(documentId || "0", 10);
@@ -101,38 +165,6 @@ export function DocumentPage() {
     } catch (error) {
       console.error("Failed to update document:", error);
       toast.error("Failed to update document");
-    }
-  };
-
-  const handleUpdatePublishedStatus = async (published: boolean) => {
-    try {
-      if (
-        window.confirm(
-          "Are you sure you want to " +
-            (published ? "publish" : "unpublish") +
-            " this document?"
-        )
-      ) {
-        await updateDocument({
-          id: document.id,
-          title: document.title,
-          content: document.content,
-          isPublished: published,
-        });
-        toast.success(
-          "Document " +
-            (published ? "published" : "unpublished") +
-            " successfully"
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Failed to " + (published ? "publish" : "unpublish") + " document:",
-        error
-      );
-      toast.error(
-        "Failed to " + (published ? "publish" : "unpublish") + " document"
-      );
     }
   };
 
@@ -188,22 +220,34 @@ export function DocumentPage() {
                   </Button>
                 </DeleteDocumentWithAlertDialog>
                 {document.isPublished ? (
-                  <Button
-                    className="hover:text-destructive"
-                    size="icon"
-                    variant="outline"
-                    onClick={() => handleUpdatePublishedStatus(false)}
+                  <PublishDocumentWithAlertDialog 
+                    id={document.id}
+                    title={document.title}
+                    content={document.content}
+                    isPublished={document.isPublished}
                   >
-                    <BadgeX className="w-4 h-4" />
-                  </Button>
+                    <Button
+                      className="hover:text-destructive"
+                      size="icon"
+                      variant="outline"
+                    >
+                      <BadgeX className="w-4 h-4" />
+                    </Button>
+                  </PublishDocumentWithAlertDialog>
                 ) : (
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => handleUpdatePublishedStatus(true)}
+                  <PublishDocumentWithAlertDialog 
+                    id={document.id}
+                    title={document.title}
+                    content={document.content}
+                    isPublished={document.isPublished}
                   >
-                    <BadgeCheck className="w-4 h-4" />
-                  </Button>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                    >
+                      <BadgeCheck className="w-4 h-4" />
+                    </Button>
+                  </PublishDocumentWithAlertDialog>
                 )}
               </div>
             )}
