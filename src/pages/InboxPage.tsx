@@ -84,6 +84,7 @@ export function InboxPage() {
         <div>
           <div className="flex gap-2 mb-6">
             <Input
+              autoFocus={true}
               type="text"
               placeholder="Add a new task..."
               value={newTaskTitle}
