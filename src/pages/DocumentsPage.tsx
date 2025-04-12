@@ -32,7 +32,7 @@ export function DocumentsPage() {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-medium">Docs</h1>
-          <Button onClick={() => navigate("/documents/new")}>
+          <Button variant="outline" onClick={() => navigate("/documents/new")}>
             <Plus className="w-4 h-4 mr-2" />
             New Doc
           </Button>
