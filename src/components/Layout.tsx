@@ -72,7 +72,7 @@ export function Layout({
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="container mx-auto p-6">{children}</div>
+        <div className="max-w-xl mx-auto p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

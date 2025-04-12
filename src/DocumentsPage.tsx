@@ -23,7 +23,7 @@ export function DocumentsPage() {
 
   return (
     <Layout breadcrumbItems={[{ title: 'Documents' }]}>
-      <div className="space-y-4 max-w-xl mx-auto">
+      <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-medium">Documents</h1>
           <Button onClick={() => navigate('/documents/new')}>

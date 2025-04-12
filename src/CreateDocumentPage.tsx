@@ -39,7 +39,7 @@ export const CreateDocumentPage = () => {
 
   return (
     <Layout breadcrumbItems={[{ title: "New Document" }]}>
-      <div className="max-w-xl mx-auto">
+      <div>
         <form
           onSubmit={handleSubmit}
           id="createDocumentForm"
