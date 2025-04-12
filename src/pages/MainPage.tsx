@@ -4,7 +4,8 @@ import {
   Task as BaseTask,
   Resource as BaseResource,
 } from "wasp/entities";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { Link } from "wasp/client/router";
 import {
   getProjects,
   useQuery,
@@ -112,7 +113,8 @@ export const MainPage = () => {
           {(projects as Project[]).map((project) => (
             <Link
               key={project.id}
-              to={`/projects/${project.id}`}
+              to={"/projects/:projectId"}
+              params={{ projectId: project.id }}
               className="no-underline"
             >
               <Card className="h-full hover:shadow-md transition-shadow">

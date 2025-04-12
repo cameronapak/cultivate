@@ -17,7 +17,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../../components/ui/collapsible";
-import { Link } from 'react-router-dom';
+import { Link } from 'wasp/client/router'
 
 export function AppSidebar({ items }: { items: { isActive: boolean, title: string, icon: any, items: { title: string, url: string }[] }[] }) {
   // Get the current path
@@ -31,7 +31,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Link to={"/" + window.location.search}>
+              <Link to={"/"}>
                 <RouteIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Pitchboard</span>
               </Link>
@@ -45,7 +45,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
           <SidebarMenu>
           <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={currentPath === "/inbox"}>
-                <Link to={"/inbox" + window.location.search}>
+                <Link to={"/inbox"}>
                   <InboxIcon className="h-5 w-5" />
                   <span>Inbox</span>
                 </Link>
@@ -53,7 +53,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={currentPath === "/documents"}>
-                <Link to={"/documents" + window.location.search}>
+                <Link to={"/documents"}>
                   <BookOpen className="h-5 w-5" />
                   <span>Docs</span>
                 </Link>
@@ -79,7 +79,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
                       {item.items?.sort((a: any, b: any) => a.title.localeCompare(b.title))?.map((subItem: any) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton isActive={subItem.isActive} asChild>
-                            <Link to={subItem.url + window.location.search}>
+                            <Link to={subItem.url}>
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
