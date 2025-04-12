@@ -1,9 +1,8 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useQuery, getProject } from 'wasp/client/operations'
-import { ProjectView } from './components/ProjectView'
-import { Layout } from './components/Layout'
-import { Toaster } from './components/ui/sonner'
-import { Project } from './types'
+import { ProjectView } from '../components/ProjectView'
+import { Layout } from '../components/Layout'
+import { Project } from '../types'
 
 export const ProjectPage = () => {
   const { projectId } = useParams()

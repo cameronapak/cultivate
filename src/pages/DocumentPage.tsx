@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useCreateBlockNote } from "@blocknote/react";
-import { Layout } from "./components/Layout";
+import { Layout } from "../components/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   useQuery,
@@ -8,8 +7,8 @@ import {
   updateDocument,
   deleteDocument,
 } from "wasp/client/operations";
-import { BlockNoteEditor } from "./components/custom/BlockNoteEditor";
-import { Button } from "./components/ui/button";
+import { BlockNoteEditor } from "../components/custom/BlockNoteEditor";
+import { Button } from "../components/ui/button";
 import { Pencil, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -19,8 +18,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./components/ui/dialog";
-import "./client/blocknote.css";
+} from "../components/ui/dialog";
+import "../client/blocknote.css";
 
 export function DocumentPage() {
   const { documentId } = useParams();

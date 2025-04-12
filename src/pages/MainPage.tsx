@@ -1,4 +1,4 @@
-import { FormEvent, useRef, useState, useEffect } from "react";
+import { FormEvent, useRef, useState } from "react";
 import {
   Project as BaseProject,
   Task as BaseTask,
@@ -20,10 +20,10 @@ import {
   deleteTask,
 } from "wasp/client/operations";
 import { Trash, Pencil, ExternalLink, Plus, Folder } from "lucide-react";
-import "./Main.css";
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import { Textarea } from "./components/ui/textarea";
+import "../Main.css";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Textarea } from "../components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -35,7 +35,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./components/ui/form";
+} from "../components/ui/form";
 import {
   Card,
   CardContent,
@@ -43,10 +43,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { Checkbox } from "./components/ui/checkbox";
-import { Switch } from "./components/ui/switch";
+} from "../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Checkbox } from "../components/ui/checkbox";
+import { Switch } from "../components/ui/switch";
 import {
   Table,
   TableCaption,
@@ -55,15 +55,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./components/ui/table";
-import { getFaviconFromUrl } from "./lib/utils";
+} from "../components/ui/table";
+import { getFaviconFromUrl } from "../lib/utils";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-} from "./components/ui/popover";
+} from "../components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
-import { Layout } from "./components/Layout";
+import { Layout } from "../components/Layout";
 
 // Extended types with relationships
 interface Task extends BaseTask {}

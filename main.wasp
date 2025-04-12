@@ -7,32 +7,32 @@ app shapeUp {
 
 route RootRoute { path: "/", to: MainPage }
 page MainPage {
-  component: import { MainPage } from "@src/MainPage"
+  component: import { MainPage } from "@src/pages/MainPage"
 }
 
 route ProjectRoute { path: "/projects/:projectId", to: ProjectPage }
 page ProjectPage {
-  component: import { ProjectPage } from "@src/ProjectPage"
+  component: import { ProjectPage } from "@src/pages/ProjectPage"
 }
 
 route InboxRoute { path: "/inbox", to: InboxPage }
 page InboxPage {
-  component: import { InboxPage } from "@src/InboxPage"
+  component: import { InboxPage } from "@src/pages/InboxPage"
 }
 
 route DocumentsRoute { path: "/documents", to: DocumentsPage }
 page DocumentsPage {
-  component: import { DocumentsPage } from "@src/DocumentsPage"
+  component: import { DocumentsPage } from "@src/pages/DocumentsPage"
 }
 
 route DocumentRoute { path: "/documents/:documentId", to: DocumentPage }
 page DocumentPage {
-  component: import { DocumentPage } from "@src/DocumentPage"
+  component: import { DocumentPage } from "@src/pages/DocumentPage"
 }
 
 route CreateDocumentRoute { path: "/documents/new", to: CreateDocumentPage }
 page CreateDocumentPage {
-  component: import { CreateDocumentPage } from "@src/CreateDocumentPage"
+  component: import { CreateDocumentPage } from "@src/pages/CreateDocumentPage"
 }
 
 query getProjects {

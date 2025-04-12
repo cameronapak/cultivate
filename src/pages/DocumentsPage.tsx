@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "wasp/client/operations";
 import { getDocuments } from "wasp/client/operations";
 import { Document } from "wasp/entities";
-import { Layout } from "./components/Layout";
+import { Layout } from "../components/Layout";
 import {
   Table,
   TableBody,
@@ -10,10 +10,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./components/ui/table";
-import { Button } from "./components/ui/button";
+} from "../components/ui/table";
+import { Button } from "../components/ui/button";
 import { Plus } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 
 export function DocumentsPage() {
   const navigate = useNavigate();

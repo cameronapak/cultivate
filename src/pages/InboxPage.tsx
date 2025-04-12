@@ -2,9 +2,9 @@ import { Task } from 'wasp/entities'
 import { getInboxTasks, useQuery } from 'wasp/client/operations'
 import { createTask, updateTaskStatus, deleteTask, moveTask } from 'wasp/client/operations'
 import { useState } from 'react'
-import { Button } from './components/ui/button'
-import { Input } from './components/ui/input'
-import { Checkbox } from './components/ui/checkbox'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Checkbox } from '../components/ui/checkbox'
 import { Trash2, MoveRight } from 'lucide-react'
 import { getProjects } from 'wasp/client/operations'
 import {
@@ -12,14 +12,14 @@ import {
   TableBody,
   TableRow,
   TableCell,
-} from './components/ui/table'
+} from '../components/ui/table'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from './components/ui/dropdown-menu'
-import { Layout } from './components/Layout'
+} from '../components/ui/dropdown-menu'
+import { Layout } from '../components/Layout'
 
 export function InboxPage() {
   const { data: tasks, isLoading, error } = useQuery(getInboxTasks)

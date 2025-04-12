@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createDocument } from "wasp/client/operations";
-import { Layout } from "./components/Layout";
-import { Button } from "./components/ui/button";
-import { BlockNoteEditor } from "./components/custom/BlockNoteEditor";
+import { Layout } from "../components/Layout";
+import { Button } from "../components/ui/button";
+import { BlockNoteEditor } from "../components/custom/BlockNoteEditor";
 import { toast } from "sonner";
 
 // Add Trix editor declaration
