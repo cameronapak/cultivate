@@ -41,8 +41,9 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
+          {/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
           <SidebarMenu>
-            <SidebarMenuItem>
+          <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={currentPath === "/inbox"}>
                 <Link to={"/inbox" + window.location.search}>
                   <InboxIcon className="h-5 w-5" />
@@ -58,11 +59,6 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
-        <SidebarGroup>
-          {/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
-          <SidebarMenu>
             {items.map((item: any) => (
               <Collapsible
                 key={item.title}
