@@ -25,21 +25,15 @@ declare global {
 export const CreateDocumentPage = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
-  useEffect(() => {
-    // Initialize Trix editor
-    const editor = document.querySelector("trix-editor");
-    if (editor) {
-      editor.addEventListener("trix-change", (event: any) => {
-        setContent(event.target.value);
-      });
-    }
-  }, []);
+  const [content, setContent] = useState<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      console.log({
+        title,
+        content,
+      });
       const newDocument = await createDocument({ title, content });
       navigate(`/documents/${newDocument.id}`);
     } catch (error) {
@@ -69,7 +63,7 @@ export const CreateDocumentPage = () => {
             </Button>
           </div>
 
-          <BlockNoteEditor id="content" name="content" />
+          <BlockNoteEditor onChange={setContent} value={content} id="content" name="content" />
         </form>
       </div>
     </Layout>

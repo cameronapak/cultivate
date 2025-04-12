@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
+import React, { forwardRef, useImperativeHandle, useRef, useEffect } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "../../client/blocknote.css";
@@ -10,22 +10,46 @@ interface BlockNoteEditorProps {
   className?: string;
   name?: string;
   id?: string;
+  debounceDelay?: number;
 }
 
 const BlockNoteEditorComponent = forwardRef<HTMLDivElement, BlockNoteEditorProps>(
-  ({ onChange, value, placeholder, className, name, id, ...props }, ref) => {
+  ({ onChange, value, placeholder, className, name, id, debounceDelay = 500, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Creates a new editor instance with default settings
     const editor = useCreateBlockNote();
+
+    // Debounced onChange handler
+    useEffect(() => {
+      const handleEditorChange = async () => {
+        const markdown = await editor.blocksToMarkdownLossy();
+        onChange?.(markdown);
+      };
+
+      const editorChangeListener = () => {
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+        }
+        debounceTimeoutRef.current = setTimeout(handleEditorChange, debounceDelay);
+      };
+
+      editor.onChange(editorChangeListener);
+
+      // Cleanup function to clear timeout on unmount
+      return () => {
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+        }
+      };
+    }, [editor, onChange, debounceDelay]);
 
     // Forward the ref to the container div
     useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
     return (
       <div id={id} ref={containerRef} className={`block-note-editor-container ${className || ""}`}>
-        {/* Hidden input field with a default value so form submission works */}
-        {name && <input type="hidden" name={name} value={value || "Editor content"} />}
         <BlockNoteView editor={editor} theme="light" />
       </div>
     );
