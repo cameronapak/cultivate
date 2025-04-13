@@ -22,17 +22,17 @@ import {
   InboxIcon,
 } from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
+import { useSidebar } from "../ui/sidebar";
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const { data: projects } = useQuery(getProjects);
   const {
-    isSidebarHidden,
     hideCompletedTasks,
-    toggleSidebar,
     toggleHideCompleted,
   } = useLayoutState();
+  const { open: isSidebarOpen, toggleSidebar } = useSidebar();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -72,12 +72,12 @@ export function CommandMenu() {
             </CommandItem>
           )}
           <CommandItem onSelect={() => runCommand(toggleSidebar)}>
-            {isSidebarHidden ? (
-              <PanelLeftOpen className="mr-2 h-4 w-4" />
-            ) : (
+            {isSidebarOpen ? (
               <PanelLeftClose className="mr-2 h-4 w-4" />
+            ) : (
+              <PanelLeftOpen className="mr-2 h-4 w-4" />
             )}
-            {isSidebarHidden ? "Show sidebar" : "Hide sidebar"}
+            {isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />

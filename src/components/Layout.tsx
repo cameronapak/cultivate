@@ -1,5 +1,4 @@
-import { Fragment, ReactNode } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Fragment, ReactNode, useState } from "react";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "./custom/AppSidebar";
 import { CommandMenu } from "./custom/CommandMenu";
@@ -30,12 +29,19 @@ export function Layout({
   breadcrumbItems = [],
   activeProjectId,
 }: LayoutProps) {
-  const [searchParams] = useSearchParams();
-  const hideSidebar = searchParams.get("hideSidebar") === "true";
+  const isSidebarHidden = JSON.parse(localStorage.getItem("isSidebarHidden") || "false");
+  const [open, setOpen] = useState(Boolean(isSidebarHidden));
   const { data: projects } = useQuery(getProjects);
 
+  const toggleSidebar = () => {
+    setOpen((open) => {
+      localStorage.setItem("isSidebarHidden", (!open).toString());
+      return !open;
+    });
+  };
+
   return (
-    <SidebarProvider open={!hideSidebar}>
+    <SidebarProvider onOpenChange={toggleSidebar} open={open}>
       <CommandMenu />
       <Toaster />
       <AppSidebar
