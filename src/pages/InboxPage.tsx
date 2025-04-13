@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight } from "lucide-react";
+import { Trash2, MoveRight, Eye, EyeClosed } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -26,11 +26,14 @@ import {
   TooltipTrigger,
 } from "../components/ui/tooltip";
 import { toast } from "sonner";
+import { Toggle } from "../components/ui/toggle";
+import { EmptyStateView } from "../components/custom/EmptyStateView";
 
 export function InboxPage() {
   const { data: tasks, isLoading, error } = useQuery(getInboxTasks);
   const { data: projects } = useQuery(getProjects);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [showTasks, setShowTasks] = useState(true);
 
   const handleCreateTask = async () => {
     if (!newTaskTitle.trim()) return;
@@ -96,7 +99,26 @@ export function InboxPage() {
     <Layout breadcrumbItems={[{ title: "Inbox" }]}>
       <div>
         <div className="flex flex-col gap-2 items-start mb-4">
-          <h2 className="text-2xl font-medium">Inbox</h2>
+          <div className="flex gap-2 items-center">
+            <h2 className="text-2xl font-medium">Inbox</h2>
+            <Tooltip>
+              <TooltipTrigger>
+                <Toggle
+                  variant="outline"
+                  onClick={() => setShowTasks((prev) => !prev)}
+                >
+                  {showTasks ? (
+                    <Eye className="h-5 w-5" />
+                  ) : (
+                    <EyeClosed className="h-5 w-5" />
+                  )}
+                </Toggle>
+              </TooltipTrigger>
+              <TooltipContent>
+                {showTasks ? "Hide tasks" : "Show tasks"}
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <p className="text-sm text-muted-foreground">
             Tasks fade away the longer they sit in the inbox
           </p>
@@ -118,108 +140,119 @@ export function InboxPage() {
 
           {isLoading && <div>Loading...</div>}
           {error && <div className="text-red-500">Error: {error.message}</div>}
-
-          <div>
-            <Table>
-              <TableBody>
-                {tasks?.map((task: Task) => (
-                  <TableRow
-                    key={task.id}
-                    style={{
-                      opacity: Math.max(
-                        0.1,
-                        1 - getDaysAgo(task.createdAt) * 0.33
-                      ),
-                    }}
-                  >
-                    <TableCell className="w-8">
-                      <Checkbox
-                        checked={task.complete}
-                        onCheckedChange={() =>
-                          handleToggleTask(task.id, task.complete)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`mr-2 ${
-                          task.complete
-                            ? "line-through text-muted-foreground"
-                            : ""
-                        }`}
-                      >
-                        {task.title}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {getDaysAgo(task.createdAt)
-                          ? getDaysAgo(task.createdAt) +
-                            " day" +
-                            (getDaysAgo(task.createdAt) > 1 ? "s" : "") +
-                            " ago"
-                          : "today"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button variant="outline" size="icon">
-                                  <MoveRight className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Move task to a project</TooltipContent>
-                            </Tooltip>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {projects?.length ? (
-                              projects?.map((project) => (
-                                <DropdownMenuItem
-                                  key={project.id}
-                                  onClick={() =>
-                                    handleMoveTask(task.id, project.id)
-                                  }
-                                >
-                                  Move to {project.title}
-                                </DropdownMenuItem>
-                              ))
-                            ) : (
-                              <DropdownMenuItem className="text-muted-foreground">
-                                No projects found
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleDeleteTask(task.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Delete task</TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {tasks?.length === 0 && !isLoading && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      className="text-center text-muted-foreground"
+          {showTasks ? (
+            <div>
+              <Table>
+                <TableBody>
+                  {tasks?.map((task: Task) => (
+                    <TableRow
+                      key={task.id}
+                      style={{
+                        opacity: Math.max(
+                          0.1,
+                          1 - getDaysAgo(task.createdAt) * 0.33
+                        ),
+                      }}
                     >
-                      You've reached Inbox Zero 🍹
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                      <TableCell className="w-8">
+                        <Checkbox
+                          checked={task.complete}
+                          onCheckedChange={() =>
+                            handleToggleTask(task.id, task.complete)
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`mr-2 ${
+                            task.complete
+                              ? "line-through text-muted-foreground"
+                              : ""
+                          }`}
+                        >
+                          {task.title}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {getDaysAgo(task.createdAt)
+                            ? getDaysAgo(task.createdAt) +
+                              " day" +
+                              (getDaysAgo(task.createdAt) > 1 ? "s" : "") +
+                              " ago"
+                            : "today"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="outline" size="icon">
+                                    <MoveRight className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  Move task to a project
+                                </TooltipContent>
+                              </Tooltip>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {projects?.length ? (
+                                projects?.map((project) => (
+                                  <DropdownMenuItem
+                                    key={project.id}
+                                    onClick={() =>
+                                      handleMoveTask(task.id, project.id)
+                                    }
+                                  >
+                                    Move to {project.title}
+                                  </DropdownMenuItem>
+                                ))
+                              ) : (
+                                <DropdownMenuItem className="text-muted-foreground">
+                                  No projects found
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleDeleteTask(task.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete task</TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {tasks?.length === 0 && !isLoading && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={3}
+                        className="text-center text-muted-foreground"
+                      >
+                        You've reached Inbox Zero 🍹
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="opacity-50 flex justify-center items-center h-full">
+              <EmptyStateView
+                Icon={<EyeClosed className="h-10 w-10" />}
+                title="Inbox is safely hidden"
+                description="You can add tasks without distraction"
+              />
+            </div>
+          )}
         </div>
       </div>
     </Layout>

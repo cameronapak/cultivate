@@ -74,8 +74,8 @@ function EmptyStateView({
   Icon,
 }: {
   title: string;
-  description: string;
-  action: React.ReactNode;
+  description?: string;
+  action?: React.ReactNode;
   Icon: React.ReactNode;
 }) {
   return (
@@ -83,7 +83,7 @@ function EmptyStateView({
       <EmptyStateIcon>{Icon}</EmptyStateIcon>
       <EmptyStateTitle>{title}</EmptyStateTitle>
       {description && <EmptyStateDescription>{description}</EmptyStateDescription>}
-      <EmptyStateAction>{action}</EmptyStateAction>
+      {action && <EmptyStateAction>{action}</EmptyStateAction>}
     </EmptyStateRoot>
   );
 }
