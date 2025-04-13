@@ -2,10 +2,8 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
-import { useSearchParams } from "react-router-dom"
 
 import { useIsMobile } from "../../hooks/use-mobile"
-import { useLayoutState } from "../../hooks/useLayoutState"
 import { cn } from "../../lib/utils"
 import { Button } from "./button"
 import { Input } from "./input"
@@ -75,12 +73,11 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
-    const { isSidebarHidden, toggleSidebar: toggleLayoutSidebar } = useLayoutState()
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
-    const open = openProp ?? !isSidebarHidden // Sync with URL state
+    const open = openProp ?? true
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === "function" ? value(open) : value
@@ -89,17 +86,13 @@ const SidebarProvider = React.forwardRef<
         } else {
           _setOpen(openState)
         }
-
-        // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
       },
       [setOpenProp, open]
     )
 
     const toggleSidebar = React.useCallback(() => {
-      toggleLayoutSidebar()
-      setOpen(!open)
-    }, [open, setOpen, toggleLayoutSidebar])
+      setOpen((prev) => !prev)
+    }, [setOpen])
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
