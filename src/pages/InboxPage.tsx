@@ -42,7 +42,7 @@ export function InboxPage() {
         title: newTaskTitle,
         // No projectId means it goes to inbox
       });
-      toast.success("Task created");
+      toast.success(`Task created: "${newTaskTitle}"`);
       setNewTaskTitle("");
     } catch (error) {
       console.error("Failed to create task:", error);
