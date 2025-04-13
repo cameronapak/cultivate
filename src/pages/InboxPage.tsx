@@ -249,7 +249,6 @@ export function InboxPage() {
               <EmptyStateView
                 Icon={<EyeClosed className="h-10 w-10" />}
                 title="Inbox is safely hidden"
-                description="You can add tasks without distraction"
               />
             </div>
           )}
