@@ -21,6 +21,7 @@ import {
 } from '../components/ui/dropdown-menu'
 import { Layout } from '../components/Layout'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip'
+import { toast } from 'sonner'
 
 export function InboxPage() {
   const { data: tasks, isLoading, error } = useQuery(getInboxTasks)
@@ -34,6 +35,7 @@ export function InboxPage() {
         title: newTaskTitle,
         // No projectId means it goes to inbox
       })
+      toast.success('Task created')
       setNewTaskTitle('')
     } catch (error) {
       console.error('Failed to create task:', error)
@@ -59,7 +61,10 @@ export function InboxPage() {
 
   const handleDeleteTask = async (taskId: number) => {
     try {
-      await deleteTask({ id: taskId })
+      if (confirm('Are you sure you want to delete this task?')) {
+        await deleteTask({ id: taskId })
+        toast.success('Task deleted')
+      }
     } catch (error) {
       console.error('Failed to delete task:', error)
     }
