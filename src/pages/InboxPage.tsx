@@ -33,7 +33,17 @@ export function InboxPage() {
   const { data: tasks, isLoading, error } = useQuery(getInboxTasks);
   const { data: projects } = useQuery(getProjects);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [showTasks, setShowTasks] = useState(true);
+  const [showTasks, setShowTasks] = useState(() => {
+    const showTasksLocalStorage = JSON.parse(localStorage.getItem("shouldShowTasks") || "true");
+    return showTasksLocalStorage;
+  });
+
+  const handleToggleTasks = () => {
+    setShowTasks((prev: boolean) => {
+      localStorage.setItem("shouldShowTasks", (!prev).toString());
+      return !prev;
+    });
+  };
 
   const handleCreateTask = async () => {
     if (!newTaskTitle.trim()) return;
@@ -105,7 +115,7 @@ export function InboxPage() {
               <TooltipTrigger>
                 <Toggle
                   variant="outline"
-                  onClick={() => setShowTasks((prev) => !prev)}
+                  onClick={handleToggleTasks}
                 >
                   {showTasks ? (
                     <Eye className="h-5 w-5" />
