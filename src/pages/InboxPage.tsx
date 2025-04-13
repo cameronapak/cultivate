@@ -122,7 +122,7 @@ export function InboxPage() {
                         {task.title}
                       </span>
                       <span className="text-xs text-muted-foreground">  
-                        {getDaysAgo(task.createdAt) ? getDaysAgo(task.createdAt) + ' day' + (getDaysAgo(task.createdAt) > 1 ? 's' : '') + ' ago' : 'new'}
+                        {getDaysAgo(task.createdAt) ? getDaysAgo(task.createdAt) + ' day' + (getDaysAgo(task.createdAt) > 1 ? 's' : '') + ' ago' : 'today'}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">

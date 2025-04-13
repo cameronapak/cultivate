@@ -1,4 +1,4 @@
-import { RouteIcon, ChevronRight, InboxIcon, BookOpen, Plus } from "lucide-react";
+import { ChevronRight, InboxIcon, BookOpen, Plus, Sprout } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -32,8 +32,8 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link to={"/"}>
-                <RouteIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Pitchboard</span>
+                <Sprout className="h-5 w-5" />
+                <span className="text-base font-semibold">Cultivate</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
