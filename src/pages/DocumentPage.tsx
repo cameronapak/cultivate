@@ -153,7 +153,11 @@ export function DocumentPage() {
   } = useQuery(getDocument, { documentId: parsedDocumentId });
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState<any>(null);
-  const [title, setTitle] = useState(document?.title || "");
+  const [title, setTitle] = useState("");
+
+  React.useEffect(() => {
+    setTitle(document?.title || "");
+  }, [document]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
