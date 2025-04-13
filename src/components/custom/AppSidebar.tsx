@@ -18,10 +18,24 @@ import {
   CollapsibleTrigger,
 } from "../../components/ui/collapsible";
 import { Link } from 'wasp/client/router'
+import { useState } from "react";
 
 export function AppSidebar({ items }: { items: { isActive: boolean, title: string, icon: any, items: { title: string, url: string }[] }[] }) {
+  const [showProjects, setShowProjects] = useState(() => {
+    const showProjectsLocalStorage = JSON.parse(localStorage.getItem("showProjects") || "true");
+    return showProjectsLocalStorage;
+  });
+
+  const handleToggleProjects = () => {
+    setShowProjects((prev: boolean) => {
+      localStorage.setItem("showProjects", (!prev).toString());
+      return !prev;
+    });
+  };
+
   // Get the current path
   const currentPath = window.location.pathname;
+
   return (
     <Sidebar>
        <SidebarHeader>
@@ -63,7 +77,8 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
               <Collapsible
                 key={item.title}
                 asChild
-                defaultOpen={item.isActive}
+                defaultOpen={showProjects}
+                onOpenChange={handleToggleProjects}
                 className="group/collapsible"
               >
                 <SidebarMenuItem>
