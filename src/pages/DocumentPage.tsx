@@ -103,7 +103,9 @@ function PublishDocumentWithAlertDialog({
         `Failed to ${isPublished ? "unpublish" : "publish"} document:`,
         error
       );
-      toast.error(`Failed to ${isPublished ? "unpublish" : "publish"} document`);
+      toast.error(
+        `Failed to ${isPublished ? "unpublish" : "publish"} document`
+      );
     }
   };
 
@@ -116,8 +118,9 @@ function PublishDocumentWithAlertDialog({
             {isPublished ? "Unpublish Document" : "Publish Document"}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to {isPublished ? "unpublish" : "publish"} this document?
-            {isPublished 
+            Are you sure you want to {isPublished ? "unpublish" : "publish"}{" "}
+            this document?
+            {isPublished
               ? " Unpublish puts it back in draft mode."
               : " Publishing shows that the document is completed."}
           </AlertDialogDescription>
@@ -125,9 +128,11 @@ function PublishDocumentWithAlertDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className={isPublished 
-              ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
-              : ""}
+            className={
+              isPublished
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                : ""
+            }
             onClick={handlePublish}
           >
             {isPublished ? "Unpublish" : "Publish"}
@@ -148,6 +153,7 @@ export function DocumentPage() {
   } = useQuery(getDocument, { documentId: parsedDocumentId });
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState<any>(null);
+  const [title, setTitle] = useState(document?.title || "");
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
@@ -157,7 +163,7 @@ export function DocumentPage() {
     try {
       await updateDocument({
         id: document.id,
-        title: document.title,
+        title: title,
         content: content || document.content,
       });
       setIsEditing(false);
@@ -177,24 +183,35 @@ export function DocumentPage() {
     >
       <div className="max-w-xl mx-auto">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-medium flex items-center gap-2">
-            {document.title}
-            {document.isPublished ? (
-              <Tooltip>
-                <TooltipTrigger>
-                  <BadgeCheck className="w-5 h-5 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>Published</TooltipContent>
-              </Tooltip>
-            ) : (
-              <Badge
-                variant="secondary"
-                className="text-muted-foreground font-normal"
-              >
-                Draft
-              </Badge>
-            )}
-          </h1>
+          {isEditing ? (
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Title"
+              className="w-full text-2xl font-medium outline-none"
+            />
+          ) : (
+            <h1 className="text-2xl font-medium flex items-center gap-2">
+              {document.title}
+              {document.isPublished ? (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <BadgeCheck className="w-5 h-5 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>Published</TooltipContent>
+                </Tooltip>
+              ) : (
+                <Badge
+                  variant="secondary"
+                  className="text-muted-foreground font-normal"
+                >
+                  Draft
+                </Badge>
+              )}
+            </h1>
+          )}
           <div className="flex gap-2">
             {isEditing ? (
               <Button size="default" onClick={handleSave}>
@@ -220,7 +237,7 @@ export function DocumentPage() {
                   </Button>
                 </DeleteDocumentWithAlertDialog>
                 {document.isPublished ? (
-                  <PublishDocumentWithAlertDialog 
+                  <PublishDocumentWithAlertDialog
                     id={document.id}
                     title={document.title}
                     content={document.content}
@@ -235,16 +252,13 @@ export function DocumentPage() {
                     </Button>
                   </PublishDocumentWithAlertDialog>
                 ) : (
-                  <PublishDocumentWithAlertDialog 
+                  <PublishDocumentWithAlertDialog
                     id={document.id}
                     title={document.title}
                     content={document.content}
                     isPublished={document.isPublished}
                   >
-                    <Button
-                      size="icon"
-                      variant="outline"
-                    >
+                    <Button size="icon" variant="outline">
                       <BadgeCheck className="w-4 h-4" />
                     </Button>
                   </PublishDocumentWithAlertDialog>
