@@ -53,7 +53,7 @@ export const CreateDocumentPage = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
-              className="w-full text-2xl font-medium outline-none"
+              className="w-full bg-background text-2xl font-medium outline-none"
             />
             <Button type="submit" form="createDocumentForm">
               Save

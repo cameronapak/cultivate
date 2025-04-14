@@ -2,6 +2,7 @@ import React, { forwardRef, useImperativeHandle, useRef, useEffect } from "react
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "../../client/blocknote.css";
+import { useTheme, getSystemTheme } from "./ThemeProvider";
 
 interface BlockNoteEditorProps {
   onChange?: (value: string) => void;
@@ -19,6 +20,7 @@ const BlockNoteEditorComponent = forwardRef<HTMLDivElement, BlockNoteEditorProps
   ({ onChange, value, placeholder, className, name, id, debounceDelay = 500, initialContent, editable = true, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const { theme } = useTheme();
 
     // Creates a new editor instance with default settings
     const editor = useCreateBlockNote();
@@ -62,9 +64,14 @@ const BlockNoteEditorComponent = forwardRef<HTMLDivElement, BlockNoteEditorProps
     // Forward the ref to the container div
     useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
+    let blockNoteTheme: "dark" | "light" = theme === "dark" ? "dark" : "light";
+    if (theme === "system") {
+      blockNoteTheme = getSystemTheme();
+    }
+
     return (
       <div id={id} ref={containerRef} className={`block-note-editor-container ${className || ""}`}>
-        <BlockNoteView autoFocus={true} editable={editable} editor={editor} theme="light" />
+        <BlockNoteView autoFocus={true} editable={editable} editor={editor} theme={blockNoteTheme} />
       </div>
     );
   }
