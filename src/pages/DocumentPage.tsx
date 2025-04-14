@@ -185,7 +185,7 @@ export function DocumentPage() {
         { title: document.title },
       ]}
     >
-      <div className="max-w-xl mx-auto">
+      <div>
         <div className="flex justify-between items-center mb-4">
           {isEditing ? (
             <input
