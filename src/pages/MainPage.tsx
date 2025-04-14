@@ -860,7 +860,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
             {project.resources.map((resource) =>
               editingResourceId === resource.id ? (
                 <TableRow key={resource.id}>
-                  <TableCell colSpan={2} className="bg-white">
+                  <TableCell colSpan={2} className="bg-background">
                     <EditResourceForm
                       key={resource.id}
                       resource={resource}
@@ -999,7 +999,7 @@ const ProjectView = ({ project }: { project: Project }) => {
                       <>
                         {filteredTasks.map((task: Task) => (
                           <TableRow key={task.id}>
-                            <TableCell className="bg-white">
+                            <TableCell className="bg-background">
                               <TaskItem key={task.id} task={task} />
                             </TableCell>
                           </TableRow>
@@ -1017,7 +1017,7 @@ const ProjectView = ({ project }: { project: Project }) => {
                       </TableRow>
                     )}
                     <TableRow>
-                      <TableCell className="bg-white pt-4">
+                      <TableCell className="bg-background pt-4">
                         <NewTaskForm projectId={project.id} />
                       </TableCell>
                     </TableRow>

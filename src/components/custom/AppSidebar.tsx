@@ -19,6 +19,7 @@ import {
 } from "../../components/ui/collapsible";
 import { Link } from 'wasp/client/router'
 import { useState } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function AppSidebar({ items }: { items: { isActive: boolean, title: string, icon: any, items: { title: string, url: string }[] }[] }) {
   const [showProjects, setShowProjects] = useState(() => {
@@ -117,7 +118,9 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <ThemeToggle />
+      </SidebarFooter>
     </Sidebar>
   );
 }

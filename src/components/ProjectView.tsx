@@ -686,7 +686,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
             {project.resources.map((resource: Resource) =>
               editingResourceId === resource.id ? (
                 <TableRow key={resource.id}>
-                  <TableCell colSpan={2} className="bg-white">
+                  <TableCell colSpan={2} className="bg-background">
                     <EditResourceForm
                       key={resource.id}
                       resource={resource}
@@ -921,7 +921,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                       </TableRow>
                     )}
                     <TableRow>
-                      <TableCell className="bg-white p-0 pt-4">
+                      <TableCell className="bg-background p-0 pt-4">
                         <NewTaskForm projectId={project.id} />
                       </TableCell>
                     </TableRow>
