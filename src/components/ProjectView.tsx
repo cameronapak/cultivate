@@ -841,7 +841,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
 
   return (
     <main>
-      <h1 className="text-2xl font-medium pb-6">{project.title}</h1>
+      <h1 className="heading-1 pb-6">{project.title}</h1>
       <Tabs
         value={currentTab}
         onValueChange={(value) =>

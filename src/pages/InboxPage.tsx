@@ -110,7 +110,7 @@ export function InboxPage() {
       <div>
         <div className="flex flex-col gap-2 items-start mb-4">
           <div className="flex gap-2 items-center">
-            <h2 className="text-2xl font-medium">Inbox</h2>
+            <h1 className="heading-1">Inbox</h1>
             <Tooltip>
               <TooltipTrigger>
                 <Toggle

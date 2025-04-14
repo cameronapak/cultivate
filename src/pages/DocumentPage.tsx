@@ -197,7 +197,7 @@ export function DocumentPage() {
               className="w-full bg-background text-2xl font-medium outline-none"
             />
           ) : (
-            <h1 className="text-2xl font-medium flex items-center gap-2">
+            <h1 className="heading-1 flex items-center gap-2">
               {document.title}
               {document.isPublished ? (
                 <Tooltip>
