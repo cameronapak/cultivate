@@ -10,20 +10,20 @@ page MainPage {
   component: import { MainPage } from "@src/pages/MainPage"
 }
 
-route CanvasCreateRoute { path: "/canvas/new", to: CanvasCreatePage }
-page CanvasCreatePage {
-  component: import { CanvasCreatePage } from "@src/client/pages/CanvasCreatePage"
-}
+// route CanvasCreateRoute { path: "/canvas/new", to: CanvasCreatePage }
+// page CanvasCreatePage {
+//   component: import { CanvasCreatePage } from "@src/client/pages/CanvasCreatePage"
+// }
 
-route CanvasesRoute { path: "/canvases", to: CanvasesPage }
-page CanvasesPage {
-  component: import { CanvasesPage } from "@src/client/pages/CanvasesPage"
-}
+// route CanvasesRoute { path: "/canvases", to: CanvasesPage }
+// page CanvasesPage {
+//   component: import { CanvasesPage } from "@src/client/pages/CanvasesPage"
+// }
 
-route CanvasRoute { path: "/canvas/:id", to: CanvasPage }
-page CanvasPage {
-  component: import { CanvasPage } from "@src/client/pages/CanvasPage"
-}
+// route CanvasRoute { path: "/canvas/:id", to: CanvasPage }
+// page CanvasPage {
+//   component: import { CanvasPage } from "@src/client/pages/CanvasPage"
+// }
 
 route ProjectRoute { path: "/projects/:projectId", to: ProjectPage }
 page ProjectPage {
