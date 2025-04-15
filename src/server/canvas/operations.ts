@@ -1,5 +1,5 @@
 import { HttpError } from 'wasp/server';
-import type { SaveCanvas, LoadCanvas } from 'wasp/server/operations';
+import type { SaveCanvas, LoadCanvas, CreateCanvas } from 'wasp/server/operations';
 
 export const saveCanvas: SaveCanvas<{ snapshot: any, id: number }, { success: boolean }> = async (args, context) => {
   try {
@@ -30,5 +30,20 @@ export const loadCanvas: LoadCanvas<{ id: number }, any> = async (args, context)
   } catch (error) {
     console.error('Failed to load canvas:', error);
     throw new HttpError(500, 'Failed to load canvas');
+  }
+};
+
+export const createCanvas: CreateCanvas<void, { id: number }> = async (_args, context) => {
+  try {
+    const canvas = await context.entities.Canvas.create({
+      data: {
+        snapshot: JSON.stringify({})
+      }
+    });
+
+    return { id: canvas.id };
+  } catch (error) {
+    console.error('Failed to create canvas:', error);
+    throw new HttpError(500, 'Failed to create canvas');
   }
 }; 

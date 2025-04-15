@@ -1,80 +1,96 @@
-import { TLUiComponents, Tldraw, useEditor, createTLStore, getSnapshot, loadSnapshot } from "tldraw";
+import {
+  TLUiComponents,
+  Tldraw,
+  createTLStore,
+  getSnapshot,
+  loadSnapshot,
+} from "tldraw";
 import { throttle } from "../../lib/utils";
-import { useLayoutEffect, useMemo, useState } from 'react';
-import { useQuery, useAction, loadCanvas, saveCanvas } from 'wasp/client/operations';
+import { useLayoutEffect, useMemo, useState } from "react";
+import {
+  useQuery,
+  useAction,
+  loadCanvas,
+  saveCanvas,
+} from "wasp/client/operations";
 import "tldraw/tldraw.css";
 import { Layout } from "../../components/Layout";
+import { useParams } from "react-router-dom";
 /** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
-	// ContextMenu: null,
-	// ActionsMenu: null,
-	// HelpMenu: null,
-	// ZoomMenu: null,
-	// MainMenu: null,
-	Minimap: null,
-	// StylePanel: null,
-	// PageMenu: null,
-	// NavigationPanel: null,
-	// Toolbar: null,
-	// KeyboardShortcutsDialog: null,
-	// QuickActions: null,
-	// HelperButtons: null,
-	DebugPanel: null,
-	DebugMenu: null,
-	MenuPanel: null,
-	TopPanel: null,
-	// CursorChatBubble: null,
-	RichTextToolbar: null,
-	// Dialogs: null,
-	// Toasts: null,
-}
+  // ContextMenu: null,
+  // ActionsMenu: null,
+  // HelpMenu: null,
+  // ZoomMenu: null,
+  // MainMenu: null,
+  Minimap: null,
+  // StylePanel: null,
+  // PageMenu: null,
+  // NavigationPanel: null,
+  // Toolbar: null,
+  // KeyboardShortcutsDialog: null,
+  // QuickActions: null,
+  // HelperButtons: null,
+  DebugPanel: null,
+  DebugMenu: null,
+  MenuPanel: null,
+  TopPanel: null,
+  // CursorChatBubble: null,
+  RichTextToolbar: null,
+  // Dialogs: null,
+  // Toasts: null,
+};
 
 export function CanvasPage() {
-  // Create a new store
   const store = useMemo(() => createTLStore(), []);
+  const { id } = useParams();
+  const canvasId = id ? parseInt(id) : null;
 
-  // Set up loading state
   const [loadingState, setLoadingState] = useState<
-    { status: 'loading' } | { status: 'ready' } | { status: 'error'; error: string }
+    | { status: "loading" }
+    | { status: "ready" }
+    | { status: "error"; error: string }
   >({
-    status: 'loading',
+    status: "loading",
   });
 
-  // Load canvas from database
-  const { data: savedSnapshot, isLoading: isLoadingCanvas } = useQuery(loadCanvas, { id: 1 });
+  const { data: savedSnapshot, isLoading: isLoadingCanvas } = useQuery(
+    loadCanvas,
+    { id: canvasId || 0 }
+  );
   const saveCanvasToDb = useAction(saveCanvas);
 
-  // Handle persistence
   useLayoutEffect(() => {
     if (isLoadingCanvas) return;
 
-    setLoadingState({ status: 'loading' });
+    setLoadingState({ status: "loading" });
 
-    if (savedSnapshot) {
-      try {
+    try {
+      if (savedSnapshot) {
         loadSnapshot(store, savedSnapshot);
-        setLoadingState({ status: 'ready' });
-      } catch (error: any) {
-        setLoadingState({ status: 'error', error: error.message });
       }
-    } else {
-      setLoadingState({ status: 'ready' });
+      setLoadingState({ status: "ready" });
+    } catch (error: any) {
+      setLoadingState({ status: "error", error: error.message });
     }
+  }, [store, savedSnapshot, isLoadingCanvas]);
 
-    // Set up store listener for persistence
+  useLayoutEffect(() => {
+    if (!canvasId) return;
+
     const cleanupFn = store.listen(
       throttle(() => {
         const snapshot = getSnapshot(store);
-        saveCanvasToDb({ snapshot, id: savedSnapshot?.id });
+        saveCanvasToDb({ snapshot, id: canvasId });
       }, 500)
     );
 
     return () => {
       cleanupFn();
     };
-  }, [store, savedSnapshot, isLoadingCanvas, saveCanvasToDb]);
+  }, [store, canvasId, saveCanvasToDb]);
 
-  if (loadingState.status === 'loading') {
+  if (loadingState.status === "loading") {
     return (
       <Layout mainContentClasses="w-full max-w-full !p-0 h-full">
         <div className="tldraw__editor h-full flex items-center justify-center">
@@ -84,7 +100,7 @@ export function CanvasPage() {
     );
   }
 
-  if (loadingState.status === 'error') {
+  if (loadingState.status === "error") {
     return (
       <Layout mainContentClasses="w-full max-w-full !p-0 h-full">
         <div className="tldraw__editor h-full flex items-center justify-center">
@@ -98,13 +114,13 @@ export function CanvasPage() {
   return (
     <Layout mainContentClasses="w-full max-w-full !p-0 h-full">
       <div className="tldraw__editor h-full">
-        <Tldraw 
+        <Tldraw
           className="h-full"
           components={components}
-          inferDarkMode 
+          inferDarkMode
           store={store}
-          options={{ 
-            maxPages: 1, 
+          options={{
+            maxPages: 1,
             maxFilesAtOnce: 0,
             enableToolbarKeyboardShortcuts: false,
           }}

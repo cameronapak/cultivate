@@ -10,7 +10,12 @@ page MainPage {
   component: import { MainPage } from "@src/pages/MainPage"
 }
 
-route CanvasRoute { path: "/canvas", to: CanvasPage }
+route CanvasCreateRoute { path: "/canvas", to: CanvasCreatePage }
+page CanvasCreatePage {
+  component: import { CanvasCreatePage } from "@src/client/pages/CanvasCreatePage"
+}
+
+route CanvasRoute { path: "/canvas/:id", to: CanvasPage }
 page CanvasPage {
   component: import { CanvasPage } from "@src/client/pages/CanvasPage"
 }
@@ -178,6 +183,11 @@ action saveCanvas {
 
 query loadCanvas {
   fn: import { loadCanvas } from "@src/server/canvas/operations.js",
+  entities: [Canvas]
+}
+
+action createCanvas {
+  fn: import { createCanvas } from "@src/server/canvas/operations.js",
   entities: [Canvas]
 }
 //#endregion
