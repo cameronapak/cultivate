@@ -1,4 +1,4 @@
-import { ChevronRight, InboxIcon, BookOpen, Plus, Sprout } from "lucide-react";
+import { ChevronRight, InboxIcon, BookOpen, Plus, Sprout, PencilRuler } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -63,6 +63,14 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
                 <Link to={"/inbox"}>
                   <InboxIcon className="h-5 w-5" />
                   <span>Inbox</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={currentPath.includes("/canvas")}>
+                <Link to={"/canvas"}>
+                  <PencilRuler className="h-5 w-5" />
+                  <span>Canvas</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
