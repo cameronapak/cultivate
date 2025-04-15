@@ -17,7 +17,18 @@ app shapeUp {
 
 route RootRoute { path: "/", to: MainPage }
 page MainPage {
+  authRequired: true,
   component: import { MainPage } from "@src/pages/MainPage"
+}
+
+route SignupRoute { path: "/signup", to: SignupPage }
+page SignupPage {
+  component: import { SignupPage } from "@src/pages/SignupPage"
+}
+
+route LoginRoute { path: "/login", to: LoginPage }
+page LoginPage {
+  component: import { LoginPage } from "@src/pages/LoginPage"
 }
 
 // route CanvasCreateRoute { path: "/canvas/new", to: CanvasCreatePage }
@@ -37,26 +48,31 @@ page MainPage {
 
 route ProjectRoute { path: "/projects/:projectId", to: ProjectPage }
 page ProjectPage {
+  authRequired: true,
   component: import { ProjectPage } from "@src/pages/ProjectPage"
 }
 
 route InboxRoute { path: "/inbox", to: InboxPage }
 page InboxPage {
+  authRequired: true,
   component: import { InboxPage } from "@src/pages/InboxPage"
 }
 
 route DocumentsRoute { path: "/documents", to: DocumentsPage }
 page DocumentsPage {
+  authRequired: true,
   component: import { DocumentsPage } from "@src/pages/DocumentsPage"
 }
 
 route DocumentRoute { path: "/documents/:documentId", to: DocumentPage }
 page DocumentPage {
+  authRequired: true,
   component: import { DocumentPage } from "@src/pages/DocumentPage"
 }
 
 route CreateDocumentRoute { path: "/documents/new", to: CreateDocumentPage }
 page CreateDocumentPage {
+  authRequired: true,
   component: import { CreateDocumentPage } from "@src/pages/CreateDocumentPage"
 }
 
@@ -191,28 +207,28 @@ action deleteDocument {
 }
 
 //#region Canvas
-action saveCanvas {
-  fn: import { saveCanvas } from "@src/queries",
-  entities: [Canvas]
-}
+// action saveCanvas {
+//   fn: import { saveCanvas } from "@src/queries",
+//   entities: [Canvas]
+// }
 
-query loadCanvas {
-  fn: import { loadCanvas } from "@src/queries",
-  entities: [Canvas]
-}
+// query loadCanvas {
+//   fn: import { loadCanvas } from "@src/queries",
+//   entities: [Canvas]
+// }
 
-query getCanvases {
-  fn: import { getCanvases } from "@src/queries",
-  entities: [Canvas]
-}
+// query getCanvases {
+//   fn: import { getCanvases } from "@src/queries",
+//   entities: [Canvas]
+// }
 
-action createCanvas {
-  fn: import { createCanvas } from "@src/queries",
-  entities: [Canvas]
-}
+// action createCanvas {
+//   fn: import { createCanvas } from "@src/queries",
+//   entities: [Canvas]
+// }
 
-action deleteCanvas {
-  fn: import { deleteCanvas } from "@src/queries",
-  entities: [Canvas]
-}
+// action deleteCanvas {
+//   fn: import { deleteCanvas } from "@src/queries",
+//   entities: [Canvas]
+// }
 //#endregion
