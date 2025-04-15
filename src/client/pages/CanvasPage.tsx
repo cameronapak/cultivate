@@ -2,7 +2,7 @@ import { TLUiComponents, Tldraw } from "tldraw";
 import "tldraw/tldraw.css";
 import { Layout } from "../../components/Layout";
 
-// The type here is include only to ensure this example contains all possible ui components,
+/** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
 	// ContextMenu: null,
 	// ActionsMenu: null,
