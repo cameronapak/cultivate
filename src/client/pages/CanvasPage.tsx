@@ -112,7 +112,18 @@ export function CanvasPage() {
   }
 
   return (
-    <Layout mainContentClasses="w-full max-w-full !p-0 h-full">
+    <Layout 
+      mainContentClasses="w-full max-w-full !p-0 h-full"
+      breadcrumbItems={[
+        {
+          title: "Canvas",
+          url: "/canvases",
+        },
+        {
+          title: canvasId ? `Canvas ${canvasId}` : "New Canvas",
+        },
+      ]}
+    >
       <div className="tldraw__editor h-full">
         <Tldraw
           className="h-full"
