@@ -82,7 +82,7 @@ export function CanvasPage() {
       throttle(() => {
         const snapshot = getSnapshot(store);
         saveCanvasToDb({ snapshot, id: canvasId });
-      }, 500)
+      }, 1000)
     );
 
     return () => {

@@ -428,3 +428,60 @@ export const deleteDocument = async (args: { id: number }, context: any) => {
     where: { id: args.id }
   })
 }
+
+//#region Canvas
+type SaveCanvasPayload = {
+  snapshot: any
+  id: number
+}
+
+export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
+  try {
+    await context.entities.Canvas.upsert({
+      where: { id: args.id },
+      update: { snapshot: JSON.stringify(args.snapshot) },
+      create: { 
+        id: args.id,
+        snapshot: JSON.stringify(args.snapshot)
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to save canvas:', error);
+    throw new HttpError(500, 'Failed to save canvas');
+  }
+};
+
+type LoadCanvasPayload = {
+  id: number
+}
+
+export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
+  try {
+    const canvas = await context.entities.Canvas.findUnique({
+      where: { id: args.id }
+    });
+
+    return canvas ? JSON.parse(canvas.snapshot) : null;
+  } catch (error) {
+    console.error('Failed to load canvas:', error);
+    throw new HttpError(500, 'Failed to load canvas');
+  }
+};
+
+export const createCanvas = async (_args: {}, context: any) => {
+  try {
+    const canvas = await context.entities.Canvas.create({
+      data: {
+        snapshot: JSON.stringify({})
+      }
+    });
+
+    return { id: canvas.id };
+  } catch (error) {
+    console.error('Failed to create canvas:', error);
+    throw new HttpError(500, 'Failed to create canvas');
+  }
+};
+//#endregion
