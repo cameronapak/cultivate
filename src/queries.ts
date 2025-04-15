@@ -470,6 +470,17 @@ export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
   }
 };
 
+export const getCanvases = async (_args: {}, context: any) => {
+  try {
+    return context.entities.Canvas.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+  } catch (error) {
+    console.error('Failed to get canvases:', error);
+    throw new HttpError(500, 'Failed to get canvases');
+  }
+};
+
 export const createCanvas = async (_args: {}, context: any) => {
   try {
     const canvas = await context.entities.Canvas.create({

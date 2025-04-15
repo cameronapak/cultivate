@@ -68,7 +68,7 @@ export function AppSidebar({ items }: { items: { isActive: boolean, title: strin
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={currentPath.includes("/canvas")}>
-                <Link to={"/canvas"}>
+                <Link to={"/canvases"}>
                   <PencilRuler className="h-5 w-5" />
                   <span>Canvas</span>
                 </Link>
