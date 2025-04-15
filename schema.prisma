@@ -4,7 +4,6 @@
 //   url      = env("DATABASE_URL")
 // }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -82,3 +81,6 @@ model Canvas {
   updatedAt DateTime @updatedAt
 }
 
+model User {
+  id Int @id @default(autoincrement())
+}
