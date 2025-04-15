@@ -69,3 +69,10 @@ model Document {
   isPublished Boolean  @default(false)
 }
 
+model Canvas {
+  id        Int      @id @default(autoincrement())
+  snapshot  String   // Stores the Tldraw snapshot as JSON
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

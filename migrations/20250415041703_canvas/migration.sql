@@ -1,0 +1,7 @@
+-- CreateTable
+CREATE TABLE "Canvas" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "snapshot" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);

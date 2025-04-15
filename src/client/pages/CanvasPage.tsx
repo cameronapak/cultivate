@@ -1,8 +1,9 @@
 import { TLUiComponents, Tldraw, useEditor, createTLStore, getSnapshot, loadSnapshot } from "tldraw";
+import { throttle } from "../../lib/utils";
 import { useLayoutEffect, useMemo, useState } from 'react';
+import { useQuery, useAction, loadCanvas, saveCanvas } from 'wasp/client/operations';
 import "tldraw/tldraw.css";
 import { Layout } from "../../components/Layout";
-import { throttle } from "../../lib/utils";
 /** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
 	// ContextMenu: null,
@@ -28,8 +29,6 @@ const components: Partial<TLUiComponents> = {
 	// Toasts: null,
 }
 
-const PERSISTENCE_KEY = 'shape-up-canvas';
-
 export function CanvasPage() {
   // Create a new store
   const store = useMemo(() => createTLStore(), []);
@@ -41,17 +40,19 @@ export function CanvasPage() {
     status: 'loading',
   });
 
+  // Load canvas from database
+  const { data: savedSnapshot, isLoading: isLoadingCanvas } = useQuery(loadCanvas, { id: 1 });
+  const saveCanvasToDb = useAction(saveCanvas);
+
   // Handle persistence
   useLayoutEffect(() => {
+    if (isLoadingCanvas) return;
+
     setLoadingState({ status: 'loading' });
 
-    // Get persisted data from local storage
-    const persistedSnapshot = localStorage.getItem(PERSISTENCE_KEY);
-
-    if (persistedSnapshot) {
+    if (savedSnapshot) {
       try {
-        const snapshot = JSON.parse(persistedSnapshot);
-        loadSnapshot(store, snapshot);
+        loadSnapshot(store, savedSnapshot);
         setLoadingState({ status: 'ready' });
       } catch (error: any) {
         setLoadingState({ status: 'error', error: error.message });
@@ -64,14 +65,14 @@ export function CanvasPage() {
     const cleanupFn = store.listen(
       throttle(() => {
         const snapshot = getSnapshot(store);
-        localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(snapshot));
+        saveCanvasToDb({ snapshot, id: savedSnapshot?.id });
       }, 500)
     );
 
     return () => {
       cleanupFn();
     };
-  }, [store]);
+  }, [store, savedSnapshot, isLoadingCanvas, saveCanvasToDb]);
 
   if (loadingState.status === 'loading') {
     return (

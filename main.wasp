@@ -169,3 +169,15 @@ action deleteDocument {
   fn: import { deleteDocument } from "@src/queries",
   entities: [Document]
 }
+
+//#region Canvas
+action saveCanvas {
+  fn: import { saveCanvas } from "@src/server/canvas/operations.js",
+  entities: [Canvas]
+}
+
+query loadCanvas {
+  fn: import { loadCanvas } from "@src/server/canvas/operations.js",
+  entities: [Canvas]
+}
+//#endregion
