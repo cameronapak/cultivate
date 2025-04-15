@@ -1,6 +1,12 @@
+// datasource db {
+//   provider = "sqlite"
+//   // Wasp requires that the url is set to the DATABASE_URL environment variable.
+//   url      = env("DATABASE_URL")
+// }
+
+
 datasource db {
-  provider = "sqlite"
-  // Wasp requires that the url is set to the DATABASE_URL environment variable.
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
