@@ -102,6 +102,11 @@ export function CanvasPage() {
           components={components}
           inferDarkMode 
           store={store}
+          options={{ 
+            maxPages: 1, 
+            maxFilesAtOnce: 0,
+            enableToolbarKeyboardShortcuts: false,
+          }}
         />
       </div>
     </Layout>
