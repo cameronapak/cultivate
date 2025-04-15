@@ -2,7 +2,17 @@ app shapeUp {
   wasp: {
     version: "^0.16.2"
   },
-  title: "Cultivate"
+  title: "Cultivate",
+  auth: {
+    // Tells Wasp which entity to use for storing users.
+    userEntity: User,
+    methods: {
+      // Enable username and password auth.
+      usernameAndPassword: {}
+    },
+    // We'll see how this is used in a bit.
+    onAuthFailedRedirectTo: "/login"
+  }
 }
 
 route RootRoute { path: "/", to: MainPage }
