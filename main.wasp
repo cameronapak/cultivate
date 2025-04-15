@@ -206,29 +206,29 @@ action deleteDocument {
   entities: [Document]
 }
 
-//#region Canvas
-// action saveCanvas {
-//   fn: import { saveCanvas } from "@src/queries",
-//   entities: [Canvas]
-// }
+//#region Canvas - Not implemented
+action saveCanvas {
+  fn: import { saveCanvas } from "@src/queries",
+  entities: [Canvas]
+}
 
-// query loadCanvas {
-//   fn: import { loadCanvas } from "@src/queries",
-//   entities: [Canvas]
-// }
+query loadCanvas {
+  fn: import { loadCanvas } from "@src/queries",
+  entities: [Canvas]
+}
 
-// query getCanvases {
-//   fn: import { getCanvases } from "@src/queries",
-//   entities: [Canvas]
-// }
+query getCanvases {
+  fn: import { getCanvases } from "@src/queries",
+  entities: [Canvas]
+}
 
-// action createCanvas {
-//   fn: import { createCanvas } from "@src/queries",
-//   entities: [Canvas]
-// }
+action createCanvas {
+  fn: import { createCanvas } from "@src/queries",
+  entities: [Canvas]
+}
 
-// action deleteCanvas {
-//   fn: import { deleteCanvas } from "@src/queries",
-//   entities: [Canvas]
-// }
+action deleteCanvas {
+  fn: import { deleteCanvas } from "@src/queries",
+  entities: [Canvas]
+}
 //#endregion
