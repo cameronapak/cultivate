@@ -31,6 +31,7 @@
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.1.0",
     "tailwindcss-animate": "^1.0.7",
+    "tldraw": "^3.11.1",
     "wasp": "file:.wasp/out/sdk/wasp",
     "zod": "^3.24.2"
   },

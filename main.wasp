@@ -10,6 +10,11 @@ page MainPage {
   component: import { MainPage } from "@src/pages/MainPage"
 }
 
+route CanvasRoute { path: "/canvas", to: CanvasPage }
+page CanvasPage {
+  component: import { CanvasPage } from "@src/client/pages/CanvasPage"
+}
+
 route ProjectRoute { path: "/projects/:projectId", to: ProjectPage }
 page ProjectPage {
   component: import { ProjectPage } from "@src/pages/ProjectPage"

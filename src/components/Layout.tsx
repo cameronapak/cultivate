@@ -23,12 +23,14 @@ interface LayoutProps {
     url?: string;
   }[];
   activeProjectId?: number;
+  mainContentClasses?: string;
 }
 
 export function Layout({
   children,
   breadcrumbItems = [],
   activeProjectId,
+  mainContentClasses,
 }: LayoutProps) {
   const isSidebarHidden = JSON.parse(
     localStorage.getItem("isSidebarHidden") || "false"
@@ -84,7 +86,9 @@ export function Layout({
               </BreadcrumbList>
             </Breadcrumb>
           </header>
-          <div className="max-w-2xl w-full mx-auto p-6">{children}</div>
+          <div className={`max-w-2xl w-full mx-auto p-6 ${mainContentClasses}`}>
+            {children}
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </ThemeProvider>
