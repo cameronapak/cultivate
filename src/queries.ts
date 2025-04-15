@@ -495,4 +495,16 @@ export const createCanvas = async (_args: {}, context: any) => {
     throw new HttpError(500, 'Failed to create canvas');
   }
 };
+
+export const deleteCanvas = async (args: { id: number }, context: any) => {
+  try {
+    await context.entities.Canvas.delete({
+      where: { id: args.id }
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete canvas:', error);
+    throw new HttpError(500, 'Failed to delete canvas');
+  }
+};
 //#endregion

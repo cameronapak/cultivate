@@ -200,4 +200,9 @@ action createCanvas {
   fn: import { createCanvas } from "@src/queries",
   entities: [Canvas]
 }
+
+action deleteCanvas {
+  fn: import { deleteCanvas } from "@src/queries",
+  entities: [Canvas]
+}
 //#endregion

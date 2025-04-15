@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useQuery, getCanvases } from "wasp/client/operations";
+import { useQuery, getCanvases, deleteCanvas } from "wasp/client/operations";
 import { Canvas } from "wasp/entities";
 import { Layout } from "../../components/Layout";
 import {
@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { Button } from "../../components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import {
   EmptyStateRoot,
   EmptyStateDescription,
@@ -20,10 +20,28 @@ import {
   EmptyStateIcon,
 } from "../../components/custom/EmptyStateView";
 import { File } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../components/ui/tooltip";
+import { toast } from "sonner";
 
 export function CanvasesPage() {
   const navigate = useNavigate();
   const { data: canvases, isLoading, error } = useQuery(getCanvases);
+
+  const handleDeleteCanvas = async (canvasId: number) => {
+    try {
+      if (confirm("Are you sure you want to delete this canvas?")) {
+        await deleteCanvas({ id: canvasId });
+        toast.success("Canvas deleted");
+      }
+    } catch (error) {
+      console.error("Failed to delete canvas:", error);
+      toast.error("Failed to delete canvas");
+    }
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
@@ -68,6 +86,7 @@ export function CanvasesPage() {
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Created</TableHead>
+              <TableHead className="w-[100px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -75,13 +94,37 @@ export function CanvasesPage() {
               <TableRow
                 key={canvas.id}
                 className="cursor-pointer hover:bg-muted/50"
-                onClick={() => navigate(`/canvas/${canvas.id}`)}
               >
-                <TableCell className="font-medium">
+                <TableCell 
+                  className="font-medium"
+                  onClick={() => navigate(`/canvas/${canvas.id}`)}
+                >
                   Canvas {canvas.id}
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
+                <TableCell 
+                  className="text-sm text-muted-foreground"
+                  onClick={() => navigate(`/canvas/${canvas.id}`)}
+                >
                   {new Date(canvas.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <div className="flex justify-end">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteCanvas(canvas.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete canvas</TooltipContent>
+                    </Tooltip>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
