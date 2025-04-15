@@ -200,6 +200,9 @@ export const createTask: CreateTask<CreateTaskPayload, Task> = async (
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Task.create({
     data: {
       title: args.title,
@@ -207,7 +210,8 @@ export const createTask: CreateTask<CreateTaskPayload, Task> = async (
       // Only connect to project if projectId is provided
       ...(args.projectId && {
         project: { connect: { id: args.projectId } }
-      })
+      }),
+      user: { connect: { id: context.user.id } }
     }
   })
 }
@@ -318,12 +322,16 @@ export const createResource: CreateResource<CreateResourcePayload, Resource> = a
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Resource.create({
     data: {
       url: args.url,
       title: args.title,
       description: args.description,
-      project: { connect: { id: args.projectId } }
+      project: { connect: { id: args.projectId } },
+      user: { connect: { id: context.user.id } }
     }
   })
 }
@@ -387,18 +395,32 @@ export const moveTask: MoveTask<MoveTaskArgs, Task> = async (args, context) => {
 }
 
 export const getDocument = async (args: { documentId: number }, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Document.findUnique({
-    where: { id: args.documentId }
+    where: { 
+      id: args.documentId,
+      userId: context.user.id 
+    }
   })
 }
 
 export const getDocuments = async (args: {}, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+
   return context.entities.Document.findMany({
+    where: { userId: context.user.id },
     orderBy: { createdAt: 'desc' }
   })
 }
 
 export const createDocument = async (args: { title: string; content: string, isPublished?: boolean }, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   if (!args.title || !args.content) {
     throw new HttpError(400, "Title and content are required");
   }
@@ -407,12 +429,16 @@ export const createDocument = async (args: { title: string; content: string, isP
     data: {
       title: args.title,
       content: args.content,
-      isPublished: args.isPublished || false
+      isPublished: args.isPublished || false,
+      user: { connect: { id: context.user.id } }
     }
   })
 }
 
 export const updateDocument = async (args: { id: number; title: string; content: string, isPublished?: boolean }, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Document.update({
     where: { id: args.id },
     data: {
@@ -424,6 +450,9 @@ export const updateDocument = async (args: { id: number; title: string; content:
 }
 
 export const deleteDocument = async (args: { id: number }, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Document.delete({
     where: { id: args.id }
   })
@@ -436,13 +465,17 @@ type SaveCanvasPayload = {
 }
 
 export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   try {
     await context.entities.Canvas.upsert({
       where: { id: args.id },
       update: { snapshot: JSON.stringify(args.snapshot) },
       create: { 
         id: args.id,
-        snapshot: JSON.stringify(args.snapshot)
+        snapshot: JSON.stringify(args.snapshot),
+        user: { connect: { id: context.user.id } }
       }
     });
 
@@ -458,6 +491,9 @@ type LoadCanvasPayload = {
 }
 
 export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   try {
     const canvas = await context.entities.Canvas.findUnique({
       where: { id: args.id }
@@ -471,8 +507,12 @@ export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
 };
 
 export const getCanvases = async (_args: {}, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   try {
     return context.entities.Canvas.findMany({
+      where: { userId: context.user.id },
       orderBy: { createdAt: 'desc' }
     });
   } catch (error) {
@@ -482,10 +522,14 @@ export const getCanvases = async (_args: {}, context: any) => {
 };
 
 export const createCanvas = async (_args: {}, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   try {
     const canvas = await context.entities.Canvas.create({
       data: {
-        snapshot: JSON.stringify({})
+        snapshot: JSON.stringify({}),
+        user: { connect: { id: context.user.id } }
       }
     });
 
@@ -497,6 +541,9 @@ export const createCanvas = async (_args: {}, context: any) => {
 };
 
 export const deleteCanvas = async (args: { id: number }, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   try {
     await context.entities.Canvas.delete({
       where: { id: args.id }
