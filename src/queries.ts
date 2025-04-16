@@ -31,6 +31,9 @@ export const getProjects: GetProjects<void, Project[]> = async (args, context) =
   }
   return context.entities.Project.findMany({
     orderBy: { id: 'asc' },
+    where: {
+      userId: context.user.id
+    },
     include: { 
       tasks: true,
       pitch: true,
@@ -48,7 +51,7 @@ export const getProject: GetProject<GetProjectInput, Project> = async (args, con
     throw new HttpError(401)
   }
   return context.entities.Project.findUnique({
-    where: { id: args.projectId },
+    where: { id: args.projectId, userId: context.user.id },
     include: { 
       tasks: true,
       resources: true,
@@ -103,7 +106,8 @@ export const createProject: CreateProject<CreateProjectPayload, Project> = async
   return context.entities.Project.create({
     data: {
       title: args.title,
-      description: args.description
+      description: args.description,
+      user: { connect: { id: context.user.id } }
     },
   })
 }
@@ -122,7 +126,7 @@ export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async
     throw new HttpError(401)
   }
   return context.entities.Project.update({
-    where: { id: args.id },
+    where: { id: args.id, userId: context.user.id },
     data: {
       title: args.title,
       description: args.description
@@ -142,7 +146,10 @@ export const deleteProject: DeleteProject<DeleteProjectPayload, Project> = async
     throw new HttpError(401)
   }
   return context.entities.Project.delete({
-    where: { id: args.id }
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    }
   })
 }
 
