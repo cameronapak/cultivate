@@ -26,6 +26,9 @@ import {
 type GetProject<Input, Output> = (args: Input, context: any) => Output | Promise<Output>
 
 export const getProjects: GetProjects<void, Project[]> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Project.findMany({
     orderBy: { id: 'asc' },
     include: { 
@@ -41,6 +44,9 @@ type GetProjectInput = {
 }
 
 export const getProject: GetProject<GetProjectInput, Project> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Project.findUnique({
     where: { id: args.projectId },
     include: { 
@@ -56,8 +62,14 @@ type GetProjectTasksInput = {
 }
 
 export const getProjectTasks: GetProjectTasks<GetProjectTasksInput, Task[]> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Task.findMany({
-    where: { projectId: args.projectId },
+    where: { 
+      projectId: args.projectId,
+      userId: context.user.id 
+    },
     orderBy: { createdAt: 'desc' }
   })
 }
@@ -67,6 +79,9 @@ type GetProjectPitchesInput = {
 }
 
 export const getProjectPitches: GetProjectPitches<GetProjectPitchesInput, Pitch[]> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Pitch.findMany({
     where: { projectId: args.projectId },
     orderBy: { createdAt: 'desc' }
@@ -82,6 +97,9 @@ export const createProject: CreateProject<CreateProjectPayload, Project> = async
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Project.create({
     data: {
       title: args.title,
@@ -100,6 +118,9 @@ export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Project.update({
     where: { id: args.id },
     data: {
@@ -117,6 +138,9 @@ export const deleteProject: DeleteProject<DeleteProjectPayload, Project> = async
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Project.delete({
     where: { id: args.id }
   })
@@ -139,6 +163,9 @@ export const createPitch: CreatePitch<CreatePitchPayload, Pitch> = async (
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   // First, check if the project already has a pitch
   const existingPitch = await context.entities.Pitch.findUnique({
     where: { projectId: args.projectId }
@@ -176,15 +203,22 @@ export const deletePitch: DeletePitch<DeletePitchPayload, Pitch> = async (
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Pitch.delete({
     where: { id: args.id }
   })
 }
 
 export const getInboxTasks: GetInboxTasks<void, Task[]> = async (_args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Task.findMany({
     where: {
-      projectId: null
+      projectId: null,
+      userId: context.user.id
     }
   })
 }
@@ -226,13 +260,20 @@ export const updateTaskStatus: UpdateTaskStatus<UpdateTaskStatusPayload, Task> =
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   const updateData: any = { complete: args.complete }
   if (args.status) updateData.status = args.status
   
-  return context.entities.Task.update({
-    where: { id: args.id },
+  const task = await context.entities.Task.update({
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    },
     data: updateData
   })
+  return task
 }
 
 type UpdateTaskPayload = {
@@ -245,13 +286,20 @@ export const updateTask: UpdateTask<UpdateTaskPayload, Task> = async (
   args,
   context
 ) => {
-  return context.entities.Task.update({
-    where: { id: args.id },
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const task = await context.entities.Task.update({
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    },
     data: {
       title: args.title,
       description: args.description
     }
   })
+  return task
 }
 
 type DeleteTaskPayload = {
@@ -262,9 +310,16 @@ export const deleteTask: DeleteTask<DeleteTaskPayload, Task> = async (
   args,
   context
 ) => {
-  return context.entities.Task.delete({
-    where: { id: args.id }
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const task = await context.entities.Task.delete({
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    }
   })
+  return task
 }
 
 type UpdatePitchPayload = {
@@ -284,6 +339,9 @@ export const updatePitch: UpdatePitch<UpdatePitchPayload, Pitch> = async (
   args,
   context
 ) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Pitch.update({
     where: { id: args.id },
     data: {
@@ -305,8 +363,14 @@ type GetProjectResourcesInput = {
 }
 
 export const getProjectResources: GetProjectResources<GetProjectResourcesInput, Resource[]> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
   return context.entities.Resource.findMany({
-    where: { projectId: args.projectId },
+    where: { 
+      projectId: args.projectId,
+      userId: context.user.id 
+    },
     orderBy: { createdAt: 'desc' }
   })
 }
@@ -347,14 +411,21 @@ export const updateResource: UpdateResource<UpdateResourcePayload, Resource> = a
   args,
   context
 ) => {
-  return context.entities.Resource.update({
-    where: { id: args.id },
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const resource = await context.entities.Resource.update({
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    },
     data: {
       url: args.url,
       title: args.title,
       description: args.description
     }
   })
+  return resource
 }
 
 type DeleteResourcePayload = {
@@ -365,9 +436,16 @@ export const deleteResource: DeleteResource<DeleteResourcePayload, Resource> = a
   args,
   context
 ) => {
-  return context.entities.Resource.delete({
-    where: { id: args.id }
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const resource = await context.entities.Resource.delete({
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    }
   })
+  return resource
 }
 
 // Add operation to move task to/from inbox
@@ -382,16 +460,19 @@ type MoveTaskArgs = {
 }
 
 export const moveTask: MoveTask<MoveTaskArgs, Task> = async (args, context) => {
-  return context.entities.Task.update({
-    where: { id: args.taskId },
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const task = await context.entities.Task.update({
+    where: { 
+      id: args.taskId,
+      userId: context.user.id 
+    },
     data: {
-      project: args.projectId ? {
-        connect: { id: args.projectId }
-      } : {
-        disconnect: true
-      }
+      projectId: args.projectId || null
     }
   })
+  return task
 }
 
 export const getDocument = async (args: { documentId: number }, context: any) => {
