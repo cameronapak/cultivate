@@ -1,6 +1,6 @@
 import { Fragment, ReactNode, useState } from "react";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
-import { AppSidebar } from "./custom/AppSidebar";
+import { AppSidebar, type SidebarItem } from "./custom/AppSidebar";
 import { CommandMenu } from "./custom/CommandMenu";
 import { Separator } from "./ui/separator";
 import { Toaster } from "sonner";
@@ -39,7 +39,8 @@ export function Layout({
     localStorage.getItem("isSidebarHidden") || "false"
   );
   const [open, setOpen] = useState(Boolean(isSidebarHidden));
-  const { data: projects } = useQuery(getProjects);
+  const { data: projects, isLoading: areProjectsLoading } =
+    useQuery(getProjects);
 
   const toggleSidebar = () => {
     setOpen((open) => {
@@ -48,26 +49,28 @@ export function Layout({
     });
   };
 
+  const sidebarItems: SidebarItem[] = areProjectsLoading
+    ? []
+    : [
+        {
+          isActive: true,
+          title: "Projects",
+          icon: Folder,
+          items:
+            projects?.map((project) => ({
+              title: project.title,
+              url: `/projects/${project.id}`,
+              isActive: project.id === activeProjectId,
+            })) || [],
+        },
+      ];
+
   return (
     <ThemeProvider>
       <SidebarProvider onOpenChange={toggleSidebar} open={open}>
         <CommandMenu />
         <Toaster />
-        <AppSidebar
-          items={[
-            {
-              isActive: true,
-              title: "Projects",
-              icon: Folder,
-              items:
-                projects?.map((project) => ({
-                  title: project.title,
-                  url: `/projects/${project.id}`,
-                  isActive: project.id === activeProjectId,
-                })) || [],
-            },
-          ]}
-        />
+        <AppSidebar items={sidebarItems} />
         <SidebarInset>
           <header className="relative flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
