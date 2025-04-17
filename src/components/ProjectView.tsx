@@ -58,7 +58,7 @@ import {
 } from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
 import { Table, TableBody, TableCell, TableRow } from "../components/ui/table";
-import { getFaviconFromUrl } from "../lib/utils";
+import { getFaviconFromUrl, isUrl, getMetadataFromUrl } from "../lib/utils";
 import {
   Popover,
   PopoverTrigger,
@@ -480,6 +480,7 @@ const NewResourceForm = ({
   onSave: () => void;
   onCancel: () => void;
 }) => {
+  const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
   const formSchema = z.object({
     title: z.string().min(1, { message: "Title is required" }),
     url: z.string().url({ message: "Please enter a valid URL" }),
@@ -494,6 +495,27 @@ const NewResourceForm = ({
       description: "",
     },
   });
+
+  const handleUrlChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    form.setValue("url", value);
+
+    // If the input is a URL, try to fetch metadata
+    if (isUrl(value.trim())) {
+      setIsFetchingMetadata(true);
+      try {
+        const metadata = await getMetadataFromUrl(value.trim());
+        form.setValue("title", metadata.title || value);
+        if (metadata.description) {
+          form.setValue("description", metadata.description);
+        }
+      } catch (error) {
+        console.error("Failed to fetch metadata:", error);
+      } finally {
+        setIsFetchingMetadata(false);
+      }
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -520,7 +542,20 @@ const NewResourceForm = ({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input autoFocus placeholder="https://example.com" {...field} />
+                <div className="relative">
+                  <Input 
+                    autoFocus 
+                    placeholder="https://example.com" 
+                    {...field}
+                    onChange={handleUrlChange}
+                    className={isFetchingMetadata ? "pr-8" : ""}
+                  />
+                  {isFetchingMetadata && (
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                    </div>
+                  )}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
