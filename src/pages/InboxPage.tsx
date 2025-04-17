@@ -41,6 +41,16 @@ const isUrl = (text: string): boolean => {
   }
 };
 
+// Add common shape type
+type InboxItem = {
+  id: number;
+  title: string;
+  type: 'task' | 'resource';
+  createdAt: Date;
+  complete?: boolean;
+  url?: string;
+};
+
 export function InboxPage() {
   const { data: tasks, isLoading: isLoadingTasks, error: tasksError } = useQuery(getInboxTasks);
   const { data: resources, isLoading: isLoadingResources, error: resourcesError } = useQuery(getInboxResources);
@@ -142,6 +152,24 @@ export function InboxPage() {
     return diffDays;
   };
 
+  // Transform tasks and resources into a common shape and sort by date
+  const inboxItems: InboxItem[] = [
+    ...(tasks?.map(task => ({
+      id: task.id,
+      title: task.title,
+      type: 'task' as const,
+      createdAt: task.createdAt,
+      complete: task.complete,
+    })) || []),
+    ...(resources?.map(resource => ({
+      id: resource.id,
+      title: resource.title,
+      type: 'resource' as const,
+      createdAt: resource.createdAt,
+      url: resource.url,
+    })) || []),
+  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
   if (tasksError || resourcesError) {
     return <div>Error: {tasksError?.message || resourcesError?.message}</div>;
   }
@@ -190,31 +218,46 @@ export function InboxPage() {
             <div>
               <Table>
                 <TableBody>
-                  {tasks?.map((task: Task) => (
-                    <TableRow key={task.id}>
+                  {inboxItems.map((item) => (
+                    <TableRow key={`${item.type}-${item.id}`}>
                       <TableCell className="w-8">
-                        <Checkbox
-                          checked={task.complete}
-                          onCheckedChange={() =>
-                            handleToggleTask(task.id, task.complete)
-                          }
-                        />
+                        {item.type === 'task' ? (
+                          <Checkbox
+                            checked={item.complete}
+                            onCheckedChange={() =>
+                              handleToggleTask(item.id, item.complete || false)
+                            }
+                          />
+                        ) : (
+                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                        )}
                       </TableCell>
                       <TableCell>
-                        <span
-                          className={`mr-2 ${
-                            task.complete
-                              ? "line-through text-muted-foreground"
-                              : ""
-                          }`}
-                        >
-                          {task.title}
-                        </span>
+                        {item.type === 'task' ? (
+                          <span
+                            className={`mr-2 ${
+                              item.complete
+                                ? "line-through text-muted-foreground"
+                                : ""
+                            }`}
+                          >
+                            {item.title}
+                          </span>
+                        ) : (
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 hover:underline"
+                          >
+                            <span className="text-sm">{item.title}</span>
+                          </a>
+                        )}
                         <span className="text-xs text-muted-foreground">
-                          {getDaysAgo(task.createdAt)
-                            ? getDaysAgo(task.createdAt) +
+                          {getDaysAgo(item.createdAt)
+                            ? getDaysAgo(item.createdAt) +
                               " day" +
-                              (getDaysAgo(task.createdAt) > 1 ? "s" : "") +
+                              (getDaysAgo(item.createdAt) > 1 ? "s" : "") +
                               " ago"
                             : "today"}
                         </span>
@@ -230,7 +273,7 @@ export function InboxPage() {
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  Move task to a project
+                                  Move {item.type} to a project
                                 </TooltipContent>
                               </Tooltip>
                             </DropdownMenuTrigger>
@@ -240,7 +283,7 @@ export function InboxPage() {
                                   <DropdownMenuItem
                                     key={project.id}
                                     onClick={() =>
-                                      handleMoveTask(task.id, project.id)
+                                      handleMoveTask(item.id, project.id)
                                     }
                                   >
                                     Move to {project.title}
@@ -258,91 +301,22 @@ export function InboxPage() {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={() => handleDeleteTask(task.id)}
+                                onClick={() => 
+                                  item.type === 'task' 
+                                    ? handleDeleteTask(item.id)
+                                    : handleDeleteResource(item.id)
+                                }
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Delete task</TooltipContent>
+                            <TooltipContent>Delete {item.type}</TooltipContent>
                           </Tooltip>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
-                  {resources?.map((resource: Resource) => (
-                    <TableRow key={resource.id}>
-                      <TableCell className="w-8">
-                        <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                      </TableCell>
-                      <TableCell>
-                        <a
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 hover:underline"
-                        >
-                          <span className="text-sm">{resource.title}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {getDaysAgo(resource.createdAt)
-                              ? getDaysAgo(resource.createdAt) +
-                                " day" +
-                                (getDaysAgo(resource.createdAt) > 1 ? "s" : "") +
-                                " ago"
-                              : "today"}
-                          </span>
-                        </a>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button variant="outline" size="icon">
-                                    <MoveRight className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Move resource to a project
-                                </TooltipContent>
-                              </Tooltip>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {projects?.length ? (
-                                projects?.map((project) => (
-                                  <DropdownMenuItem
-                                    key={project.id}
-                                    onClick={() =>
-                                      handleMoveTask(resource.id, project.id)
-                                    }
-                                  >
-                                    Move to {project.title}
-                                  </DropdownMenuItem>
-                                ))
-                              ) : (
-                                <DropdownMenuItem className="text-muted-foreground">
-                                  No projects found
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => handleDeleteResource(resource.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Delete resource</TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {tasks?.length === 0 && resources?.length === 0 && !isLoadingTasks && !isLoadingResources && (
+                  {inboxItems.length === 0 && !isLoadingTasks && !isLoadingResources && (
                     <TableRow>
                       <TableCell
                         colSpan={3}
