@@ -921,7 +921,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                       </TableRow>
                     )}
                     <TableRow>
-                      <TableCell className="bg-background p-0 pt-4">
+                      <TableCell className="bg-background">
                         <NewTaskForm projectId={project.id} />
                       </TableCell>
                     </TableRow>
