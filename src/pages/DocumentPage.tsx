@@ -29,6 +29,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../components/ui/tooltip";
+import { Skeleton } from "../components/ui/skeleton";
 
 function DeleteDocumentWithAlertDialog({
   id,
@@ -159,8 +160,9 @@ export function DocumentPage() {
     setTitle(document?.title || "");
   }, [document]);
 
-  if (error) return <div className="text-red-500">Error: {error.message}</div>;
-  if (!document) return null;
+  if (error) {
+    return <div className="text-red-500">Error: {error.message}</div>;
+  }
 
   const handleSave = async () => {
     try {
@@ -182,7 +184,7 @@ export function DocumentPage() {
       isLoading={isLoading}
       breadcrumbItems={[
         { title: "Docs", url: "/documents" },
-        { title: document.title },
+        { title: document?.title || "Loading..." },
       ]}
     >
       <div>
@@ -197,24 +199,30 @@ export function DocumentPage() {
               className="w-full bg-background text-2xl font-medium outline-none"
             />
           ) : (
-            <h1 className="heading-1 flex items-center gap-2">
-              {document.title}
-              {document.isPublished ? (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <BadgeCheck className="w-5 h-5 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>Published</TooltipContent>
-                </Tooltip>
+            <>
+              {isLoading ? (
+                <Skeleton className="w-1/2 h-10" />
               ) : (
-                <Badge
-                  variant="secondary"
-                  className="text-muted-foreground font-normal"
-                >
-                  Draft
-                </Badge>
+                <h1 className="heading-1 flex items-center gap-2">
+                  {document.title}
+                  {document.isPublished ? (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <BadgeCheck className="w-5 h-5 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>Published</TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <Badge
+                      variant="secondary"
+                      className="text-muted-foreground font-normal"
+                    >
+                      Draft
+                    </Badge>
+                  )}
+                </h1>
               )}
-            </h1>
+            </>
           )}
           <div className="flex gap-2">
             {isEditing ? (
@@ -231,42 +239,46 @@ export function DocumentPage() {
                 >
                   <Pencil className="w-4 h-4" />
                 </Button>
-                <DeleteDocumentWithAlertDialog id={document.id}>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="hover:text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </DeleteDocumentWithAlertDialog>
-                {document.isPublished ? (
-                  <PublishDocumentWithAlertDialog
-                    id={document.id}
-                    title={document.title}
-                    content={document.content}
-                    isPublished={document.isPublished}
-                  >
+                {document ? (
+                  <DeleteDocumentWithAlertDialog id={document.id}>
                     <Button
-                      className="hover:text-destructive"
                       size="icon"
                       variant="outline"
-                    >
-                      <BadgeX className="w-4 h-4" />
-                    </Button>
-                  </PublishDocumentWithAlertDialog>
-                ) : (
-                  <PublishDocumentWithAlertDialog
-                    id={document.id}
-                    title={document.title}
-                    content={document.content}
-                    isPublished={document.isPublished}
+                      className="hover:text-destructive"
                   >
-                    <Button size="icon" variant="outline">
-                      <BadgeCheck className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                     </Button>
-                  </PublishDocumentWithAlertDialog>
-                )}
+                  </DeleteDocumentWithAlertDialog>
+                ) : null}
+                {document ? (
+                  document?.isPublished ? (
+                    <PublishDocumentWithAlertDialog
+                      id={document.id}
+                      title={document.title}
+                      content={document.content}
+                      isPublished={document.isPublished}
+                    >
+                      <Button
+                        className="hover:text-destructive"
+                        size="icon"
+                        variant="outline"
+                      >
+                        <BadgeX className="w-4 h-4" />
+                      </Button>
+                    </PublishDocumentWithAlertDialog>
+                  ) : (
+                    <PublishDocumentWithAlertDialog
+                      id={document.id}
+                      title={document.title}
+                      content={document.content}
+                      isPublished={document.isPublished}
+                    >
+                      <Button size="icon" variant="outline">
+                        <BadgeCheck className="w-4 h-4" />
+                      </Button>
+                    </PublishDocumentWithAlertDialog>
+                  )
+                ) : null}
               </div>
             )}
           </div>
