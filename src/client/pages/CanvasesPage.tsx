@@ -70,7 +70,7 @@ export function CanvasesPage() {
   }
 
   return (
-    <Layout breadcrumbItems={[{ title: "Canvas" }]}>
+    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Canvas" }]}>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="heading-1">Canvas</h1>
