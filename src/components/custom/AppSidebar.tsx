@@ -82,7 +82,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
               </SidebarMenuButton>
             </SidebarMenuItem> */}
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={currentPath === "/documents"}>
+              <SidebarMenuButton asChild isActive={currentPath.includes("/documents")}>
                 <Link to={"/documents"}>
                   <BookOpen className="h-5 w-5" />
                   <span>Docs</span>

@@ -57,7 +57,7 @@ export function Layout({
           title: "Projects",
           icon: Folder,
           items:
-            projects?.map((project) => ({
+            projects?.map((project: { id: number; title: string }) => ({
               title: project.title,
               url: `/projects/${project.id}`,
               isActive: project.id === activeProjectId,
