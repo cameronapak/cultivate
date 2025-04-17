@@ -14,7 +14,23 @@ export const ProjectPage = () => {
     error,
   } = useQuery(getProject, { projectId: parsedProjectId })
 
-  if (error || !project) return null
+  if (error) {
+    return null
+  }
+
+  if (isLoading || !project) {
+    return (
+      <Layout
+        isLoading={isLoading}
+        breadcrumbItems={[
+          { title: "Projects", url: "/" },
+          { title: "Loading..." },
+        ]}
+        // Yes, this is redundant, but the component expects children
+        children={<></>}
+      />
+    )
+  }
 
   return (
     <Layout
