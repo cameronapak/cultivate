@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
+import { Progress } from "./ui/progress";
 import { ThemeProvider } from "./custom/ThemeProvider";
 import { Folder } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
@@ -18,6 +19,7 @@ import { useQuery } from "wasp/client/operations";
 
 interface LayoutProps {
   children: ReactNode;
+  isLoading?: boolean;
   breadcrumbItems?: {
     title: string;
     url?: string;
@@ -28,6 +30,7 @@ interface LayoutProps {
 
 export function Layout({
   children,
+  isLoading = false,
   breadcrumbItems = [],
   activeProjectId,
   mainContentClasses,
@@ -86,6 +89,13 @@ export function Layout({
               </BreadcrumbList>
             </Breadcrumb>
           </header>
+          {isLoading ? (
+            <div className="sticky top-0 left-0 right-0">
+              <Progress indeterminate />
+            </div>
+          ) : (
+            null
+          )}
           <div className={`max-w-2xl w-full mx-auto p-6 ${mainContentClasses}`}>
             {children}
           </div>
