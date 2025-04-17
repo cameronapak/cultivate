@@ -559,7 +559,7 @@ const NewResourceForm = ({
           )}
         />
 
-        <div className="flex gap-2 mt-4">
+        <div className="grid grid-cols-2 gap-2 mt-4">
           <PopoverClose asChild>
             <Button type="submit" variant="default">
               Add Resource
