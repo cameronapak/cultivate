@@ -269,7 +269,7 @@ export function InboxPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {/* {resources?.map((resource: Resource) => (
+                  {resources?.map((resource: Resource) => (
                     <TableRow key={resource.id}>
                       <TableCell className="w-8">
                         <ExternalLink className="h-4 w-4 text-muted-foreground" />
@@ -341,7 +341,7 @@ export function InboxPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))} */}
+                  ))}
                   {tasks?.length === 0 && resources?.length === 0 && !isLoadingTasks && !isLoadingResources && (
                     <TableRow>
                       <TableCell
