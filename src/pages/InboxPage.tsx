@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight, Eye, EyeClosed } from "lucide-react";
+import { Trash2, MoveRight, Eye, EyeClosed, Coffee } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -133,9 +133,6 @@ export function InboxPage() {
               </TooltipContent>
             </Tooltip>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Tasks fade away the longer they sit in the inbox
-          </p>
         </div>
         <div>
           <div className="flex gap-4 mb-6">
@@ -159,12 +156,6 @@ export function InboxPage() {
                   {tasks?.map((task: Task) => (
                     <TableRow
                       key={task.id}
-                      style={{
-                        opacity: Math.max(
-                          0.1,
-                          1 - getDaysAgo(task.createdAt) * 0.33
-                        ),
-                      }}
                     >
                       <TableCell className="w-8">
                         <Checkbox
@@ -247,9 +238,12 @@ export function InboxPage() {
                     <TableRow>
                       <TableCell
                         colSpan={3}
-                        className="text-center text-muted-foreground"
+                        className="text-center flex flex-col items-center justify-center text-muted-foreground"
                       >
-                        You've reached Inbox Zero 🍹
+                        <EmptyStateView
+                          Icon={<Coffee className="h-10 w-10" />}
+                          title="Inbox Zero"
+                        />
                       </TableCell>
                     </TableRow>
                   )}
