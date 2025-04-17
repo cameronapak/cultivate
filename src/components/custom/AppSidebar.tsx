@@ -21,7 +21,14 @@ import { Link } from 'wasp/client/router'
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 
-export function AppSidebar({ items }: { items: { isActive: boolean, title: string, icon: any, items: { title: string, url: string }[] }[] }) {
+export type SidebarItem = {
+  isActive: boolean;
+  title: string;
+  icon: any;
+  items: { title: string; url: string }[];
+};
+
+export function AppSidebar({ items }: { items: SidebarItem[] }) {
   const [showProjects, setShowProjects] = useState(() => {
     const showProjectsLocalStorage = JSON.parse(localStorage.getItem("showProjects") || "true");
     return showProjectsLocalStorage;
