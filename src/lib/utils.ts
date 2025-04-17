@@ -10,6 +10,21 @@ export function getFaviconFromUrl(url: string, size: number = 16) {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`;
 }
 
+export async function getMetadataFromUrl(url: string): Promise<{
+  title: string;
+  description: string;
+  image: string;
+}> {
+  const response = await fetch(`https://api.dub.co/metatags?url=${url}`);
+  const data = await response.json();
+  
+  return {
+    title: data.title,
+    description: data.description,
+    image: data.image,
+  };
+}
+
 // Custom throttle function implementation
 export const throttle = <T extends (...args: any[]) => any>(
   func: T,

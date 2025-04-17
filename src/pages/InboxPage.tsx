@@ -31,7 +31,8 @@ import {
 import { toast } from "sonner";
 import { Toggle } from "../components/ui/toggle";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
-import { getFaviconFromUrl } from "../lib/utils";
+import { getFaviconFromUrl, getMetadataFromUrl } from "../lib/utils";
+
 // Add URL detection utility function
 const isUrl = (text: string): boolean => {
   try {
@@ -73,10 +74,12 @@ export function InboxPage() {
     if (!newTaskTitle.trim()) return;
     try {
       if (isUrl(newTaskTitle.trim())) {
+        const metadata = await getMetadataFromUrl(newTaskTitle.trim());
         // Create a resource instead of a task
         await createResource({
-          title: newTaskTitle.trim(),
+          title: metadata.title,
           url: newTaskTitle.trim(),
+          description: metadata.description,
           projectId: 0,
           // No projectId means it goes to inbox
         });
@@ -272,7 +275,7 @@ export function InboxPage() {
                             className="flex items-center gap-2 hover:underline"
                           >
                             {item.url ? <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="mt-0.5 w-4 h-4 bg-white rounded-full" /> : null}
-                            <span className="text-sm">{item.title}</span>
+                            <span className="line-clamp-2 text-sm">{item.title}</span>
                           </a>
                         )}
                         <span className="text-xs text-muted-foreground">
