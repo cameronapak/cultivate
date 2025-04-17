@@ -28,7 +28,7 @@ const BlockNoteEditorComponent = forwardRef<HTMLDivElement, BlockNoteEditorProps
     // For initialization; on mount, convert the initial Markdown to blocks and replace the default editor's content
     React.useEffect(() => {
       async function loadInitialHTML() {
-        const blocks = await editor.tryParseMarkdownToBlocks(initialContent || "");
+        const blocks = await editor.tryParseHTMLToBlocks(initialContent || "");
         editor.replaceBlocks(editor.document, blocks);
       }
 
@@ -40,8 +40,8 @@ const BlockNoteEditorComponent = forwardRef<HTMLDivElement, BlockNoteEditorProps
     // Debounced onChange handler
     useEffect(() => {
       const handleEditorChange = async () => {
-        const markdown = await editor.blocksToMarkdownLossy();
-        onChange?.(markdown);
+        const html = await editor.blocksToFullHTML(editor.document);
+        onChange?.(html);
       };
 
       const editorChangeListener = () => {
