@@ -196,7 +196,7 @@ export function DocumentPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
-              className="w-full bg-background text-2xl font-medium outline-none"
+              className="w-full bg-background heading-1 outline-none"
             />
           ) : (
             <>
