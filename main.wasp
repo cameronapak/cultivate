@@ -196,6 +196,11 @@ action moveTask {
   entities: [Task, Project]
 }
 
+action moveResource {
+  fn: import { moveResource } from "@src/queries",
+  entities: [Resource, Project]
+}
+
 action createDocument {
   fn: import { createDocument } from "@src/queries",
   entities: [Document]

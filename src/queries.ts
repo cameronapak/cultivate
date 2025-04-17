@@ -21,6 +21,7 @@ import {
   type MoveTask,
   type GetInboxTasks,
   type GetInboxResources,
+  type MoveResource,
 } from 'wasp/server/operations'
 
 // Define our own GetProject type since we need to include related entities
@@ -658,4 +659,25 @@ export const getInboxResources: GetInboxResources<void, Resource[]> = async (_ar
     },
     orderBy: { createdAt: 'desc' }
   })
+}
+
+type MoveResourceArgs = {
+  resourceId: number
+  projectId: number | null
+}
+
+export const moveResource: MoveResource<MoveResourceArgs, Resource> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const resource = await context.entities.Resource.update({
+    where: { 
+      id: args.resourceId,
+      userId: context.user.id 
+    },
+    data: {
+      projectId: args.projectId || null
+    }
+  })
+  return resource
 }

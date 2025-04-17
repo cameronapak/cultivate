@@ -7,6 +7,7 @@ import {
   moveTask,
   createResource,
   deleteResource,
+  moveResource,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
@@ -142,6 +143,26 @@ export function InboxPage() {
       }
     } catch (error) {
       console.error("Failed to delete resource:", error);
+    }
+  };
+
+  const handleMoveItem = async (item: InboxItem, projectId: number) => {
+    try {
+      if (item.type === 'task') {
+        await moveTask({
+          taskId: item.id,
+          projectId,
+        });
+      } else {
+        await moveResource({
+          resourceId: item.id,
+          projectId,
+        });
+      }
+      toast.success(`${item.type} moved to project`);
+    } catch (error) {
+      console.error(`Failed to move ${item.type}:`, error);
+      toast.error(`Failed to move ${item.type}`);
     }
   };
 
@@ -282,9 +303,7 @@ export function InboxPage() {
                                 projects?.map((project) => (
                                   <DropdownMenuItem
                                     key={project.id}
-                                    onClick={() =>
-                                      handleMoveTask(item.id, project.id)
-                                    }
+                                    onClick={() => handleMoveItem(item, project.id)}
                                   >
                                     Move to {project.title}
                                   </DropdownMenuItem>
