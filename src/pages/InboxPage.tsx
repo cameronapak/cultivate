@@ -58,13 +58,13 @@ export function InboxPage() {
   const { data: resources, isLoading: isLoadingResources, error: resourcesError } = useQuery(getInboxResources);
   const { data: projects } = useQuery(getProjects);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [showTasks, setShowTasks] = useState(() => {
+  const [showInbox, setShowInbox] = useState(() => {
     const showTasksLocalStorage = JSON.parse(localStorage.getItem("shouldShowTasks") || "true");
     return showTasksLocalStorage;
   });
 
   const handleToggleTasks = () => {
-    setShowTasks((prev: boolean) => {
+    setShowInbox((prev: boolean) => {
       localStorage.setItem("shouldShowTasks", (!prev).toString());
       return !prev;
     });
@@ -210,7 +210,7 @@ export function InboxPage() {
                   variant="outline"
                   onClick={handleToggleTasks}
                 >
-                  {showTasks ? (
+                  {showInbox ? (
                     <Eye className="h-5 w-5" />
                   ) : (
                     <EyeClosed className="h-5 w-5" />
@@ -218,7 +218,7 @@ export function InboxPage() {
                 </Toggle>
               </TooltipTrigger>
               <TooltipContent>
-                {showTasks ? "Hide tasks" : "Show tasks"}
+                {showInbox ? "Hide inbox" : "Show inbox"}
               </TooltipContent>
             </Tooltip>
           </div>
@@ -238,7 +238,7 @@ export function InboxPage() {
             </Button>
           </div>
 
-          {showTasks ? (
+          {showInbox ? (
             <div>
               <Table>
                 <TableBody>
