@@ -272,9 +272,10 @@ export function InboxPage() {
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`grid grid-cols-[${item.url ? '16px_1fr' : '1fr'}] items-center gap-3 hover:underline`}
+                            className="grid items-center gap-2 hover:underline"
+                            style={{ gridTemplateColumns: item.url ? '16px 1fr' : '1fr' }}
                           >
-                            {item.url ? <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="mt-0.5 w-4 h-4 bg-white rounded-full" /> : null}
+                            {item.url ? <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="mt-0.5 w-4 h-4 bg-secondary rounded-sm" /> : null}
                             <span className="line-clamp-2 text-sm">{item.title}</span>
                           </a>
                         )}
