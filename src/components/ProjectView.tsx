@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from "react-router-dom";
-import type { Project as BaseProject, Task, Resource, Pitch } from 'wasp/entities';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type {
+  Project as BaseProject,
+  Task,
+  Resource,
+  Pitch,
+} from "wasp/entities";
 import {
   deleteTask,
   updateTask,
@@ -13,9 +18,17 @@ import {
   updateTaskStatus,
   getProject,
   getProjectTasks,
-  getProjectResources
-} from 'wasp/client/operations';
-import { Trash, Pencil, ExternalLink, Plus, Trash2, Settings2Icon, CheckIcon } from "lucide-react";
+  getProjectResources,
+} from "wasp/client/operations";
+import {
+  Trash,
+  Pencil,
+  ExternalLink,
+  Plus,
+  Trash2,
+  Settings2Icon,
+  CheckIcon,
+} from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -68,9 +81,9 @@ import { toast } from "sonner";
 import { Switch } from "./ui/switch";
 import React from "react";
 import { Kbd } from "./custom/Kbd";
-import { useTabShortcuts } from '../hooks/useKeyboardShortcuts';
-import { useLayoutState } from '../hooks/useLayoutState'
-import { Project } from '../types'
+import { useTabShortcuts } from "../hooks/useKeyboardShortcuts";
+import { useLayoutState } from "../hooks/useLayoutState";
+import { Project } from "../types";
 
 const EditTaskForm = ({
   task,
@@ -209,7 +222,9 @@ const TaskItem = ({ task }: { task: Task }) => {
           <div className="flex flex-col">
             <label
               htmlFor={task.id.toString()}
-              className={`pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${task.complete ? "line-through text-muted-foreground" : ""}`}
+              className={`pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+                task.complete ? "line-through text-muted-foreground" : ""
+              }`}
             >
               {task.title}
             </label>
@@ -220,10 +235,11 @@ const TaskItem = ({ task }: { task: Task }) => {
             )}
             {task.complete && (
               <p className="text-sm text-muted-foreground line-clamp-1">
-                Completed {task.updatedAt.toLocaleDateString('en', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
+                Completed{" "}
+                {task.updatedAt.toLocaleDateString("en", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </p>
             )}
@@ -500,15 +516,11 @@ const NewResourceForm = ({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="title"
+          name="url"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
-                  autoFocus
-                  placeholder="Resource title or name"
-                  {...field}
-                />
+                <Input autoFocus placeholder="https://example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -517,11 +529,14 @@ const NewResourceForm = ({
 
         <FormField
           control={form.control}
-          name="url"
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="https://example.com" {...field} />
+                <Input
+                  placeholder="Resource title or name"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -792,40 +807,41 @@ const AboutForm = ({
 };
 
 type ProjectWithRelations = Project & {
-  tasks?: Task[]
-  resources?: Resource[]
-  pitch?: Pitch
-}
+  tasks?: Task[];
+  resources?: Resource[];
+  pitch?: Pitch;
+};
 
 export const ProjectView = ({ project }: { project: Project }) => {
-  const [isEditing, setIsEditing] = useState(false)
-  const [_, setIsAddingResource] = useState(false)
-  const navigate = useNavigate()
-  const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } = useLayoutState()
+  const [isEditing, setIsEditing] = useState(false);
+  const [_, setIsAddingResource] = useState(false);
+  const navigate = useNavigate();
+  const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } =
+    useLayoutState();
 
-  const handleTabChange = (tab: 'tasks' | 'resources' | 'about') => {
-    setTab(tab)
-  }
+  const handleTabChange = (tab: "tasks" | "resources" | "about") => {
+    setTab(tab);
+  };
 
   // Use the new hook for tab shortcuts
-  useTabShortcuts(handleTabChange)
+  useTabShortcuts(handleTabChange);
 
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
       try {
-        await deleteProject({ id: project.id })
-        toast.success("Project deleted successfully")
-        navigate("/")
+        await deleteProject({ id: project.id });
+        toast.success("Project deleted successfully");
+        navigate("/");
       } catch (err: any) {
-        toast.error("Error deleting project: " + err.message)
+        toast.error("Error deleting project: " + err.message);
       }
     }
-  }
+  };
 
   // Filter tasks based on the hideCompletedTasks state
   const filteredTasks = project.tasks?.filter(
     (task) => !hideCompletedTasks || !task.complete
-  )
+  );
 
   if (isEditing) {
     return (
@@ -845,19 +861,28 @@ export const ProjectView = ({ project }: { project: Project }) => {
       <Tabs
         value={currentTab}
         onValueChange={(value) =>
-          handleTabChange(value as 'tasks' | 'resources' | 'about')
+          handleTabChange(value as "tasks" | "resources" | "about")
         }
       >
         <TabsList className="group grid w-full grid-cols-3">
-          <TabsTrigger value="tasks" className="relative flex items-center gap-2">
+          <TabsTrigger
+            value="tasks"
+            className="relative flex items-center gap-2"
+          >
             Tasks
             <Kbd>1</Kbd>
           </TabsTrigger>
-          <TabsTrigger value="resources" className="relative flex items-center gap-2">
+          <TabsTrigger
+            value="resources"
+            className="relative flex items-center gap-2"
+          >
             Resources
             <Kbd>2</Kbd>
           </TabsTrigger>
-          <TabsTrigger value="about" className="relative flex items-center gap-2">
+          <TabsTrigger
+            value="about"
+            className="relative flex items-center gap-2"
+          >
             About
             <Kbd>3</Kbd>
           </TabsTrigger>
@@ -872,7 +897,10 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <CardTitle>Tasks</CardTitle>
                     <CardDescription className="flex items-center gap-1">
                       <CircleCheckIcon className="w-4 h-4" />
-                      {project.tasks?.filter((task) => !task.complete).length} tasks remaining
+                      {
+                        project.tasks?.filter((task) => !task.complete).length
+                      }{" "}
+                      tasks remaining
                     </CardDescription>
                   </div>
                   <Popover>
@@ -883,7 +911,10 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     </PopoverTrigger>
                     <PopoverContent className="w-80">
                       <div className="flex items-center justify-between space-x-2">
-                        <label htmlFor="hide-completed" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        <label
+                          htmlFor="hide-completed"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
                           Hide Completed Tasks
                         </label>
                         <Switch
@@ -946,7 +977,11 @@ export const ProjectView = ({ project }: { project: Project }) => {
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button size="sm" onClick={() => setIsAddingResource(true)} variant="outline">
+                      <Button
+                        size="sm"
+                        onClick={() => setIsAddingResource(true)}
+                        variant="outline"
+                      >
                         <Plus className="w-4 h-4" />
                         Add Resource
                       </Button>
