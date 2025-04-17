@@ -5,6 +5,7 @@ import {
   updateTaskStatus,
   deleteTask,
   moveTask,
+  createResource,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
@@ -29,6 +30,16 @@ import { toast } from "sonner";
 import { Toggle } from "../components/ui/toggle";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
 
+// Add URL detection utility function
+const isUrl = (text: string): boolean => {
+  try {
+    new URL(text);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export function InboxPage() {
   const { data: tasks, isLoading, error } = useQuery(getInboxTasks);
   const { data: projects } = useQuery(getProjects);
@@ -48,14 +59,26 @@ export function InboxPage() {
   const handleCreateTask = async () => {
     if (!newTaskTitle.trim()) return;
     try {
-      await createTask({
-        title: newTaskTitle,
-        // No projectId means it goes to inbox
-      });
-      toast.success(`Task created: "${newTaskTitle}"`);
+      if (isUrl(newTaskTitle.trim())) {
+        // Create a resource instead of a task
+        await createResource({
+          title: newTaskTitle.trim(),
+          url: newTaskTitle.trim(),
+          // No projectId means it goes to inbox
+        });
+        toast.success(`Resource created: "${newTaskTitle}"`);
+      } else {
+        // Create a regular task
+        await createTask({
+          title: newTaskTitle,
+          // No projectId means it goes to inbox
+        });
+        toast.success(`Task created: "${newTaskTitle}"`);
+      }
       setNewTaskTitle("");
     } catch (error) {
-      console.error("Failed to create task:", error);
+      console.error("Failed to create task/resource:", error);
+      toast.error("Failed to create task/resource");
     }
   };
 
