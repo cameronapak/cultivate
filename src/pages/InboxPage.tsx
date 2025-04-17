@@ -272,7 +272,7 @@ export function InboxPage() {
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 hover:underline"
+                            className={`grid grid-cols-[${item.url ? '16px_1fr' : '1fr'}] items-center gap-3 hover:underline`}
                           >
                             {item.url ? <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="mt-0.5 w-4 h-4 bg-white rounded-full" /> : null}
                             <span className="line-clamp-2 text-sm">{item.title}</span>
