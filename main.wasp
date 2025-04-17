@@ -111,6 +111,11 @@ query getInboxTasks {
   entities: [Task]
 }
 
+query getInboxResources {
+  fn: import { getInboxResources } from "@src/queries",
+  entities: [Resource]
+}
+
 query getDocument {
   fn: import { getDocument } from "@src/queries",
   entities: [Document]

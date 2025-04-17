@@ -65,8 +65,8 @@ model Resource {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   Int
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   Int?
   user        User?    @relation(fields: [userId], references: [id])
   userId      Int?
 }

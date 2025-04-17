@@ -1,17 +1,18 @@
-import { Task } from "wasp/entities";
-import { getInboxTasks, useQuery } from "wasp/client/operations";
+import { Task, Resource } from "wasp/entities";
+import { getInboxTasks, getInboxResources, useQuery } from "wasp/client/operations";
 import {
   createTask,
   updateTaskStatus,
   deleteTask,
   moveTask,
   createResource,
+  deleteResource,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight, Eye, EyeClosed, Coffee } from "lucide-react";
+import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -41,7 +42,8 @@ const isUrl = (text: string): boolean => {
 };
 
 export function InboxPage() {
-  const { data: tasks, isLoading, error } = useQuery(getInboxTasks);
+  const { data: tasks, isLoading: isLoadingTasks, error: tasksError } = useQuery(getInboxTasks);
+  const { data: resources, isLoading: isLoadingResources, error: resourcesError } = useQuery(getInboxResources);
   const { data: projects } = useQuery(getProjects);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [showTasks, setShowTasks] = useState(() => {
@@ -64,6 +66,7 @@ export function InboxPage() {
         await createResource({
           title: newTaskTitle.trim(),
           url: newTaskTitle.trim(),
+          projectId: 0,
           // No projectId means it goes to inbox
         });
         toast.success(`Resource created: "${newTaskTitle}"`);
@@ -121,6 +124,17 @@ export function InboxPage() {
     }
   };
 
+  const handleDeleteResource = async (resourceId: number) => {
+    try {
+      if (confirm("Are you sure you want to delete this resource?")) {
+        await deleteResource({ id: resourceId });
+        toast.success("Resource deleted");
+      }
+    } catch (error) {
+      console.error("Failed to delete resource:", error);
+    }
+  };
+
   const getDaysAgo = (date: Date) => {
     const today = new Date();
     const diffTime = today.getTime() - date.getTime();
@@ -128,12 +142,12 @@ export function InboxPage() {
     return diffDays;
   };
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (tasksError || resourcesError) {
+    return <div>Error: {tasksError?.message || resourcesError?.message}</div>;
   }
 
   return (
-    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Inbox" }]}>
+    <Layout isLoading={isLoadingTasks || isLoadingResources} breadcrumbItems={[{ title: "Inbox" }]}>
       <div>
         <div className="flex flex-col gap-2 items-start mb-4">
           <div className="flex gap-2 items-center">
@@ -162,13 +176,13 @@ export function InboxPage() {
             <Input
               autoFocus={true}
               type="text"
-              placeholder="Add a new task..."
+              placeholder="Add a new task or paste a URL..."
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               onKeyPress={handleKeyPress}
             />
             <Button variant="outline" onClick={handleCreateTask}>
-              Add Task
+              Add
             </Button>
           </div>
 
@@ -177,9 +191,7 @@ export function InboxPage() {
               <Table>
                 <TableBody>
                   {tasks?.map((task: Task) => (
-                    <TableRow
-                      key={task.id}
-                    >
+                    <TableRow key={task.id}>
                       <TableCell className="w-8">
                         <Checkbox
                           checked={task.complete}
@@ -257,7 +269,80 @@ export function InboxPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {tasks?.length === 0 && !isLoading && (
+                  {/* {resources?.map((resource: Resource) => (
+                    <TableRow key={resource.id}>
+                      <TableCell className="w-8">
+                        <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                      </TableCell>
+                      <TableCell>
+                        <a
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 hover:underline"
+                        >
+                          <span className="text-sm">{resource.title}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {getDaysAgo(resource.createdAt)
+                              ? getDaysAgo(resource.createdAt) +
+                                " day" +
+                                (getDaysAgo(resource.createdAt) > 1 ? "s" : "") +
+                                " ago"
+                              : "today"}
+                          </span>
+                        </a>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="outline" size="icon">
+                                    <MoveRight className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  Move resource to a project
+                                </TooltipContent>
+                              </Tooltip>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {projects?.length ? (
+                                projects?.map((project) => (
+                                  <DropdownMenuItem
+                                    key={project.id}
+                                    onClick={() =>
+                                      handleMoveTask(resource.id, project.id)
+                                    }
+                                  >
+                                    Move to {project.title}
+                                  </DropdownMenuItem>
+                                ))
+                              ) : (
+                                <DropdownMenuItem className="text-muted-foreground">
+                                  No projects found
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleDeleteResource(resource.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete resource</TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))} */}
+                  {tasks?.length === 0 && resources?.length === 0 && !isLoadingTasks && !isLoadingResources && (
                     <TableRow>
                       <TableCell
                         colSpan={3}
