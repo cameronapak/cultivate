@@ -20,6 +20,7 @@ import {
   type UpdateTask,
   type MoveTask,
   type GetInboxTasks,
+  type GetInboxResources,
 } from 'wasp/server/operations'
 
 // Define our own GetProject type since we need to include related entities
@@ -386,7 +387,7 @@ type CreateResourcePayload = {
   url: string
   title: string
   description?: string
-  projectId: number
+  projectId?: number
 }
 
 export const createResource: CreateResource<CreateResourcePayload, Resource> = async (
@@ -396,12 +397,13 @@ export const createResource: CreateResource<CreateResourcePayload, Resource> = a
   if (!context.user) {
     throw new HttpError(401)
   }
+
   return context.entities.Resource.create({
     data: {
       url: args.url,
       title: args.title,
       description: args.description,
-      project: { connect: { id: args.projectId } },
+      project: args.projectId ? { connect: { id: args.projectId } } : undefined,
       user: { connect: { id: context.user.id } }
     }
   })
@@ -643,3 +645,17 @@ export const deleteCanvas = async (args: { id: number }, context: any) => {
   }
 };
 //#endregion
+
+export const getInboxResources: GetInboxResources<void, Resource[]> = async (_args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+
+  return context.entities.Resource.findMany({
+    where: { 
+      projectId: null,
+      userId: context.user.id 
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
