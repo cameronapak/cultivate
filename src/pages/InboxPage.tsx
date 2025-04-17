@@ -110,7 +110,7 @@ export function InboxPage() {
   }
 
   return (
-    <Layout isLoading={true} breadcrumbItems={[{ title: "Inbox" }]}>
+    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Inbox" }]}>
       <div>
         <div className="flex flex-col gap-2 items-start mb-4">
           <div className="flex gap-2 items-center">
