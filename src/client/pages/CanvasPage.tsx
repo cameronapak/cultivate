@@ -90,16 +90,6 @@ export function CanvasPage() {
     };
   }, [store, canvasId, saveCanvasToDb]);
 
-  if (loadingState.status === "loading") {
-    return (
-      <Layout mainContentClasses="w-full max-w-full !p-0 h-full">
-        <div className="tldraw__editor h-full flex items-center justify-center">
-          <h2>Loading canvas...</h2>
-        </div>
-      </Layout>
-    );
-  }
-
   if (loadingState.status === "error") {
     return (
       <Layout mainContentClasses="w-full max-w-full !p-0 h-full">
@@ -112,7 +102,8 @@ export function CanvasPage() {
   }
 
   return (
-    <Layout 
+    <Layout
+      isLoading={loadingState.status === "loading"}
       mainContentClasses="w-full max-w-full !p-0 h-full"
       breadcrumbItems={[
         {

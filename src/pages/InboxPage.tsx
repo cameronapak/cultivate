@@ -105,8 +105,12 @@ export function InboxPage() {
     return diffDays;
   };
 
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
-    <Layout breadcrumbItems={[{ title: "Inbox" }]}>
+    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Inbox" }]}>
       <div>
         <div className="flex flex-col gap-2 items-start mb-4">
           <div className="flex gap-2 items-center">
@@ -148,8 +152,6 @@ export function InboxPage() {
             </Button>
           </div>
 
-          {isLoading && <div>Loading...</div>}
-          {error && <div className="text-red-500">Error: {error.message}</div>}
           {showTasks ? (
             <div>
               <Table>

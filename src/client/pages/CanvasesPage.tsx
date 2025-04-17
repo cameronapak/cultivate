@@ -43,12 +43,11 @@ export function CanvasesPage() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
 
   if (!canvases?.length) {
     return (
-      <Layout breadcrumbItems={[{ title: "Canvases" }]}>
+      <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Canvases" }]}>
         <EmptyStateRoot className="mx-auto">
           <EmptyStateIcon>
             <File />
@@ -71,7 +70,7 @@ export function CanvasesPage() {
   }
 
   return (
-    <Layout breadcrumbItems={[{ title: "Canvas" }]}>
+    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Canvas" }]}>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="heading-1">Canvas</h1>
