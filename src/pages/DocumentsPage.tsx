@@ -31,7 +31,9 @@ export function DocumentsPage() {
   const navigate = useNavigate();
   const { data: documents, isLoading, error } = useQuery(getDocuments);
 
-  if (error) return <div className="text-red-500">Error: {error.message}</div>;
+  if (error) {
+    return <div className="text-red-500">Error: {error.message}</div>;
+  }
 
   if (documents?.length === 0) {
     return (
@@ -58,7 +60,7 @@ export function DocumentsPage() {
   }
 
   return (
-    <Layout breadcrumbItems={[{ title: "Docs" }]}>
+    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Docs" }]}>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="heading-1">Docs</h1>

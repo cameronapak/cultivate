@@ -69,7 +69,7 @@ export function Layout({
           ]}
         />
         <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <header className="relative flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
@@ -88,14 +88,12 @@ export function Layout({
                 ))}
               </BreadcrumbList>
             </Breadcrumb>
+            {isLoading ? (
+              <div className="absolute -bottom-1 left-0 right-0">
+                <Progress indeterminate />
+              </div>
+            ) : null}
           </header>
-          {isLoading ? (
-            <div className="sticky top-0 left-0 right-0">
-              <Progress indeterminate />
-            </div>
-          ) : (
-            null
-          )}
           <div className={`max-w-2xl w-full mx-auto p-6 ${mainContentClasses}`}>
             {children}
           </div>
