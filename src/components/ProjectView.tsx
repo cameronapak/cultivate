@@ -435,7 +435,10 @@ const ResourceItem = ({
   }
 
   return (
-    <TableRow className="w-full group">
+    <TableRow className="grid grid-cols-[auto_1fr_auto] items-center group">
+      <TableCell className="w-8">
+        <ExternalLink className="h-4 w-4 text-muted-foreground" />
+      </TableCell>
       <TableCell className="flex justify-between w-full">
         <a
           href={resource.url}
@@ -443,9 +446,12 @@ const ResourceItem = ({
           rel="noopener noreferrer"
           className="flex items-center gap-2"
         >
-          <div className="flex gap-2">
+          <div 
+            className="grid items-center gap-2"
+            style={{ gridTemplateColumns: faviconUrl ? '16px 1fr' : '1fr' }}
+          >
             {faviconUrl && (
-              <img src={faviconUrl} alt="Favicon" className="mt-0.5 w-4 h-4" />
+              <img src={faviconUrl} alt="Favicon" className="mt-0.5 w-4 h-4 bg-secondary rounded-sm" />
             )}
             <div className="flex flex-col">
               <p className="text-sm hover:underline">{resource.title}</p>
@@ -455,7 +461,6 @@ const ResourceItem = ({
                 </p>
               )}
             </div>
-            <ExternalLink className="mt-0.5 w-4 h-4 text-muted-foreground" />
           </div>
         </a>
         <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
