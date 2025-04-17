@@ -5,6 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function isUrl(str: string): boolean {
+  try {
+    new URL(str);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function getFaviconFromUrl(url: string, size: number = 16) {
   const domain = new URL(url).hostname;
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`;
