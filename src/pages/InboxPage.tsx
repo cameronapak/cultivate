@@ -31,7 +31,7 @@ import {
 import { toast } from "sonner";
 import { Toggle } from "../components/ui/toggle";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
-
+import { getFaviconFromUrl } from "../lib/utils";
 // Add URL detection utility function
 const isUrl = (text: string): boolean => {
   try {
@@ -240,7 +240,7 @@ export function InboxPage() {
               <Table>
                 <TableBody>
                   {inboxItems.map((item) => (
-                    <TableRow key={`${item.type}-${item.id}`}>
+                    <TableRow className="grid grid-cols-[auto_1fr_auto] items-center" key={`${item.type}-${item.id}`}>
                       <TableCell className="w-8">
                         {item.type === 'task' ? (
                           <Checkbox
@@ -253,7 +253,7 @@ export function InboxPage() {
                           <ExternalLink className="h-4 w-4 text-muted-foreground" />
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="flex items-center gap-2">
                         {item.type === 'task' ? (
                           <span
                             className={`mr-2 ${
@@ -271,6 +271,7 @@ export function InboxPage() {
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 hover:underline"
                           >
+                            {item.url ? <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="mt-0.5 w-4 h-4 bg-white rounded-full" /> : null}
                             <span className="text-sm">{item.title}</span>
                           </a>
                         )}
