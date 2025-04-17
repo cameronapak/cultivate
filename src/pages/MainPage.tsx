@@ -103,8 +103,7 @@ export const MainPage = () => {
   const { data: projects, isLoading, error } = useQuery(getProjects);
 
   return (
-    <Layout breadcrumbItems={[{ title: "Projects" }]}>
-      {isLoading && <p>Loading projects...</p>}
+    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Projects" }]}>
       {error && <p className="text-red-500">Error: {error.message}</p>}
 
       {projects && projects.length > 0 ? (

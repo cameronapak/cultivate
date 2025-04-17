@@ -14,13 +14,14 @@ export const ProjectPage = () => {
     error,
   } = useQuery(getProject, { projectId: parsedProjectId })
 
-  if (isLoading || error || !project) return null
+  if (error || !project) return null
 
   return (
-    <Layout 
+    <Layout
+      isLoading={isLoading}
       breadcrumbItems={[
-        { title: 'Projects', url: '/' },
-        { title: project.title }
+        { title: "Projects", url: "/" },
+        { title: project.title },
       ]}
       activeProjectId={parsedProjectId}
     >

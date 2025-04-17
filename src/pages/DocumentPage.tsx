@@ -159,7 +159,6 @@ export function DocumentPage() {
     setTitle(document?.title || "");
   }, [document]);
 
-  if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
   if (!document) return null;
 
@@ -180,6 +179,7 @@ export function DocumentPage() {
 
   return (
     <Layout
+      isLoading={isLoading}
       breadcrumbItems={[
         { title: "Docs", url: "/documents" },
         { title: document.title },

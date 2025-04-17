@@ -31,12 +31,11 @@ export function DocumentsPage() {
   const navigate = useNavigate();
   const { data: documents, isLoading, error } = useQuery(getDocuments);
 
-  if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
 
   if (documents?.length === 0) {
     return (
-      <Layout breadcrumbItems={[{ title: "Docs" }]}>
+      <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Docs" }]}>
         <EmptyStateRoot className="mx-auto">
           <EmptyStateIcon>
             <File />
