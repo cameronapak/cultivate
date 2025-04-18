@@ -6,6 +6,7 @@ import { Button } from "../components/ui/button";
 import { BadgeCheck } from "lucide-react";
 import { Skeleton } from "../components/ui/skeleton";
 import Logo from "../components/custom/Logo";
+import { ThemeProvider } from "../components/custom/ThemeProvider";
 
 export function SharedDocumentPage() {
   const { documentId } = useParams();
@@ -22,7 +23,9 @@ export function SharedDocumentPage() {
         <div className="text-red-500 text-center">
           <h2 className="text-2xl font-bold mb-4">Error</h2>
           <p>{error.message}</p>
-          <p className="mt-4">This document might not exist or is not published.</p>
+          <p className="mt-4">
+            This document might not exist or is not published.
+          </p>
           <Button className="mt-4" asChild>
             <Link to="/">Go Home</Link>
           </Button>
@@ -32,41 +35,43 @@ export function SharedDocumentPage() {
   }
 
   return (
-    <div className="max-w-2xl w-full mx-auto p-6 mt-8">
-      <Logo className="text-muted-foreground" />
+    <ThemeProvider>
+      <div className="max-w-2xl w-full mx-auto p-6 mt-8">
+        <Logo className="text-muted-foreground" />
 
-      <div>
-        <div className="mt-8 flex justify-between items-center mb-4">
-          {isLoading ? (
-            <Skeleton className="w-1/2 h-10" />
-          ) : (
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              {document.title}
-              <BadgeCheck className="w-5 h-5 text-muted-foreground" />
-              {document.user?.username && (
-                <span className="text-sm font-normal text-muted-foreground ml-2">
-                  by {document.user.username}
-                </span>
-              )}
-            </h1>
-          )}
-        </div>
-        <div className="mt-4">
-          {isLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="w-1/2 h-6" />
-              <Skeleton className="w-1/2 h-6" />
-              <Skeleton className="w-1/3 h-6" />
-            </div>
-          ) : (
-            <BlockNoteEditor
-              editable={false}
-              initialContent={document?.content || ""}
-              onChange={() => {}}
-            />
-          )}
+        <div>
+          <div className="mt-8 flex justify-between items-center mb-4">
+            {isLoading ? (
+              <Skeleton className="w-1/2 h-10" />
+            ) : (
+              <h1 className="text-3xl font-bold flex items-center gap-2">
+                {document.title}
+                <BadgeCheck className="w-5 h-5 text-muted-foreground" />
+                {document.user?.username && (
+                  <span className="text-sm font-normal text-muted-foreground ml-2">
+                    by {document.user.username}
+                  </span>
+                )}
+              </h1>
+            )}
+          </div>
+          <div className="mt-4">
+            {isLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="w-1/2 h-6" />
+                <Skeleton className="w-1/2 h-6" />
+                <Skeleton className="w-1/3 h-6" />
+              </div>
+            ) : (
+              <BlockNoteEditor
+                editable={false}
+                initialContent={document?.content || ""}
+                onChange={() => {}}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
-} 
+}
