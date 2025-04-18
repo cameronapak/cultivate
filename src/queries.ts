@@ -497,6 +497,30 @@ export const getDocument = async (args: { documentId: number }, context: any) =>
   })
 }
 
+// Add a function to get a public document without auth
+export const getPublicDocument = async (args: { documentId: number }, context: any) => {
+  // Find document by ID and check if it's published
+  const document = await context.entities.Document.findFirst({
+    where: {
+      id: args.documentId,
+      isPublished: true // Only return if document is published
+    },
+    include: {
+      user: {
+        select: {
+          id: true // Include author's id
+        }
+      }
+    }
+  });
+
+  if (!document) {
+    throw new HttpError(404, "Document not found or not published");
+  }
+
+  return document;
+}
+
 export const getDocuments = async (args: {}, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
