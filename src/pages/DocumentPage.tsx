@@ -9,7 +9,7 @@ import {
 } from "wasp/client/operations";
 import { BlockNoteEditor } from "../components/custom/BlockNoteEditor";
 import { Button } from "../components/ui/button";
-import { BadgeCheck, BadgeX, Pencil, Save, Trash2 } from "lucide-react";
+import { BadgeCheck, BadgeX, Pencil, Save, Trash2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -179,6 +179,12 @@ export function DocumentPage() {
     }
   };
 
+  const handleShareClick = () => {
+    const shareUrl = `${window.location.origin}/shared/${document.id}`;
+    navigator.clipboard.writeText(shareUrl);
+    toast.success("Share link copied to clipboard");
+  };
+
   return (
     <Layout
       isLoading={isLoading}
@@ -232,6 +238,20 @@ export function DocumentPage() {
               </Button>
             ) : (
               <div className="flex items-center gap-2">
+                {document?.isPublished && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={handleShareClick}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Share document</TooltipContent>
+                  </Tooltip>
+                )}
                 <Button
                   size="icon"
                   variant="outline"

@@ -1,11 +1,11 @@
 import { Link } from "wasp/client/router";
 import { Sprout } from "lucide-react";
 
-const Logo = () => {
+const Logo = ({ className }: { className?: string }) => {
   return (
-    <Link to={"/"} className="flex items-center gap-1">
+    <Link to={"/"} className={`flex items-center gap-1 ${className}`}>
       <Sprout className="h-7 w-7" />
-      <p className="text-2xl font-semibold">Cultivate</p>
+      <p className="text-2xl font-medium">Cultivate</p>
     </Link>
   );
 };

@@ -76,6 +76,12 @@ page CreateDocumentPage {
   component: import { CreateDocumentPage } from "@src/pages/CreateDocumentPage"
 }
 
+// Add new shared document route that doesn't require auth
+route SharedDocumentRoute { path: "/shared/:documentId", to: SharedDocumentPage }
+page SharedDocumentPage {
+  component: import { SharedDocumentPage } from "@src/pages/SharedDocumentPage"
+}
+
 query getProjects {
   // Specifies where the implementation for the query function is.
   // The path `@src/queries` resolves to `src/queries.ts`.
@@ -118,6 +124,11 @@ query getInboxResources {
 
 query getDocument {
   fn: import { getDocument } from "@src/queries",
+  entities: [Document]
+}
+
+query getPublicDocument {
+  fn: import { getPublicDocument } from "@src/queries",
   entities: [Document]
 }
 
