@@ -3,6 +3,9 @@ app shapeUp {
     version: "^0.16.2"
   },
   title: "Cultivate",
+  client: {
+    setupFn: import { setupClient } from "@src/client/setup"
+  },
   auth: {
     // Tells Wasp which entity to use for storing users.
     userEntity: User,
