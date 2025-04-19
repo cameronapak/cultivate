@@ -213,7 +213,7 @@ const TaskItem = ({ task }: { task: Task }) => {
 
   return (
     <div className={`group task-item ${task.complete ? "completed" : ""}`}>
-      <div className="flex items-center space-x-2 justify-between p-2 border-b border-[hsl(var(--input))]">
+      <div className="hover:cursor-grab flex items-center space-x-2 justify-between p-2 border-b border-[hsl(var(--input))]">
         <div className="flex items-start space-x-2">
           <Checkbox
             id={task.id.toString()}
