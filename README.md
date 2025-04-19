@@ -6,11 +6,6 @@ Imagine if Notion & Basecamp had a baby.
 
 Cultivate is a PKM tool where you can calmly brain dump, write, manage projects, and get things done.
 
-[Wasp app](https://wasp.sh)
-
-- Tailwind v3
-- Shadcn v3.2.0
-
 > [!WARNING]
 > This is a beta project in active development. There will be bugs and breaking changes. Please report any issues in the Issues tab.
 
