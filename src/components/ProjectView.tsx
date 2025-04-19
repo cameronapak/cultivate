@@ -293,9 +293,8 @@ const TaskList = ({ tasks, projectId }: {
   );
 };
 
-const NewTaskForm = ({ projectId, onTaskAdded }: { 
+const NewTaskForm = ({ projectId }: { 
   projectId: number;
-  onTaskAdded: (task: Task) => void;
 }) => {
   const [isAdding, setIsAdding] = useState(false);
   const formSchema = z.object({
@@ -314,13 +313,11 @@ const NewTaskForm = ({ projectId, onTaskAdded }: {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       // Create task in database
-      const task = await createTask({
+      await createTask({
         title: values.title,
         description: values.description,
         projectId,
       });
-
-      onTaskAdded(task);
       toast.success("Task created successfully");
       form.reset();
       setIsAdding(false);
@@ -890,7 +887,6 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const navigate = useNavigate();
   const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } =
     useLayoutState();
-  const [tasks, setTasks] = useState<Task[]>(project.tasks || []);
 
   const handleTabChange = (tab: "tasks" | "resources" | "about") => {
     setTab(tab);
@@ -912,7 +908,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
   };
 
   // Filter tasks based on the hideCompletedTasks state
-  const filteredTasks = tasks?.filter(
+  const filteredTasks = project.tasks?.filter(
     (task) => !hideCompletedTasks || !task.complete
   );
 
@@ -977,7 +973,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <CardTitle>Tasks</CardTitle>
                     <CardDescription className="flex items-center gap-1">
                       <CircleCheckIcon className="w-4 h-4" />
-                      {tasks?.filter((task) => !task.complete).length} tasks
+                      {project.tasks?.filter((task) => !task.complete).length} tasks
                       remaining
                     </CardDescription>
                   </div>
@@ -1013,7 +1009,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                   />
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {tasks && tasks.length > 0
+                    {project?.tasks?.length
                       ? "All tasks are completed and/or hidden."
                       : "No tasks yet"}
                   </p>
@@ -1021,9 +1017,6 @@ export const ProjectView = ({ project }: { project: Project }) => {
                 <div className="mt-4">
                   <NewTaskForm 
                     projectId={project.id} 
-                    onTaskAdded={(task) => {
-                      setTasks((prevTasks) => [...prevTasks, task]);
-                    }}
                   />
                 </div>
               </CardContent>
