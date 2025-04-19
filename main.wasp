@@ -24,9 +24,9 @@ page MainPage {
   component: import { MainPage } from "@src/pages/MainPage"
 }
 
-route SignupRoute { path: "/signup", to: SignupPage }
-page SignupPage {
-  component: import { SignupPage } from "@src/pages/SignupPage"
+route SignUpRoute { path: "/signup", to: SignUpPage }
+page SignUpPage {
+  component: import { SignUpPage } from "@src/pages/SignUpPage"
 }
 
 route LoginRoute { path: "/login", to: LoginPage }
