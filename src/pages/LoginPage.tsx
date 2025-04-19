@@ -18,7 +18,7 @@ import Logo from "../components/custom/Logo";
 import { Badge } from "../components/ui/badge";
 import { toast } from "sonner";
 import { Toaster } from "../components/ui/sonner";
-import { Github } from "lucide-react";
+import { Footer } from "../components/custom/Footer";
 
 export function LoginPage({
   className,
@@ -126,11 +126,7 @@ export function LoginPage({
         </CardContent>
       </Card>
 
-      <footer className="flex flex-col items-center justify-center gap-2">
-        <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
-          {new Date().getFullYear()} &copy; FAITH TOOLS SOFTWARE SOLUTIONS, LLC
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

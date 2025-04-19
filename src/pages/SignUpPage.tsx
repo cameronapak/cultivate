@@ -18,6 +18,7 @@ import Logo from "../components/custom/Logo";
 import { Badge } from "../components/ui/badge";
 import { toast } from "sonner";
 import { Toaster } from "../components/ui/sonner";
+import { Footer } from "../components/custom/Footer";
 
 export function SignUpPage({
   className,
@@ -33,7 +34,11 @@ export function SignUpPage({
       await signup({ username, password });
       navigate("/");
     } catch (error: HttpError | any) {
-      toast.error(error?.data?.data?.message || error?.data?.message || "An unknown error occurred");
+      toast.error(
+        error?.data?.data?.message ||
+          error?.data?.message ||
+          "An unknown error occurred"
+      );
     }
   }
 
@@ -114,6 +119,17 @@ export function SignUpPage({
                   Sign up
                 </Button>
               </div>
+              <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
+                By clicking continue, you agree to our{" "}
+                <a href="https://go.faith.tools/cultivate-tos">
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a href="https://go.faith.tools/cultivate-privacy">
+                  Privacy Policy
+                </a>
+                .
+              </div>
               <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Link to="/login" className="underline underline-offset-4">
@@ -124,10 +140,8 @@ export function SignUpPage({
           </form>
         </CardContent>
       </Card>
-      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
-        By clicking continue, you agree to our <a href="https://go.faith.tools/cultivate-tos">Terms of Service</a>{" "}
-        and <a href="https://go.faith.tools/cultivate-privacy">Privacy Policy</a>.
-      </div>
+
+      <Footer />
     </div>
   );
 }
