@@ -267,15 +267,13 @@ const TaskList = ({ tasks, projectId }: {
     tasks,
     {
       onSort: async (event) => {
-        // Get the new order from the event
         const newTaskOrder = (event.values as Task[]).map((task) => task.id);
         try {
-          // Update the order in the database
           await updateProjectTaskOrder({
             projectId: projectId,
             taskOrder: newTaskOrder
           });
-          setValues(event.values as Task[]);
+          // No need to setValues here as the parent component will handle the update
         } catch (error) {
           console.error("Failed to update task order:", error);
           // Revert to the previous order if the update fails
@@ -287,6 +285,7 @@ const TaskList = ({ tasks, projectId }: {
     }
   );
 
+  // Only update values when tasks prop changes
   React.useEffect(() => {
     setValues(tasks);
   }, [tasks]);
