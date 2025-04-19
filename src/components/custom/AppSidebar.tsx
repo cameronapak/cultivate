@@ -1,4 +1,4 @@
-import { ChevronRight, InboxIcon, BookOpen, Plus, Sprout, PencilRuler } from "lucide-react";
+import { InboxIcon, BookOpen, Sprout, PencilRuler } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -8,17 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
 } from "../../components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../../components/ui/collapsible";
 import { Link } from 'wasp/client/router'
-import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 
 export type SidebarItem = {
@@ -29,18 +20,6 @@ export type SidebarItem = {
 };
 
 export function AppSidebar({ items }: { items: SidebarItem[] }) {
-  const [showProjects, setShowProjects] = useState(() => {
-    const showProjectsLocalStorage = JSON.parse(localStorage.getItem("showProjects") || "true");
-    return showProjectsLocalStorage;
-  });
-
-  const handleToggleProjects = () => {
-    setShowProjects((prev: boolean) => {
-      localStorage.setItem("showProjects", (!prev).toString());
-      return !prev;
-    });
-  };
-
   // Get the current path
   const currentPath = window.location.pathname;
 
@@ -89,47 +68,14 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {items.map((item: any) => (
-              <Collapsible
-                key={item.title}
-                asChild
-                defaultOpen={showProjects}
-                onOpenChange={handleToggleProjects}
-                className="group/collapsible"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items.length ? item.items?.sort((a: any, b: any) => a.title.localeCompare(b.title))?.map((subItem: any) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton isActive={subItem.isActive} asChild>
-                            <Link to={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      )) : (
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild isActive={currentPath === "/"}>
-                            <Link to={"/"}>
-                              <Plus className="h-5 w-5" />
-                              <span>New Project</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      )}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-            ))}
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={currentPath === "/"}>
+                <Link to={"/"}>
+                  <PencilRuler className="h-5 w-5" />
+                  <span>Projects</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
