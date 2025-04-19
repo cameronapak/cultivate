@@ -20,7 +20,15 @@ import {
   deleteResource,
   deleteTask,
 } from "wasp/client/operations";
-import { Trash, Pencil, ExternalLink, Plus, Folder, Pin, PinOff } from "lucide-react";
+import {
+  Trash,
+  Pencil,
+  ExternalLink,
+  Plus,
+  Folder,
+  Pin,
+  PinOff,
+} from "lucide-react";
 import "../Main.css";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -71,7 +79,7 @@ import {
 import { PopoverClose } from "@radix-ui/react-popover";
 import { Layout } from "../components/Layout";
 import { toast } from "sonner";
-import { 
+import {
   EmptyStateRoot,
   EmptyStateIcon,
   EmptyStateTitle,
@@ -102,6 +110,21 @@ type ProjectFormValues = z.infer<typeof projectFormSchema>;
 export const MainPage = () => {
   const { data: projects, isLoading, error } = useQuery(getProjects);
 
+  const pinnedProjects =
+    projects?.filter((project: Project) => project.pinned) || [];
+
+  const handlePinToggle = async (project: Project) => {
+    try {
+      await updateProject({
+        id: project.id,
+        pinned: !project.pinned,
+      });
+    } catch (error) {
+      console.error("Failed to update project pin status:", error);
+      toast.error("Failed to update project pin status");
+    }
+  };
+
   return (
     <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Projects" }]}>
       {error && <p className="text-red-500">Error: {error.message}</p>}
@@ -121,11 +144,62 @@ export const MainPage = () => {
               </PopoverContent>
             </Popover>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(projects as Project[]).map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
+
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {pinnedProjects.length > 0
+              ? pinnedProjects.map((project: Project) => (
+                  <ProjectCard
+                    onTogglePin={() => handlePinToggle(project)}
+                    key={project.id}
+                    project={project}
+                  />
+                ))
+              : null}
+          </section>
+
+          <section className="mt-8">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {projects.map((project: Project) => (
+                  <TableRow className="w-full" key={project.id}>
+                    <TableCell className="hover:underline">
+                      <Link
+                        className="w-full flex flex-col items-start"
+                        to={`/projects/:projectId`}
+                        params={{ projectId: project.id }}
+                      >
+                        <p>{project.title}</p>
+                        {project.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {project.description}
+                          </p>
+                        )}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <Button
+                        onClick={() => handlePinToggle(project)}
+                        variant="ghost"
+                        size="icon"
+                      >
+                        {project.pinned ? (
+                          <PinOff className="w-4 h-4" />
+                        ) : (
+                          <Pin className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </section>
         </>
       ) : (
         !isLoading && (
@@ -635,7 +709,7 @@ const NewResourceForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <FormField
+        <FormField
           control={form.control}
           name="url"
           render={({ field }) => (
@@ -663,7 +737,7 @@ const NewResourceForm = ({
               <FormMessage />
             </FormItem>
           )}
-        />        
+        />
 
         <FormField
           control={form.control}
@@ -868,167 +942,13 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   );
 };
 
-const ProjectView = ({ project }: { project: Project }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [isEditing, setIsEditing] = useState(false);
-
-  // Initialize from URL query parameters
-  const hideCompletedTasks = searchParams.get("hideCompleted") === "true";
-  const activeTab = searchParams.get("tab");
-  const currentTab =
-    activeTab === "tasks" || activeTab === "resources" ? activeTab : "tasks";
-
-  const handleHideCompletedChange = (hide: boolean) => {
-    setSearchParams((prev) => {
-      prev.set("hideCompleted", hide ? "true" : "false");
-      return prev;
-    });
-  };
-
-  const handleTabChange = (tab: "tasks" | "resources" | "about") => {
-    setSearchParams((prev) => {
-      prev.set("tab", tab);
-      return prev;
-    });
-  };
-
-  const handleDelete = async () => {
-    if (confirm(`Are you sure you want to delete "${project.title}"?`)) {
-      try {
-        await deleteProject({ id: project.id });
-      } catch (err: any) {
-        window.alert("Error deleting project: " + err.message);
-      }
-    }
-  };
-
-  // Filter tasks based on the hideCompletedTasks state
-  const filteredTasks = project.tasks?.filter(
-    (task) => !hideCompletedTasks || !task.complete
-  );
-
-  if (isEditing) {
-    return (
-      <div>
-        <EditProjectForm
-          project={project}
-          onSave={() => setIsEditing(false)}
-          onCancel={() => setIsEditing(false)}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <main className="mt-6">
-      <Card>
-        <CardHeader className="pb-6">
-          <CardTitle>{project.title}</CardTitle>
-          {project.description && (
-            <CardDescription className="text-start">
-              {project.description}
-            </CardDescription>
-          )}
-        </CardHeader>
-        <CardContent>
-          <Tabs
-            defaultValue={currentTab}
-            className="w-[400px]"
-            onValueChange={(value) =>
-              handleTabChange(value as "tasks" | "resources")
-            }
-          >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="tasks">Tasks</TabsTrigger>
-              <TabsTrigger value="resources">Resources</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="tasks">
-              <div className="mt-4">
-                <div className="flex justify-between gap-2">
-                  <Button disabled variant="outline">
-                    <Plus className="w-4 h-4" />
-                    Add Task
-                  </Button>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="hide-completed"
-                      checked={hideCompletedTasks}
-                      onCheckedChange={handleHideCompletedChange}
-                    />
-                    <label
-                      htmlFor="hide-completed"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Hide completed tasks
-                    </label>
-                  </div>
-                </div>
-
-                <Table className="mt-4">
-                  {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-                  {/* <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">Task</TableHead>
-                </TableRow>
-              </TableHeader> */}
-                  <TableBody>
-                    {filteredTasks && filteredTasks.length > 0 ? (
-                      <>
-                        {filteredTasks.map((task: Task) => (
-                          <TableRow key={task.id}>
-                            <TableCell className="bg-background">
-                              <TaskItem key={task.id} task={task} />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </>
-                    ) : (
-                      <TableRow>
-                        <TableCell>
-                          <p className="text-sm text-muted-foreground">
-                            {project.tasks && project.tasks.length > 0
-                              ? "All tasks are completed and/or hidden."
-                              : "No tasks yet"}
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    <TableRow>
-                      <TableCell className="bg-background pt-4">
-                        <NewTaskForm projectId={project.id} />
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="resources">
-              <ResourcesSection project={project} />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </main>
-  );
-};
-
-const ProjectCard = ({ project }: { project: Project }) => {
-  const handlePinToggle = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigation
-    e.stopPropagation(); // Prevent event bubbling
-    try {
-      await updateProject({
-        id: project.id,
-        pinned: !project.pinned,
-      });
-    } catch (error) {
-      console.error("Failed to update project pin status:", error);
-      toast.error("Failed to update project pin status");
-    }
-  };
-
+const ProjectCard = ({
+  project,
+  onTogglePin,
+}: {
+  project: Project;
+  onTogglePin: () => void;
+}) => {
   return (
     <Link
       key={project.id}
@@ -1044,7 +964,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-muted-foreground absolute top-2 right-2"
-              onClick={handlePinToggle}
+              onClick={onTogglePin}
             >
               {project.pinned ? (
                 <PinOff className="h-4 w-4" />
@@ -1066,18 +986,5 @@ const ProjectCard = ({ project }: { project: Project }) => {
         </CardContent>
       </Card>
     </Link>
-  );
-};
-
-const ProjectsList = ({ projects }: { projects: Project[] }) => {
-  if (!projects?.length)
-    return <div className="paragraph">No projects yet. Create one above!</div>;
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {projects.map((project) => (
-        <ProjectCard key={project.id} project={project} />
-      ))}
-    </div>
   );
 };
