@@ -20,3 +20,8 @@ primary_region = 'mia'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+
+[domains]
+  hostname = "cultivatepkm.com"
+  [domains.config]
+    type = "primary"
