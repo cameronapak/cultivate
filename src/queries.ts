@@ -509,7 +509,7 @@ export const moveTask: MoveTask<MoveTaskArgs, Task> = async (args, context) => {
   return task
 }
 
-export const getDocument = async (args: { documentId: number }, context: any) => {
+export const getDocument = async (args: { documentId: string }, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -522,7 +522,7 @@ export const getDocument = async (args: { documentId: number }, context: any) =>
 }
 
 // Add a function to get a public document without auth
-export const getPublicDocument = async (args: { documentId: number }, context: any) => {
+export const getPublicDocument = async (args: { documentId: string }, context: any) => {
   // Find document by ID and check if it's published
   const document = await context.entities.Document.findFirst({
     where: {
@@ -574,7 +574,7 @@ export const createDocument = async (args: { title: string; content: string, isP
   })
 }
 
-export const updateDocument = async (args: { id: number; title: string; content: string, isPublished?: boolean }, context: any) => {
+export const updateDocument = async (args: { id: string; title: string; content: string, isPublished?: boolean }, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -588,7 +588,7 @@ export const updateDocument = async (args: { id: number; title: string; content:
   })
 }
 
-export const deleteDocument = async (args: { id: number }, context: any) => {
+export const deleteDocument = async (args: { id: string }, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }

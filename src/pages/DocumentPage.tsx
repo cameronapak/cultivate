@@ -35,7 +35,7 @@ function DeleteDocumentWithAlertDialog({
   id,
   children,
 }: {
-  id: number;
+  id: string;
   children: React.ReactNode;
 }) {
   const navigate = useNavigate();
@@ -82,7 +82,7 @@ function PublishDocumentWithAlertDialog({
   isPublished,
   children,
 }: {
-  id: number;
+  id: string;
   title: string;
   content: any;
   isPublished: boolean;
@@ -146,12 +146,17 @@ function PublishDocumentWithAlertDialog({
 
 export function DocumentPage() {
   const { documentId } = useParams();
-  const parsedDocumentId = parseInt(documentId || "0", 10);
+  const navigate = useNavigate();
+
+  if (!documentId) {
+    return navigate("/documents");
+  }
+
   const {
     data: document,
     isLoading,
     error,
-  } = useQuery(getDocument, { documentId: parsedDocumentId });
+  } = useQuery(getDocument, { documentId });
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState<any>(null);
   const [title, setTitle] = useState("");
@@ -188,6 +193,10 @@ export function DocumentPage() {
   }
 
   const handleSave = async () => {
+    if (!document) {
+      return;
+    }
+    
     try {
       await updateDocument({
         id: document.id,
@@ -204,6 +213,10 @@ export function DocumentPage() {
   };
 
   const handleShareClick = () => {
+    if (!document) {
+      return;
+    }
+    
     const shareUrl = `${window.location.origin}/shared/${document.id}`;
     navigator.clipboard.writeText(shareUrl);
     toast.success("Share link copied to clipboard");
@@ -234,8 +247,8 @@ export function DocumentPage() {
                 <Skeleton className="w-1/2 h-10" />
               ) : (
                 <h1 className="heading-1 flex items-center gap-2">
-                  {document.title}
-                  {document.isPublished ? (
+                  {document?.title}
+                  {document?.isPublished ? (
                     <Tooltip>
                       <TooltipTrigger>
                         <BadgeCheck className="w-5 h-5 text-muted-foreground" />
@@ -289,13 +302,13 @@ export function DocumentPage() {
                       size="icon"
                       variant="outline"
                       className="hover:text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </DeleteDocumentWithAlertDialog>
                 ) : null}
                 {document ? (
-                  document?.isPublished ? (
+                  document.isPublished ? (
                     <PublishDocumentWithAlertDialog
                       id={document.id}
                       title={document.title}

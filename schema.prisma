@@ -74,7 +74,7 @@ model Resource {
 }
 
 model Document {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid())
   title       String
   content     String
   createdAt   DateTime @default(now())
