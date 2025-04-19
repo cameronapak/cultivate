@@ -705,3 +705,34 @@ export const moveResource: MoveResource<MoveResourceArgs, Resource> = async (arg
   })
   return resource
 }
+
+type UpdateProjectTaskOrderPayload = {
+  projectId: number
+  taskOrder: number[]
+}
+
+export const updateProjectTaskOrder = async (args: UpdateProjectTaskOrderPayload, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+
+  // Verify the project belongs to the user
+  const project = await context.entities.Project.findUnique({
+    where: { 
+      id: args.projectId,
+      userId: context.user.id 
+    }
+  })
+
+  if (!project) {
+    throw new HttpError(404, 'Project not found')
+  }
+
+  // Update the taskOrder
+  return context.entities.Project.update({
+    where: { id: args.projectId },
+    data: {
+      taskOrder: args.taskOrder
+    }
+  })
+}

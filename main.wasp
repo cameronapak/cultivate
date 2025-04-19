@@ -253,3 +253,8 @@ action deleteCanvas {
   entities: [Canvas]
 }
 //#endregion
+
+action updateProjectTaskOrder {
+  fn: import { updateProjectTaskOrder } from "@src/queries",
+  entities: [Project]
+}
