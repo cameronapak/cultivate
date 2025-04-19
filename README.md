@@ -1,4 +1,4 @@
-![cultivate](/public/og-image.webp)
+https://github.com/user-attachments/assets/a732ebb6-ffa4-4da9-b11f-24ecacc2900a
 
 # 🌱 Cultivate (beta)
 
