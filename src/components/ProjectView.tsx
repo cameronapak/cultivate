@@ -273,10 +273,8 @@ const TaskList = ({ tasks, projectId }: {
             projectId: projectId,
             taskOrder: newTaskOrder
           });
-          // No need to setValues here as the parent component will handle the update
         } catch (error) {
           console.error("Failed to update task order:", error);
-          // Revert to the previous order if the update fails
           setValues(tasks);
         }
       },
@@ -285,10 +283,10 @@ const TaskList = ({ tasks, projectId }: {
     }
   );
 
-  // Only update values when tasks prop changes
+  // Update values when tasks prop changes
   React.useEffect(() => {
     setValues(tasks);
-  }, [tasks]);
+  }, [tasks, setValues]);
 
   return (
     <div ref={parentRef} className="space-y-2">
@@ -1034,7 +1032,6 @@ export const ProjectView = ({ project }: { project: Project }) => {
                   <NewTaskForm 
                     projectId={project.id} 
                     onTaskAdded={(task) => {
-                      console.log("task", task);
                       setTasks((prevTasks) => [...prevTasks, task]);
                     }}
                   />
