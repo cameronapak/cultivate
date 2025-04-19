@@ -69,7 +69,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={currentPath === "/"}>
+              <SidebarMenuButton asChild isActive={currentPath === "/" || currentPath.includes("/projects")}>
                 <Link to={"/"}>
                   <PencilRuler className="h-5 w-5" />
                   <span>Projects</span>
