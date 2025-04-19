@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout } from "../components/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -155,10 +155,33 @@ export function DocumentPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState<any>(null);
   const [title, setTitle] = useState("");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   React.useEffect(() => {
     setTitle(document?.title || "");
   }, [document]);
+
+  // Add beforeunload handler
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  // Update hasUnsavedChanges when content or title changes
+  useEffect(() => {
+    if (isEditing && (content !== document?.content || title !== document?.title)) {
+      setHasUnsavedChanges(true);
+    } else {
+      setHasUnsavedChanges(false);
+    }
+  }, [content, title, document, isEditing]);
 
   if (error) {
     return <div className="text-red-500">Error: {error.message}</div>;
@@ -172,6 +195,7 @@ export function DocumentPage() {
         content: content || document.content,
       });
       setIsEditing(false);
+      setHasUnsavedChanges(false);
       toast.success("Document updated successfully");
     } catch (error) {
       console.error("Failed to update document:", error);
