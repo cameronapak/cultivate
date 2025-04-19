@@ -1,4 +1,4 @@
-import { InboxIcon, BookOpen, Sprout, PencilRuler } from "lucide-react";
+import { InboxIcon, BookOpen, Sprout, PencilRuler, Github } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +14,7 @@ import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
 import { useQuery } from "wasp/client/operations";
 import { getProjects } from "wasp/client/operations";
+import { Button } from "../ui/button";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -113,8 +114,13 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
           </SidebarGroup>
         )} */}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="flex flex-row items-center justify-between">
         <ThemeToggle />
+        <a target="_blank" href="https://git.new/cultivate">
+          <Button variant="ghost" size="icon" className="p-0">
+            <Github className="w-4 h-4 text-muted-foreground" />
+          </Button>
+        </a>
       </SidebarFooter>
     </Sidebar>
   );
