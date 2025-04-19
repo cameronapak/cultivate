@@ -1,3 +1,5 @@
+![cultivate](/public/og-image.webp)
+
 # 🌱 Cultivate
 
 Imagine if Notion & Basecamp had a baby. 

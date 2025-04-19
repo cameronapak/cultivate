@@ -12,7 +12,10 @@ app shapeUp {
     },
     // We'll see how this is used in a bit.
     onAuthFailedRedirectTo: "/login"
-  }
+  },
+  head: [
+    "<meta property=\"og:image\" content=\"/og-image.webp\" />"
+  ]
 }
 
 route RootRoute { path: "/", to: MainPage }
