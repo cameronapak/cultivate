@@ -116,8 +116,9 @@ export const createProject: CreateProject<CreateProjectPayload, Project> = async
 
 type UpdateProjectPayload = {
   id: number
-  title: string
+  title?: string
   description?: string
+  taskOrder?: number[]
 }
 
 export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async (
@@ -130,8 +131,9 @@ export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async
   return context.entities.Project.update({
     where: { id: args.id, userId: context.user.id },
     data: {
-      title: args.title,
-      description: args.description
+      ...(args.title && { title: args.title }),
+      ...(args.description && { description: args.description }),
+      ...(args.taskOrder && { taskOrder: args.taskOrder })
     }
   })
 }

@@ -259,7 +259,10 @@ const TaskItem = ({ task }: { task: Task }) => {
   );
 };
 
-const TaskList = ({ tasks, projectId }: { tasks: Task[]; projectId: number }) => {
+const TaskList = ({ tasks, projectId }: { 
+  tasks: Task[]; 
+  projectId: number;
+}) => {
   const [parentRef, values, setValues] = useDragAndDrop<HTMLDivElement, Task>(
     tasks,
     {
@@ -269,11 +272,10 @@ const TaskList = ({ tasks, projectId }: { tasks: Task[]; projectId: number }) =>
         try {
           // Update the order in the database
           await updateProjectTaskOrder({
-            projectId,
-            taskOrder: newTaskOrder,
+            projectId: projectId,
+            taskOrder: newTaskOrder
           });
           setValues(event.values as Task[]);
-          // The values are already updated by FormKit, no need to set them again
         } catch (error) {
           console.error("Failed to update task order:", error);
           // Revert to the previous order if the update fails
@@ -285,6 +287,10 @@ const TaskList = ({ tasks, projectId }: { tasks: Task[]; projectId: number }) =>
     }
   );
 
+  React.useEffect(() => {
+    setValues(tasks);
+  }, [tasks]);
+
   return (
     <div ref={parentRef} className="space-y-2">
       {values.map((task) => (
@@ -294,7 +300,10 @@ const TaskList = ({ tasks, projectId }: { tasks: Task[]; projectId: number }) =>
   );
 };
 
-const NewTaskForm = ({ projectId }: { projectId: number }) => {
+const NewTaskForm = ({ projectId, onTaskAdded }: { 
+  projectId: number;
+  onTaskAdded: (task: Task) => void;
+}) => {
   const [isAdding, setIsAdding] = useState(false);
   const formSchema = z.object({
     title: z.string().min(1, { message: "Task title is required" }),
@@ -311,11 +320,14 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      // Create task in database
       const task = await createTask({
         title: values.title,
         description: values.description,
         projectId,
       });
+
+      onTaskAdded(task);
       toast.success("Task created successfully");
       form.reset();
       setIsAdding(false);
@@ -891,6 +903,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const navigate = useNavigate();
   const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } =
     useLayoutState();
+  const [tasks, setTasks] = useState<Task[]>(project.tasks || []);
 
   const handleTabChange = (tab: "tasks" | "resources" | "about") => {
     setTab(tab);
@@ -912,14 +925,14 @@ export const ProjectView = ({ project }: { project: Project }) => {
   };
 
   // Filter tasks based on the hideCompletedTasks state
-  const filteredTasks = project.tasks?.filter(
+  const filteredTasks = tasks?.filter(
     (task) => !hideCompletedTasks || !task.complete
   );
 
   // Sort tasks by the order in the project.taskOrder array
   const sortedTasks = filteredTasks?.sort((a, b) => {
-    const indexA = project.taskOrder.indexOf(a.id);
-    const indexB = project.taskOrder.indexOf(b.id);
+    const indexA = project.taskOrder.indexOf(a.id) || 0;
+    const indexB = project.taskOrder.indexOf(b.id) || 0;
     return indexA - indexB;
   });
 
@@ -977,7 +990,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <CardTitle>Tasks</CardTitle>
                     <CardDescription className="flex items-center gap-1">
                       <CircleCheckIcon className="w-4 h-4" />
-                      {project.tasks?.filter((task) => !task.complete).length} tasks
+                      {tasks?.filter((task) => !task.complete).length} tasks
                       remaining
                     </CardDescription>
                   </div>
@@ -1006,17 +1019,26 @@ export const ProjectView = ({ project }: { project: Project }) => {
                 </div>
               </CardHeader>
               <CardContent>
-                {filteredTasks && filteredTasks.length > 0 ? (
-                  <TaskList tasks={filteredTasks} projectId={project.id} />
+                {sortedTasks && sortedTasks.length > 0 ? (
+                  <TaskList 
+                    tasks={sortedTasks} 
+                    projectId={project.id} 
+                  />
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {project.tasks && project.tasks.length > 0
+                    {tasks && tasks.length > 0
                       ? "All tasks are completed and/or hidden."
                       : "No tasks yet"}
                   </p>
                 )}
                 <div className="mt-4">
-                  <NewTaskForm projectId={project.id} />
+                  <NewTaskForm 
+                    projectId={project.id} 
+                    onTaskAdded={(task) => {
+                      console.log("task", task);
+                      setTasks((prevTasks) => [...prevTasks, task]);
+                    }}
+                  />
                 </div>
               </CardContent>
             </Card>
