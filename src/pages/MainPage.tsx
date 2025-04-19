@@ -949,6 +949,12 @@ const ProjectCard = ({
   project: Project;
   onTogglePin: () => void;
 }) => {
+  const handleTogglePin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onTogglePin();
+  };
+
   return (
     <Link
       key={project.id}
@@ -964,7 +970,7 @@ const ProjectCard = ({
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-muted-foreground absolute top-2 right-2"
-              onClick={onTogglePin}
+              onClick={handleTogglePin}
             >
               {project.pinned ? (
                 <PinOff className="h-4 w-4" />
