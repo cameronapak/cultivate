@@ -8,9 +8,12 @@ import {
   SidebarMenuButton,
   SidebarMenu,
   SidebarMenuItem,
+  SidebarGroupLabel,
 } from "../../components/ui/sidebar";
-import { Link } from 'wasp/client/router'
+import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
+import { useQuery } from "wasp/client/operations";
+import { getProjects } from "wasp/client/operations";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -22,10 +25,12 @@ export type SidebarItem = {
 export function AppSidebar({ items }: { items: SidebarItem[] }) {
   // Get the current path
   const currentPath = window.location.pathname;
+  const { data: projects } = useQuery(getProjects);
+  const pinnedProjects = projects?.filter((project) => project.pinned) || [];
 
   return (
     <Sidebar>
-       <SidebarHeader>
+      <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -42,9 +47,8 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          {/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
           <SidebarMenu>
-          <SidebarMenuItem>
+            <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={currentPath === "/inbox"}>
                 <Link to={"/inbox"}>
                   <InboxIcon className="h-5 w-5" />
@@ -61,7 +65,10 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
               </SidebarMenuButton>
             </SidebarMenuItem> */}
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={currentPath.includes("/documents")}>
+              <SidebarMenuButton
+                asChild
+                isActive={currentPath.includes("/documents")}
+              >
                 <Link to={"/documents"}>
                   <BookOpen className="h-5 w-5" />
                   <span>Docs</span>
@@ -69,7 +76,12 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={currentPath === "/" || currentPath.includes("/projects")}>
+              <SidebarMenuButton
+                asChild
+                isActive={
+                  currentPath === "/" || currentPath.includes("/projects")
+                }
+              >
                 <Link to={"/"}>
                   <PencilRuler className="h-5 w-5" />
                   <span>Projects</span>
@@ -78,6 +90,28 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
+        {pinnedProjects.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Pinned Projects</SidebarGroupLabel>
+            <SidebarMenu>
+              {pinnedProjects.map((project) => (
+                <SidebarMenuItem key={project.id}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={currentPath === `/projects/${project.id}`}
+                  >
+                    <Link
+                      to="/projects/:projectId"
+                      params={{ projectId: project.id }}
+                    >
+                      <span className="truncate">{project.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <ThemeToggle />

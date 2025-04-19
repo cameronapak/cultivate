@@ -119,6 +119,7 @@ type UpdateProjectPayload = {
   title?: string
   description?: string
   taskOrder?: number[]
+  pinned?: boolean
 }
 
 export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async (
@@ -133,7 +134,8 @@ export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async
     data: {
       ...(args.title && { title: args.title }),
       ...(args.description && { description: args.description }),
-      ...(args.taskOrder && { taskOrder: args.taskOrder })
+      ...(args.taskOrder && { taskOrder: args.taskOrder }),
+      ...(typeof args.pinned === 'boolean' && { pinned: args.pinned })
     }
   })
 }

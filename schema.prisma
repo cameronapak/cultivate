@@ -22,6 +22,7 @@ model Project {
   taskOrder   Int[]      @default([]) // Array of task IDs in sorted order
   pitch       Pitch?
   resources   Resource[]
+  pinned      Boolean    @default(false)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   userId      Int?

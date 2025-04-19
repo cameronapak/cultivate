@@ -20,7 +20,7 @@ import {
   deleteResource,
   deleteTask,
 } from "wasp/client/operations";
-import { Trash, Pencil, ExternalLink, Plus, Folder } from "lucide-react";
+import { Trash, Pencil, ExternalLink, Plus, Folder, Pin, PinOff } from "lucide-react";
 import "../Main.css";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -123,28 +123,7 @@ export const MainPage = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {(projects as Project[]).map((project) => (
-              <Link
-                key={project.id}
-                to={"/projects/:projectId"}
-                params={{ projectId: project.id }}
-                className="no-underline"
-              >
-                <Card className="h-full hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle>{project.title}</CardTitle>
-                    {project.description && (
-                      <CardDescription>{project.description}</CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2 text-sm text-muted-foreground">
-                      <span>{project.tasks?.length || 0} tasks</span>
-                      <span>•</span>
-                      <span>{project.resources?.length || 0} resources</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         </>
@@ -1035,9 +1014,70 @@ const ProjectView = ({ project }: { project: Project }) => {
   );
 };
 
+const ProjectCard = ({ project }: { project: Project }) => {
+  const handlePinToggle = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation
+    e.stopPropagation(); // Prevent event bubbling
+    try {
+      await updateProject({
+        id: project.id,
+        pinned: !project.pinned,
+      });
+    } catch (error) {
+      console.error("Failed to update project pin status:", error);
+      toast.error("Failed to update project pin status");
+    }
+  };
+
+  return (
+    <Link
+      key={project.id}
+      to={"/projects/:projectId"}
+      params={{ projectId: project.id }}
+      className="no-underline"
+    >
+      <Card className="h-full relative hover:shadow-md transition-shadow">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <CardTitle>{project.title}</CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground absolute top-2 right-2"
+              onClick={handlePinToggle}
+            >
+              {project.pinned ? (
+                <PinOff className="h-4 w-4" />
+              ) : (
+                <Pin className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          {project.description && (
+            <CardDescription>{project.description}</CardDescription>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2 text-sm text-muted-foreground">
+            <span>{project.tasks?.length || 0} tasks</span>
+            <span>•</span>
+            <span>{project.resources?.length || 0} resources</span>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+};
+
 const ProjectsList = ({ projects }: { projects: Project[] }) => {
   if (!projects?.length)
     return <div className="paragraph">No projects yet. Create one above!</div>;
 
-  return <ProjectView project={projects[1]} />;
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {projects.map((project) => (
+        <ProjectCard key={project.id} project={project} />
+      ))}
+    </div>
+  );
 };
