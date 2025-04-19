@@ -1,7 +1,6 @@
 import { useState, useRef, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
-  Project as BaseProject,
   Task,
   Resource,
   Pitch,
@@ -16,10 +15,7 @@ import {
   updateProject,
   deleteProject,
   updateTaskStatus,
-  getProject,
-  getProjectTasks,
-  getProjectResources,
-  updateProjectTaskOrder,
+  updateProjectTaskOrder
 } from "wasp/client/operations";
 import {
   Trash,
@@ -520,12 +516,8 @@ const ResourceItem = ({
 
 const NewResourceForm = ({
   projectId,
-  onSave,
-  onCancel,
 }: {
   projectId: number;
-  onSave: () => void;
-  onCancel: () => void;
 }) => {
   const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
   const formSchema = z.object({
@@ -574,7 +566,6 @@ const NewResourceForm = ({
       });
       toast.success("Resource added successfully");
       form.reset();
-      onSave();
     } catch (err: any) {
       toast.error("Error creating resource: " + err.message);
     }
@@ -648,7 +639,7 @@ const NewResourceForm = ({
             </Button>
           </PopoverClose>
           <PopoverClose asChild>
-            <Button type="button" onClick={onCancel} variant="outline">
+            <Button type="button" variant="outline">
               Cancel
             </Button>
           </PopoverClose>
@@ -896,7 +887,6 @@ type ProjectWithRelations = Project & {
 
 export const ProjectView = ({ project }: { project: Project }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [_, setIsAddingResource] = useState(false);
   const navigate = useNavigate();
   const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } =
     useLayoutState();
@@ -1057,7 +1047,6 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <PopoverTrigger asChild>
                       <Button
                         size="sm"
-                        onClick={() => setIsAddingResource(true)}
                         variant="outline"
                       >
                         <Plus className="w-4 h-4" />
@@ -1067,8 +1056,6 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <PopoverContent>
                       <NewResourceForm
                         projectId={project.id}
-                        onSave={() => setIsAddingResource(false)}
-                        onCancel={() => setIsAddingResource(false)}
                       />
                     </PopoverContent>
                   </Popover>
