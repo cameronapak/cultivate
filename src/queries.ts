@@ -248,7 +248,9 @@ export const createTask: CreateTask<CreateTaskPayload, Task> = async (
   if (!context.user) {
     throw new HttpError(401)
   }
-  return context.entities.Task.create({
+
+  // Create the task
+  const task = await context.entities.Task.create({
     data: {
       title: args.title,
       description: args.description,
@@ -259,6 +261,24 @@ export const createTask: CreateTask<CreateTaskPayload, Task> = async (
       user: { connect: { id: context.user.id } }
     }
   })
+
+  // If the task is associated with a project, update the project's taskOrder
+  if (args.projectId) {
+    const project = await context.entities.Project.findUnique({
+      where: { id: args.projectId },
+      select: { taskOrder: true }
+    })
+
+    // Append the new task's ID to the taskOrder array
+    const updatedTaskOrder = [...(project?.taskOrder || []), task.id]
+    
+    await context.entities.Project.update({
+      where: { id: args.projectId },
+      data: { taskOrder: updatedTaskOrder }
+    })
+  }
+
+  return task
 }
 
 type UpdateTaskStatusPayload = {
