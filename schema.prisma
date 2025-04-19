@@ -19,6 +19,7 @@ model Project {
   title       String
   description String?
   tasks       Task[]
+  taskOrder   Int[]      @default([]) // Array of task IDs in sorted order
   pitch       Pitch?
   resources   Resource[]
   createdAt   DateTime   @default(now())

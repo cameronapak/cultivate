@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
   Project as BaseProject,
@@ -19,6 +19,7 @@ import {
   getProject,
   getProjectTasks,
   getProjectResources,
+  updateProjectTaskOrder,
 } from "wasp/client/operations";
 import {
   Trash,
@@ -65,7 +66,6 @@ import {
   PopoverContent,
 } from "../components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
-import { FormEvent, useRef } from "react";
 import {
   Dialog,
   DialogClose,
@@ -84,6 +84,7 @@ import { Kbd } from "./custom/Kbd";
 import { useTabShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useLayoutState } from "../hooks/useLayoutState";
 import { Project } from "../types";
+import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 
 const EditTaskForm = ({
   task,
@@ -212,7 +213,7 @@ const TaskItem = ({ task }: { task: Task }) => {
 
   return (
     <div className={`group task-item ${task.complete ? "completed" : ""}`}>
-      <div className="flex items-center space-x-2 justify-between">
+      <div className="flex items-center space-x-2 justify-between p-2 rounded-md">
         <div className="flex items-start space-x-2">
           <Checkbox
             id={task.id.toString()}
@@ -258,9 +259,43 @@ const TaskItem = ({ task }: { task: Task }) => {
   );
 };
 
+const TaskList = ({ tasks, projectId }: { tasks: Task[]; projectId: number }) => {
+  const [parentRef, values, setValues] = useDragAndDrop<HTMLDivElement, Task>(
+    tasks,
+    {
+      onSort: async (event) => {
+        // Get the new order from the event
+        const newTaskOrder = (event.values as Task[]).map((task) => task.id);
+        try {
+          // Update the order in the database
+          await updateProjectTaskOrder({
+            projectId,
+            taskOrder: newTaskOrder,
+          });
+          setValues(event.values as Task[]);
+          // The values are already updated by FormKit, no need to set them again
+        } catch (error) {
+          console.error("Failed to update task order:", error);
+          // Revert to the previous order if the update fails
+          setValues(tasks);
+        }
+      },
+      draggingClass: "bg-muted",
+      dropZoneClass: "bg-muted opacity-30",
+    }
+  );
+
+  return (
+    <div ref={parentRef} className="space-y-2">
+      {values.map((task) => (
+        <TaskItem key={task.id} task={task} />
+      ))}
+    </div>
+  );
+};
+
 const NewTaskForm = ({ projectId }: { projectId: number }) => {
   const [isAdding, setIsAdding] = useState(false);
-
   const formSchema = z.object({
     title: z.string().min(1, { message: "Task title is required" }),
     description: z.string().optional(),
@@ -276,13 +311,14 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await createTask({
+      const task = await createTask({
         title: values.title,
         description: values.description,
         projectId,
       });
       toast.success("Task created successfully");
       form.reset();
+      setIsAdding(false);
     } catch (err: any) {
       toast.error("Error creating task: " + err.message);
     }
@@ -299,10 +335,7 @@ const NewTaskForm = ({ projectId }: { projectId: number }) => {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-2"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
         <FormField
           control={form.control}
           name="title"
@@ -883,6 +916,13 @@ export const ProjectView = ({ project }: { project: Project }) => {
     (task) => !hideCompletedTasks || !task.complete
   );
 
+  // Sort tasks by the order in the project.taskOrder array
+  const sortedTasks = filteredTasks?.sort((a, b) => {
+    const indexA = project.taskOrder.indexOf(a.id);
+    const indexB = project.taskOrder.indexOf(b.id);
+    return indexA - indexB;
+  });
+
   if (isEditing) {
     return (
       <div>
@@ -937,10 +977,8 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <CardTitle>Tasks</CardTitle>
                     <CardDescription className="flex items-center gap-1">
                       <CircleCheckIcon className="w-4 h-4" />
-                      {
-                        project.tasks?.filter((task) => !task.complete).length
-                      }{" "}
-                      tasks remaining
+                      {project.tasks?.filter((task) => !task.complete).length} tasks
+                      remaining
                     </CardDescription>
                   </div>
                   <Popover>
@@ -968,36 +1006,18 @@ export const ProjectView = ({ project }: { project: Project }) => {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableBody>
-                    {filteredTasks && filteredTasks.length > 0 ? (
-                      <>
-                        {filteredTasks.map((task: Task) => (
-                          <TableRow key={task.id}>
-                            <TableCell>
-                              <TaskItem key={task.id} task={task} />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </>
-                    ) : (
-                      <TableRow>
-                        <TableCell>
-                          <p className="text-sm text-muted-foreground">
-                            {project.tasks && project.tasks.length > 0
-                              ? "All tasks are completed and/or hidden."
-                              : "No tasks yet"}
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    <TableRow>
-                      <TableCell className="bg-background">
-                        <NewTaskForm projectId={project.id} />
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                {filteredTasks && filteredTasks.length > 0 ? (
+                  <TaskList tasks={filteredTasks} projectId={project.id} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    {project.tasks && project.tasks.length > 0
+                      ? "All tasks are completed and/or hidden."
+                      : "No tasks yet"}
+                  </p>
+                )}
+                <div className="mt-4">
+                  <NewTaskForm projectId={project.id} />
+                </div>
               </CardContent>
             </Card>
           </div>
