@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, getPublicDocument } from "wasp/client/operations";
 import { BlockNoteEditor } from "../components/custom/BlockNoteEditor";
 import { Button } from "../components/ui/button";
@@ -10,12 +10,17 @@ import { ThemeProvider } from "../components/custom/ThemeProvider";
 
 export function SharedDocumentPage() {
   const { documentId } = useParams();
-  const parsedDocumentId = parseInt(documentId || "0", 10);
+  const navigate = useNavigate();
+
+  if (!documentId) {
+    return navigate("/");
+  }
+
   const {
     data: document,
     isLoading,
     error,
-  } = useQuery(getPublicDocument, { documentId: parsedDocumentId });
+  } = useQuery(getPublicDocument, { documentId });
 
   if (error) {
     return (
@@ -45,9 +50,9 @@ export function SharedDocumentPage() {
               <Skeleton className="w-1/2 h-10" />
             ) : (
               <h1 className="text-3xl font-bold flex items-center gap-2">
-                {document.title}
+                {document?.title}
                 <BadgeCheck className="w-5 h-5 text-muted-foreground" />
-                {document.user?.username && (
+                {document?.user?.username && (
                   <span className="text-sm font-normal text-muted-foreground ml-2">
                     by {document.user.username}
                   </span>
