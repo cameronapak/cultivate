@@ -25,8 +25,8 @@ export type SidebarItem = {
 export function AppSidebar({ items }: { items: SidebarItem[] }) {
   // Get the current path
   const currentPath = window.location.pathname;
-  const { data: projects } = useQuery(getProjects);
-  const pinnedProjects = projects?.filter((project) => project.pinned) || [];
+  // const { data: projects } = useQuery(getProjects);
+  // const pinnedProjects = projects?.filter((project) => project.pinned) || [];
 
   return (
     <Sidebar>
@@ -90,7 +90,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
-        {pinnedProjects.length > 0 && (
+        {/* {pinnedProjects.length > 0 && (
           <SidebarGroup>
             <SidebarGroupLabel>Pinned Projects</SidebarGroupLabel>
             <SidebarMenu>
@@ -111,7 +111,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
               ))}
             </SidebarMenu>
           </SidebarGroup>
-        )}
+        )} */}
       </SidebarContent>
       <SidebarFooter>
         <ThemeToggle />
