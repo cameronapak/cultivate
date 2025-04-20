@@ -600,13 +600,14 @@ export const deleteDocument = async (args: { id: string }, context: any) => {
 //#region Canvas
 type SaveCanvasPayload = {
   snapshot: any
-  id: number
+  id: string
 }
 
 export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     await context.entities.Canvas.upsert({
       where: { id: args.id },
@@ -628,13 +629,14 @@ export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
 };
 
 type LoadCanvasPayload = {
-  id: number
+  id: string
 }
 
 export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     const canvas = await context.entities.Canvas.findUnique({
       where: { id: args.id }
@@ -651,6 +653,7 @@ export const getCanvases = async (_args: {}, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     return context.entities.Canvas.findMany({
       where: { userId: context.user.id },
@@ -682,10 +685,11 @@ export const createCanvas = async (_args: {}, context: any) => {
   }
 };
 
-export const deleteCanvas = async (args: { id: number }, context: any) => {
+export const deleteCanvas = async (args: { id: string }, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     await context.entities.Canvas.delete({
       where: { id: args.id }

@@ -50,9 +50,8 @@ const components: Partial<TLUiComponents> = {
 
 export function CanvasPage() {
   const store = useMemo(() => createTLStore(), []);
-  const { id } = useParams();
+  const { id: canvasId } = useParams();
   const navigate = useNavigate();
-  const canvasId = id ? parseInt(id, 10) : null;
   const { theme } = useTheme();
   const [loadingState, setLoadingState] = useState<
     | { status: "loading" }
@@ -64,7 +63,7 @@ export function CanvasPage() {
 
   const { data: savedSnapshot, isLoading: isLoadingCanvas } = useQuery(
     loadCanvas,
-    { id: canvasId || 0 }
+    { id: canvasId || "" }
   );
 
   const createNewCanvas = useAction(createCanvas);
@@ -84,7 +83,7 @@ export function CanvasPage() {
           kbd: "cmd+s,ctrl+s",
           async onSelect(_source: any) {
             try {
-              if (id === "new" || !id) {
+              if (canvasId === "new" || !canvasId) {
                 const { id } = await createNewCanvas({});
                 navigate(`/canvas/${id}`, { replace: true });
               } else if (typeof canvasId === "number") {
