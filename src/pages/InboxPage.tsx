@@ -14,7 +14,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink, Send, BrainCircuit } from "lucide-react";
+import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink, Send, BrainCircuit, Pencil } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -71,22 +71,23 @@ export function InboxPage() {
   const handleCreateItem = async () => {
     if (!newItemText.trim()) return;
     try {
-      if (isThought) {
+      // Always check for URL first, regardless of mode
+      if (isUrl(newItemText.trim())) {
+        const metadata = await getMetadataFromUrl(newItemText.trim());
+        // Create a resource
+        await createResource({
+          title: metadata.title || 'Untitled Resource',
+          url: newItemText.trim(),
+          description: metadata.description,
+          // No projectId means it goes to inbox
+        });
+        toast.success(`Resource created: "${metadata.title || newItemText}"`);
+      } else if (isThought) {
         // Create a thought
         await createThought({
           content: newItemText
         });
         toast.success(`Thought captured!`);
-      } else if (isUrl(newItemText.trim())) {
-        const metadata = await getMetadataFromUrl(newItemText.trim());
-        // Create a resource instead of a task
-        await createResource({
-          title: metadata.title,
-          url: newItemText.trim(),
-          description: metadata.description,
-          // No projectId means it goes to inbox
-        });
-        toast.success(`Resource created: "${newItemText}"`);
       } else {
         // Create a regular task
         await createTask({
@@ -239,22 +240,42 @@ export function InboxPage() {
         </div>
         <div>
           <div className="flex gap-4 mb-6">
-            <Toggle 
-              variant="outline" 
-              pressed={isThought}
-              onClick={handleToggleIsThought}
-              className="mr-2"
-            >
-              <BrainCircuit className="h-4 w-4 mr-2" />
-              {isThought ? "Thought" : "Task/Resource"}
-            </Toggle>
+            <div className="flex gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Toggle 
+                    variant="outline" 
+                    pressed={!isThought}
+                    onClick={() => isThought && handleToggleIsThought()}
+                    className="rounded-r-none"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Toggle>
+                </TooltipTrigger>
+                <TooltipContent>Task mode</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Toggle 
+                    variant="outline" 
+                    pressed={isThought}
+                    onClick={() => !isThought && handleToggleIsThought()}
+                    className="rounded-l-none"
+                  >
+                    <BrainCircuit className="h-4 w-4" />
+                  </Toggle>
+                </TooltipTrigger>
+                <TooltipContent>Thought mode</TooltipContent>
+              </Tooltip>
+            </div>
             <Input
               autoFocus={true}
               type="text"
-              placeholder={isThought ? "Add a thought..." : "Add to your inbox..."}
+              placeholder={isThought ? "Add a thought... (URLs will create resources)" : "Add a task... (URLs will create resources)"}
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
+              className="flex-1"
             />
             <Button type="submit" onClick={handleCreateItem} size="icon">
               <Send className="h-4 w-4" />
