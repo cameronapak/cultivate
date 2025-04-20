@@ -4,6 +4,8 @@ import {
   createTLStore,
   getSnapshot,
   loadSnapshot,
+  TLUiOverrides,
+  TLUiActionsContextType,
 } from "tldraw";
 import { throttle } from "../../lib/utils";
 import { useLayoutEffect, useMemo, useState } from "react";
@@ -16,6 +18,8 @@ import {
 import "tldraw/tldraw.css";
 import { Layout } from "../../components/Layout";
 import { useParams } from "react-router-dom";
+import { useTheme } from "../../components/custom/ThemeProvider";
+
 /** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
   // ContextMenu: null,
@@ -33,7 +37,7 @@ const components: Partial<TLUiComponents> = {
   // HelperButtons: null,
   DebugPanel: null,
   DebugMenu: null,
-  MenuPanel: null,
+  // MenuPanel: null,
   TopPanel: null,
   // CursorChatBubble: null,
   RichTextToolbar: null,
@@ -41,11 +45,22 @@ const components: Partial<TLUiComponents> = {
   // Toasts: null,
 };
 
+// Add keyboard shortcut overrides
+const overrides: TLUiOverrides = {
+  actions(_editor, actions): TLUiActionsContextType {
+    // This removes cmd+/,ctrl+/ from toggling dark mode so that its
+    // main purpose can continue to be toggling Cultivate's sidebar.
+    delete actions['toggle-dark-mode'];
+
+    return actions;
+  },
+};
+
 export function CanvasPage() {
   const store = useMemo(() => createTLStore(), []);
   const { id } = useParams();
-  const canvasId = id ? parseInt(id) : null;
-
+  const canvasId = id ? parseInt(id, 10) : null;
+  const { theme } = useTheme();
   const [loadingState, setLoadingState] = useState<
     | { status: "loading" }
     | { status: "ready" }
@@ -58,37 +73,41 @@ export function CanvasPage() {
     loadCanvas,
     { id: canvasId || 0 }
   );
-  const saveCanvasToDb = useAction(saveCanvas);
+  // const saveCanvasToDb = useAction(saveCanvas);
 
   useLayoutEffect(() => {
-    if (isLoadingCanvas) return;
+    if (isLoadingCanvas) {
+      return;
+    }
 
     setLoadingState({ status: "loading" });
 
     try {
-      if (savedSnapshot) {
-        loadSnapshot(store, savedSnapshot);
-      }
+      // if (savedSnapshot) {
+      //   loadSnapshot(store, savedSnapshot);
+      // }
       setLoadingState({ status: "ready" });
     } catch (error: any) {
       setLoadingState({ status: "error", error: error.message });
     }
   }, [store, savedSnapshot, isLoadingCanvas]);
 
-  useLayoutEffect(() => {
-    if (!canvasId) return;
+  // useLayoutEffect(() => {
+  //   if (!canvasId) {
+  //     return;
+  //   }
 
-    const cleanupFn = store.listen(
-      throttle(() => {
-        const snapshot = getSnapshot(store);
-        saveCanvasToDb({ snapshot, id: canvasId });
-      }, 1000)
-    );
+  //   const cleanupFn = store.listen(
+  //     throttle(() => {
+  //       const snapshot = getSnapshot(store);
+  //       saveCanvasToDb({ snapshot, id: canvasId });
+  //     }, 1000)
+  //   );
 
-    return () => {
-      cleanupFn();
-    };
-  }, [store, canvasId, saveCanvasToDb]);
+  //   return () => {
+  //     cleanupFn();
+  //   };
+  // }, [store, canvasId, saveCanvasToDb]);
 
   if (loadingState.status === "error") {
     return (
@@ -119,8 +138,9 @@ export function CanvasPage() {
         <Tldraw
           className="h-full"
           components={components}
-          inferDarkMode
+          inferDarkMode={Boolean(theme === "system" || theme === "dark")}
           store={store}
+          overrides={overrides}
           options={{
             maxPages: 1,
             maxFilesAtOnce: 0,
