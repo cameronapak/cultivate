@@ -14,7 +14,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink, Send, BrainCircuit, Pencil } from "lucide-react";
+import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink, Send, BrainCircuit, Pencil, Minus } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -300,7 +300,7 @@ export function InboxPage() {
                         ) : item.type === 'resource' ? (
                           <ExternalLink className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+                          <Minus className="h-4 w-4 text-muted-foreground" />
                         )}
                       </TableCell>
                       <TableCell className="flex items-center gap-2">
