@@ -201,13 +201,6 @@ export function CanvasPage() {
           title: canvasId ? canvas?.title || "Untitled Canvas" : "New",
         },
       ]}
-      menuItems={[
-        {
-          title: "Rename",
-          icon: <Pencil className="h-3 w-3 text-muted-foreground" />,
-          action: () => setIsNameDialogOpen(true),
-        },
-      ]}
     >
       <Dialog open={isNameDialogOpen} onOpenChange={setIsNameDialogOpen}>
         <DialogContent className="sm:max-w-md">
