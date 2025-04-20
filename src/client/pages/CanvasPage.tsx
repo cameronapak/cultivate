@@ -109,7 +109,7 @@ export function CanvasPage() {
     try {
       const { id } = await createNewCanvas({
         title: form.getValues("title"),
-        description: form.getValues("description"),
+        description: form.getValues("description") || '',
         snapshot: getSnapshot(store),
       });
       navigate(`/canvas/${id}`, { replace: true });
