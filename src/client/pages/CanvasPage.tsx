@@ -208,9 +208,9 @@ export function CanvasPage() {
             <form onSubmit={handleSubmit} ref={formRef}>
               <DialogHeader>
                 <DialogTitle>Name Your Canvas</DialogTitle>
-                <DialogDescription>
+                {/* <DialogDescription>
                   You can update the name of the canvas at any time.
-                </DialogDescription>
+                </DialogDescription> */}
               </DialogHeader>
               <DialogDescription className="mt-4 mb-8">
                 <div className="flex items-center space-x-2">
