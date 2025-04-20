@@ -270,7 +270,7 @@ export function InboxPage() {
         <div>
           <div className="relative flex gap-4 mb-6">
             <Button
-              className="absolute top-0 left-0"
+              className="absolute top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
               size="icon"
               variant="ghost"
               onClick={handleToggleIsThought}
@@ -280,7 +280,9 @@ export function InboxPage() {
               ) : (
                 <SquareCheck className="h-4 w-4" />
               )}
+              <span className="sr-only">{isThought ? "Add a thought" : "Add a task"}</span>
             </Button>
+
             <Input
               autoFocus={true}
               type="text"
@@ -292,9 +294,10 @@ export function InboxPage() {
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="pl-10 flex-1"
+              className="pl-10 flex-1 pr-10"
             />
-            <Button type="submit" onClick={handleCreateItem} size="icon">
+            
+            <Button disabled={!newItemText.trim()} className="absolute top-0 right-0 rounded-tl-none rounded-bl-none" type="submit" onClick={handleCreateItem} size="icon">
               <Send className="h-4 w-4" />
               <span className="sr-only">Add to inbox</span>
             </Button>
