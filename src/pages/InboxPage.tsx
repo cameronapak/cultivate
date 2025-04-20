@@ -257,7 +257,7 @@ export function InboxPage() {
   return (
     <Layout
       isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
-      breadcrumbItems={[{ title: "Brain Dump" }]}
+      breadcrumbItems={[{ title: `Today (${new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })})` }]}
       menuItems={[
         {
           title: showInbox ? "Hide inbox" : "Show inbox",
@@ -267,11 +267,6 @@ export function InboxPage() {
       ]}
     >
       <div>
-        {/* <div className="flex flex-col gap-2 items-start mb-4">
-          <div className="flex gap-2 items-center">
-            <h1 className="heading-1">Brain Dump</h1>
-          </div>
-        </div> */}
         <div>
           <div className="relative flex gap-4 mb-6">
             <Button
