@@ -41,7 +41,7 @@ import {
   DialogTrigger,
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
-import { Copy } from "lucide-react";
+import { Copy, Pencil } from "lucide-react";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { z } from "zod";
@@ -86,17 +86,16 @@ export function CanvasPage() {
     status: "loading",
   });
 
-  const { data: canvas, isLoading: isLoadingCanvas } = useQuery(
-    loadCanvas,
-    { id: canvasId || "" }
-  );
+  const { data: canvas, isLoading: isLoadingCanvas } = useQuery(loadCanvas, {
+    id: canvasId || "",
+  });
 
   const formRef = useRef<HTMLFormElement>(null);
   const formSchema = z.object({
     title: z.string().min(1, { message: "Canvas name is required" }),
     description: z.string().optional(),
   });
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -118,7 +117,7 @@ export function CanvasPage() {
       setIsNameDialogOpen(false);
       toast.success("Canvas created");
     } catch (err: any) {
-      toast.error("Error saving canvas: " + err?.message || 'Unknown error');
+      toast.error("Error saving canvas: " + err?.message || "Unknown error");
     }
   };
 
@@ -199,39 +198,49 @@ export function CanvasPage() {
           url: "/canvases",
         },
         {
-          title: canvasId ? (canvas?.title || "Untitled Canvas") : "New",
+          title: canvasId ? canvas?.title || "Untitled Canvas" : "New",
+        },
+      ]}
+      menuItems={[
+        {
+          title: "Rename",
+          icon: <Pencil className="h-3 w-3 text-muted-foreground" />,
+          action: () => setIsNameDialogOpen(true),
         },
       ]}
     >
       <Dialog open={isNameDialogOpen} onOpenChange={setIsNameDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <Form {...form}>
-            <form
-              onSubmit={handleSubmit}
-              ref={formRef}
-            >
+            <form onSubmit={handleSubmit} ref={formRef}>
               <DialogHeader>
                 <DialogTitle>Name Your Canvas</DialogTitle>
                 <DialogDescription>
                   You can update the name of the canvas at any time.
                 </DialogDescription>
               </DialogHeader>
-              <div className="flex items-center space-x-2">
-                <div className="grid flex-1 gap-2">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input placeholder="Canvas name" autoFocus {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <DialogDescription className="mt-4 mb-8">
+                <div className="flex items-center space-x-2">
+                  <div className="grid flex-1 gap-2">
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Canvas name"
+                              autoFocus
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-              </div>
+              </DialogDescription>
               <DialogFooter className="sm:justify-start">
                 <Button type="button" variant="default">
                   Save
