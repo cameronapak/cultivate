@@ -258,27 +258,20 @@ export function InboxPage() {
     <Layout
       isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
       breadcrumbItems={[{ title: "Brain Dump" }]}
+      menuItems={[
+        {
+          title: showInbox ? "Hide inbox" : "Show inbox",
+          icon: showInbox ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />,
+          action: handleToggleTasks,
+        },
+      ]}
     >
       <div>
-        <div className="flex flex-col gap-2 items-start mb-4">
+        {/* <div className="flex flex-col gap-2 items-start mb-4">
           <div className="flex gap-2 items-center">
             <h1 className="heading-1">Brain Dump</h1>
-            <Tooltip>
-              <TooltipTrigger>
-                <Toggle variant="outline" onClick={handleToggleTasks}>
-                  {showInbox ? (
-                    <Eye className="h-5 w-5" />
-                  ) : (
-                    <EyeClosed className="h-5 w-5" />
-                  )}
-                </Toggle>
-              </TooltipTrigger>
-              <TooltipContent>
-                {showInbox ? "Hide inbox" : "Show inbox"}
-              </TooltipContent>
-            </Tooltip>
           </div>
-        </div>
+        </div> */}
         <div>
           <div className="relative flex gap-4 mb-6">
             <Button
