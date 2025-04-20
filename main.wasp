@@ -37,11 +37,6 @@ page LoginPage {
   component: import { LoginPage } from "@src/pages/LoginPage"
 }
 
-// route CanvasCreateRoute { path: "/canvas/new", to: CanvasCreatePage }
-// page CanvasCreatePage {
-//   component: import { CanvasCreatePage } from "@src/client/pages/CanvasCreatePage"
-// }
-
 route CanvasesRoute { path: "/canvases", to: CanvasesPage }
 page CanvasesPage {
   component: import { CanvasesPage } from "@src/client/pages/CanvasesPage"
