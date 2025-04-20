@@ -259,12 +259,7 @@ export function InboxPage() {
       isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
       breadcrumbItems={[
         {
-          title: `Today (${new Date().toLocaleDateString("en-US", {
-            weekday: "short",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })})`,
+          title: "Inbox",
         },
       ]}
       ctaButton={
