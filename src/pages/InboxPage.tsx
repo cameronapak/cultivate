@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink } from "lucide-react";
+import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink, Send } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -228,13 +228,14 @@ export function InboxPage() {
             <Input
               autoFocus={true}
               type="text"
-              placeholder="Add a new task or paste a URL..."
+              placeholder="Add to your inbox..."
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               onKeyPress={handleKeyPress}
             />
-            <Button variant="outline" onClick={handleCreateTask}>
-              Add
+            <Button type="submit" onClick={handleCreateTask} size="icon">
+              <Send className="h-4 w-4" />
+              <span className="sr-only">Add to inbox</span>
             </Button>
           </div>
 
