@@ -288,7 +288,7 @@ export function InboxPage() {
               <Table>
                 <TableBody>
                   {inboxItems.map((item) => (
-                    <TableRow className="grid grid-cols-[auto_1fr_auto] items-center" key={`${item.type}-${item.id}`}>
+                    <TableRow className="group grid grid-cols-[auto_1fr_auto] items-center" key={`${item.type}-${item.id}`}>
                       <TableCell className="w-8">
                         {item.type === 'task' ? (
                           <Checkbox
@@ -330,17 +330,9 @@ export function InboxPage() {
                             <span className="text-sm">{item.content}</span>
                           </div>
                         )}
-                        <span className="text-xs text-muted-foreground">
-                          {getDaysAgo(item.createdAt)
-                            ? getDaysAgo(item.createdAt) +
-                              " day" +
-                              (getDaysAgo(item.createdAt) > 1 ? "s" : "") +
-                              " ago"
-                            : "today"}
-                        </span>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
                           {item.type !== 'thought' && (
                             <DropdownMenu>
                               <DropdownMenuTrigger>
