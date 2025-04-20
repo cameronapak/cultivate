@@ -86,7 +86,7 @@ export function CanvasPage() {
               if (canvasId === "new" || !canvasId) {
                 const { id } = await createNewCanvas({});
                 navigate(`/canvas/${id}`, { replace: true });
-              } else if (typeof canvasId === "number") {
+              } else {
                 await saveCanvasToDb({
                   id: canvasId,
                   snapshot: getSnapshot(store),
