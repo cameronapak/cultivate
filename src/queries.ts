@@ -651,7 +651,7 @@ export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
       where: { id: args.id }
     });
 
-    return canvas ? JSON.parse(canvas.snapshot) : null;
+    return canvas;
   } catch (error) {
     console.error('Failed to load canvas:', error);
     throw new HttpError(500, 'Failed to load canvas');
