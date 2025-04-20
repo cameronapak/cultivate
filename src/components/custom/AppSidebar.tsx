@@ -1,4 +1,4 @@
-import { InboxIcon, BookOpen, Sprout, PencilRuler, Github, FolderOpen, Folder } from "lucide-react";
+import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +13,7 @@ import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "../ui/button";
 import Logo from "./Logo";
+import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -109,13 +110,26 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
           </SidebarGroup>
         )} */}
       </SidebarContent>
-      <SidebarFooter className="flex flex-row items-center justify-between">
-        <ThemeToggle />
-        <a target="_blank" href="https://git.new/cultivate">
-          <Button variant="ghost" size="icon" className="p-0">
-            <Github className="w-4 h-4 text-muted-foreground" />
-          </Button>
-        </a>
+      <SidebarFooter className="flex flex-col gap-4 items-start justify-between">
+        <Card className="w-full">
+          <CardHeader>
+            <CardDescription className="flex flex-col gap-4">
+              <p className="text-xs text-muted-foreground">Thanks for being an early tester of Cultivate, an indie project created by <a href="https://cameronpak.com" target="_blank" className="hover:underline">Cam</a>. Your feedback is invaluable to me.</p>
+              <a className="flex flex-row items-center gap-1 text-xs text-muted-foreground hover:text-primary hover:underline p-0 m-0" href="mailto:cam@cultivatepkm.com?subject=Cultivate%20Feedback" target="_blank">
+                <Mail className="w-3 h-3" />
+                Send Feedback
+              </a>
+            </CardDescription>
+          </CardHeader>
+        </Card>
+        <div className="flex flex-row items-center gap-2">
+          <ThemeToggle />
+          <a target="_blank" href="https://git.new/cultivate">
+            <Button variant="ghost" size="icon" className="p-0">
+              <Github className="w-4 h-4 text-muted-foreground" />
+            </Button>
+          </a>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

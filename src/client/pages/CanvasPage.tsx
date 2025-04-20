@@ -235,7 +235,7 @@ export function CanvasPage() {
                 </div>
               </DialogDescription>
               <DialogFooter className="sm:justify-start">
-                <Button type="button" variant="default">
+                <Button type="submit" variant="default">
                   Save
                 </Button>
                 <DialogClose asChild>
