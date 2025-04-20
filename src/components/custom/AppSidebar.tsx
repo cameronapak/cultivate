@@ -1,4 +1,4 @@
-import { InboxIcon, BookOpen, Sprout, PencilRuler, Github } from "lucide-react";
+import { InboxIcon, BookOpen, Sprout, PencilRuler, Github, FolderOpen, Folder } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -57,14 +57,14 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {/* <SidebarMenuItem>
+            <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={currentPath.includes("/canvas")}>
                 <Link to={"/canvases"}>
                   <PencilRuler className="h-5 w-5" />
                   <span>Canvas</span>
                 </Link>
               </SidebarMenuButton>
-            </SidebarMenuItem> */}
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
@@ -84,7 +84,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
                 }
               >
                 <Link to={"/"}>
-                  <PencilRuler className="h-5 w-5" />
+                  {currentPath === "/" ? <FolderOpen className="h-5 w-5" /> : <Folder className="h-5 w-5" />}
                   <span>Projects</span>
                 </Link>
               </SidebarMenuButton>
