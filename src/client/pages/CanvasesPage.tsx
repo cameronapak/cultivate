@@ -98,7 +98,7 @@ export function CanvasesPage() {
                   className="font-medium"
                   onClick={() => navigate(`/canvas/${canvas.id}`)}
                 >
-                  Canvas {canvas.id}
+                  {canvas.title}
                 </TableCell>
                 <TableCell 
                   className="text-sm text-muted-foreground"
