@@ -31,7 +31,7 @@ export function CanvasesPage() {
   const navigate = useNavigate();
   const { data: canvases, isLoading, error } = useQuery(getCanvases);
 
-  const handleDeleteCanvas = async (canvasId: number) => {
+  const handleDeleteCanvas = async (canvasId: string) => {
     try {
       if (confirm("Are you sure you want to delete this canvas?")) {
         await deleteCanvas({ id: canvasId });
@@ -98,7 +98,7 @@ export function CanvasesPage() {
                   className="font-medium"
                   onClick={() => navigate(`/canvas/${canvas.id}`)}
                 >
-                  Canvas {canvas.id}
+                  {canvas.title}
                 </TableCell>
                 <TableCell 
                   className="text-sm text-muted-foreground"
