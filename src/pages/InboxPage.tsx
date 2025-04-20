@@ -257,14 +257,37 @@ export function InboxPage() {
   return (
     <Layout
       isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
-      breadcrumbItems={[{ title: `Today (${new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })})` }]}
-      menuItems={[
+      breadcrumbItems={[
         {
-          title: showInbox ? "Hide inbox" : "Show inbox",
-          icon: showInbox ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />,
-          action: handleToggleTasks,
+          title: `Today (${new Date().toLocaleDateString("en-US", {
+            weekday: "short",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })})`,
         },
       ]}
+      ctaButton={
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={showInbox ? "outline" : "default"}
+              type="submit"
+              onClick={handleToggleTasks}
+              size="icon"
+            >
+              {showInbox ? (
+                <Eye className="h-5 w-5" />
+              ) : (
+                <EyeClosed className="h-5 w-5" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {showInbox ? "Hide inbox" : "Show inbox"}
+          </TooltipContent>
+        </Tooltip>
+      }
     >
       <div>
         <div>
@@ -280,24 +303,28 @@ export function InboxPage() {
               ) : (
                 <SquareCheck className="h-4 w-4" />
               )}
-              <span className="sr-only">{isThought ? "Add a thought" : "Add a task"}</span>
+              <span className="sr-only">
+                {isThought ? "Add a thought" : "Add a task"}
+              </span>
             </Button>
 
             <Input
               autoFocus={true}
               type="text"
-              placeholder={
-                isThought
-                  ? "Add a thought..."
-                  : "Add a task..."
-              }
+              placeholder={isThought ? "Add a thought..." : "Add a task..."}
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
               className="pl-10 flex-1 pr-10"
             />
-            
-            <Button disabled={!newItemText.trim()} className="absolute top-0 right-0 rounded-tl-none rounded-bl-none" type="submit" onClick={handleCreateItem} size="icon">
+
+            <Button
+              disabled={!newItemText.trim()}
+              className="absolute top-0 right-0 rounded-tl-none rounded-bl-none"
+              type="submit"
+              onClick={handleCreateItem}
+              size="icon"
+            >
               <Send className="h-4 w-4" />
               <span className="sr-only">Add to inbox</span>
             </Button>
