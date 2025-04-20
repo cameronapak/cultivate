@@ -637,6 +637,15 @@ export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
     throw new HttpError(401)
   }
 
+  if (!args.id) {
+    throw new HttpError(400, "Canvas ID is required");
+  }
+
+  // This will load an empty canvas for the user.
+  if (args.id === "new") {
+    return null;
+  }
+
   try {
     const canvas = await context.entities.Canvas.findUnique({
       where: { id: args.id }
