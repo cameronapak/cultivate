@@ -259,3 +259,30 @@ action updateProjectTaskOrder {
   fn: import { updateProjectTaskOrder } from "@src/queries",
   entities: [Project]
 }
+
+//#region Thought Operations
+query getThoughts {
+  fn: import { getThoughts } from "@src/queries",
+  entities: [Thought]
+}
+
+query getThought {
+  fn: import { getThought } from "@src/queries",
+  entities: [Thought]
+}
+
+action createThought {
+  fn: import { createThought } from "@src/queries",
+  entities: [Thought]
+}
+
+action updateThought {
+  fn: import { updateThought } from "@src/queries",
+  entities: [Thought]
+}
+
+action deleteThought {
+  fn: import { deleteThought } from "@src/queries",
+  entities: [Thought]
+}
+//#endregion
