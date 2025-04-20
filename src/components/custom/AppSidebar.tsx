@@ -7,13 +7,10 @@ import {
   SidebarHeader,
   SidebarMenuButton,
   SidebarMenu,
-  SidebarMenuItem,
-  SidebarGroupLabel,
+  SidebarMenuItem
 } from "../../components/ui/sidebar";
 import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
-import { useQuery } from "wasp/client/operations";
-import { getProjects } from "wasp/client/operations";
 import { Button } from "../ui/button";
 
 export type SidebarItem = {
