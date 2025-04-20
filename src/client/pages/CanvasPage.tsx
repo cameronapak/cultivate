@@ -144,7 +144,7 @@ export function CanvasPage() {
           url: "/canvases",
         },
         {
-          title: canvasId ? `Canvas ${canvasId}` : "New Canvas",
+          title: canvasId ? `Canvas ${canvasId}` : "New",
         },
       ]}
     >
