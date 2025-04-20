@@ -12,6 +12,7 @@ import {
 import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "../ui/button";
+import Logo from "./Logo";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -35,10 +36,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Link to={"/"}>
-                <Sprout className="h-5 w-5" />
-                <span className="text-base font-semibold">Cultivate</span>
-              </Link>
+              <Logo />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
