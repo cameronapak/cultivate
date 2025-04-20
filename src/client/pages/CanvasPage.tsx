@@ -13,12 +13,15 @@ import {
   useQuery,
   useAction,
   loadCanvas,
+  createCanvas,
   saveCanvas,
 } from "wasp/client/operations";
+import { useNavigate } from "react-router-dom";
 import "tldraw/tldraw.css";
 import { Layout } from "../../components/Layout";
 import { useParams } from "react-router-dom";
 import { useTheme } from "../../components/custom/ThemeProvider";
+import { toast } from "sonner";
 
 /** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
@@ -45,20 +48,10 @@ const components: Partial<TLUiComponents> = {
   // Toasts: null,
 };
 
-// Add keyboard shortcut overrides
-const overrides: TLUiOverrides = {
-  actions(_editor, actions): TLUiActionsContextType {
-    // This removes cmd+/,ctrl+/ from toggling dark mode so that its
-    // main purpose can continue to be toggling Cultivate's sidebar.
-    delete actions['toggle-dark-mode'];
-
-    return actions;
-  },
-};
-
 export function CanvasPage() {
   const store = useMemo(() => createTLStore(), []);
   const { id } = useParams();
+  const navigate = useNavigate();
   const canvasId = id ? parseInt(id, 10) : null;
   const { theme } = useTheme();
   const [loadingState, setLoadingState] = useState<
@@ -73,7 +66,45 @@ export function CanvasPage() {
     loadCanvas,
     { id: canvasId || 0 }
   );
-  // const saveCanvasToDb = useAction(saveCanvas);
+
+  const createNewCanvas = useAction(createCanvas);
+  const saveCanvasToDb = useAction(saveCanvas);
+
+  // Add keyboard shortcut overrides
+  const overrides: TLUiOverrides = useMemo(
+    () => ({
+      actions(_editor, actions): TLUiActionsContextType {
+        // This removes cmd+/,ctrl+/ from toggling dark mode so that its
+        // main purpose can continue to be toggling Cultivate's sidebar.
+        delete actions["toggle-dark-mode"];
+
+        // Save or create canvas
+        actions["save-canvas"] = {
+          ...actions["save-canvas"],
+          kbd: "cmd+s,ctrl+s",
+          async onSelect(_source: any) {
+            try {
+              if (id === "new" || !id) {
+                const { id } = await createNewCanvas({});
+                navigate(`/canvas/${id}`, { replace: true });
+              } else if (typeof canvasId === "number") {
+                await saveCanvasToDb({
+                  id: canvasId,
+                  snapshot: getSnapshot(store),
+                });
+                toast.success("Saved");
+              }
+            } catch (error: any) {
+              toast.error(error?.message || "Error saving canvas");
+            }
+          },
+        };
+
+        return actions;
+      },
+    }),
+    []
+  );
 
   useLayoutEffect(() => {
     if (isLoadingCanvas) {
@@ -83,31 +114,15 @@ export function CanvasPage() {
     setLoadingState({ status: "loading" });
 
     try {
-      // if (savedSnapshot) {
-      //   loadSnapshot(store, savedSnapshot);
-      // }
+      if (savedSnapshot) {
+        loadSnapshot(store, savedSnapshot);
+      }
+
       setLoadingState({ status: "ready" });
     } catch (error: any) {
       setLoadingState({ status: "error", error: error.message });
     }
   }, [store, savedSnapshot, isLoadingCanvas]);
-
-  // useLayoutEffect(() => {
-  //   if (!canvasId) {
-  //     return;
-  //   }
-
-  //   const cleanupFn = store.listen(
-  //     throttle(() => {
-  //       const snapshot = getSnapshot(store);
-  //       saveCanvasToDb({ snapshot, id: canvasId });
-  //     }, 1000)
-  //   );
-
-  //   return () => {
-  //     cleanupFn();
-  //   };
-  // }, [store, canvasId, saveCanvasToDb]);
 
   if (loadingState.status === "error") {
     return (

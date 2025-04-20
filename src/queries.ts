@@ -610,9 +610,11 @@ export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
   try {
     await context.entities.Canvas.upsert({
       where: { id: args.id },
-      update: { snapshot: JSON.stringify(args.snapshot) },
+      update: { 
+        snapshot: JSON.stringify(args.snapshot),
+        updatedAt: new Date()
+      },
       create: { 
-        id: args.id,
         snapshot: JSON.stringify(args.snapshot),
         user: { connect: { id: context.user.id } }
       }
@@ -664,6 +666,7 @@ export const createCanvas = async (_args: {}, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     const canvas = await context.entities.Canvas.create({
       data: {
