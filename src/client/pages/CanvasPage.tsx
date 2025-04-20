@@ -93,14 +93,14 @@ export function CanvasPage() {
 
   const formRef = useRef<HTMLFormElement>(null);
   const formSchema = z.object({
-    name: z.string().min(1, { message: "Canvas name is required" }),
+    title: z.string().min(1, { message: "Canvas name is required" }),
     description: z.string().optional(),
   });
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: canvas?.name || "",
+      title: canvas?.title || "",
       description: canvas?.description || "",
     },
   });
@@ -109,13 +109,14 @@ export function CanvasPage() {
     event.preventDefault();
     try {
       const { id } = await createNewCanvas({
-        name: form.getValues("name"),
+        title: form.getValues("title"),
         description: form.getValues("description"),
         snapshot: getSnapshot(store),
       });
       navigate(`/canvas/${id}`, { replace: true });
       formRef.current?.reset();
       setIsNameDialogOpen(false);
+      toast.success("Canvas created");
     } catch (err: any) {
       toast.error("Error saving canvas: " + err?.message || 'Unknown error');
     }
@@ -198,7 +199,7 @@ export function CanvasPage() {
           url: "/canvases",
         },
         {
-          title: canvasId ? `Canvas ${canvasId}` : "New",
+          title: canvasId ? (canvas?.title || "Untitled Canvas") : "New",
         },
       ]}
     >
@@ -219,7 +220,7 @@ export function CanvasPage() {
                 <div className="grid flex-1 gap-2">
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>

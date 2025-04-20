@@ -674,7 +674,7 @@ export const getCanvases = async (_args: {}, context: any) => {
   }
 };
 
-export const createCanvas = async (_args: {}, context: any) => {
+export const createCanvas = async (args: { title: string, description: string, snapshot: any }, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -682,7 +682,9 @@ export const createCanvas = async (_args: {}, context: any) => {
   try {
     const canvas = await context.entities.Canvas.create({
       data: {
-        snapshot: JSON.stringify({}),
+        snapshot: JSON.stringify(args.snapshot),
+        title: args.title,
+        description: args.description,
         user: { connect: { id: context.user.id } }
       }
     });
