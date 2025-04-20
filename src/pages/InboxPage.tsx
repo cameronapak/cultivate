@@ -1,4 +1,9 @@
-import { getInboxTasks, getInboxResources, useQuery, getThoughts } from "wasp/client/operations";
+import {
+  getInboxTasks,
+  getInboxResources,
+  useQuery,
+  getThoughts,
+} from "wasp/client/operations";
 import {
   createTask,
   updateTaskStatus,
@@ -14,7 +19,19 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink, Send, BrainCircuit, Pencil, Minus } from "lucide-react";
+import {
+  Trash2,
+  MoveRight,
+  Eye,
+  EyeClosed,
+  Coffee,
+  ExternalLink,
+  Send,
+  BrainCircuit,
+  Pencil,
+  Minus,
+  SquareCheck,
+} from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -33,27 +50,42 @@ import { toast } from "sonner";
 import { Toggle } from "../components/ui/toggle";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
 import { getFaviconFromUrl, getMetadataFromUrl, isUrl } from "../lib/utils";
+import { Badge } from "../components/ui/badge";
 
 // Add common shape type
 type InboxItem = {
   id: number | string;
   title: string;
   content?: string;
-  type: 'task' | 'resource' | 'thought';
+  type: "task" | "resource" | "thought";
   createdAt: Date;
   complete?: boolean;
   url?: string;
 };
 
 export function InboxPage() {
-  const { data: tasks, isLoading: isLoadingTasks, error: tasksError } = useQuery(getInboxTasks);
-  const { data: resources, isLoading: isLoadingResources, error: resourcesError } = useQuery(getInboxResources);
-  const { data: thoughts, isLoading: isLoadingThoughts, error: thoughtsError } = useQuery(getThoughts);
+  const {
+    data: tasks,
+    isLoading: isLoadingTasks,
+    error: tasksError,
+  } = useQuery(getInboxTasks);
+  const {
+    data: resources,
+    isLoading: isLoadingResources,
+    error: resourcesError,
+  } = useQuery(getInboxResources);
+  const {
+    data: thoughts,
+    isLoading: isLoadingThoughts,
+    error: thoughtsError,
+  } = useQuery(getThoughts);
   const { data: projects } = useQuery(getProjects);
   const [newItemText, setNewItemText] = useState("");
   const [isThought, setIsThought] = useState(false);
   const [showInbox, setShowInbox] = useState(() => {
-    const showTasksLocalStorage = JSON.parse(localStorage.getItem("shouldShowTasks") || "true");
+    const showTasksLocalStorage = JSON.parse(
+      localStorage.getItem("shouldShowTasks") || "true"
+    );
     return showTasksLocalStorage;
   });
 
@@ -65,7 +97,7 @@ export function InboxPage() {
   };
 
   const handleToggleIsThought = () => {
-    setIsThought(prev => !prev);
+    setIsThought((prev) => !prev);
   };
 
   const handleCreateItem = async () => {
@@ -76,7 +108,7 @@ export function InboxPage() {
         const metadata = await getMetadataFromUrl(newItemText.trim());
         // Create a resource
         await createResource({
-          title: metadata.title || 'Untitled Resource',
+          title: metadata.title || "Untitled Resource",
           url: newItemText.trim(),
           description: metadata.description,
           // No projectId means it goes to inbox
@@ -85,7 +117,7 @@ export function InboxPage() {
       } else if (isThought) {
         // Create a thought
         await createThought({
-          content: newItemText
+          content: newItemText,
         });
         toast.success(`Thought captured!`);
       } else {
@@ -155,12 +187,12 @@ export function InboxPage() {
 
   const handleMoveItem = async (item: InboxItem, projectId: number) => {
     try {
-      if (item.type === 'task') {
+      if (item.type === "task") {
         await moveTask({
           taskId: item.id as number,
           projectId,
         });
-      } else if (item.type === 'resource') {
+      } else if (item.type === "resource") {
         await moveResource({
           resourceId: item.id as number,
           projectId,
@@ -186,45 +218,54 @@ export function InboxPage() {
 
   // Transform tasks, resources, and thoughts into a common shape and sort by date
   const inboxItems: InboxItem[] = [
-    ...(tasks?.map(task => ({
+    ...(tasks?.map((task) => ({
       id: task.id,
       title: task.title,
-      type: 'task' as const,
+      type: "task" as const,
       createdAt: task.createdAt,
       complete: task.complete,
     })) || []),
-    ...(resources?.map(resource => ({
+    ...(resources?.map((resource) => ({
       id: resource.id,
       title: resource.title,
-      type: 'resource' as const,
+      type: "resource" as const,
       createdAt: resource.createdAt,
       url: resource.url,
     })) || []),
-    ...(thoughts?.map(thought => ({
+    ...(thoughts?.map((thought) => ({
       id: thought.id,
-      title: thought.content.slice(0, 60) + (thought.content.length > 60 ? '...' : ''),
+      title:
+        thought.content.slice(0, 60) +
+        (thought.content.length > 60 ? "..." : ""),
       content: thought.content,
-      type: 'thought' as const,
+      type: "thought" as const,
       createdAt: thought.createdAt,
     })) || []),
   ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   if (tasksError || resourcesError || thoughtsError) {
-    return <div>Error: {tasksError?.message || resourcesError?.message || thoughtsError?.message}</div>;
+    return (
+      <div>
+        Error:{" "}
+        {tasksError?.message ||
+          resourcesError?.message ||
+          thoughtsError?.message}
+      </div>
+    );
   }
 
   return (
-    <Layout isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts} breadcrumbItems={[{ title: "Brain Dump" }]}>
+    <Layout
+      isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
+      breadcrumbItems={[{ title: "Brain Dump" }]}
+    >
       <div>
         <div className="flex flex-col gap-2 items-start mb-4">
           <div className="flex gap-2 items-center">
             <h1 className="heading-1">Brain Dump</h1>
             <Tooltip>
               <TooltipTrigger>
-                <Toggle
-                  variant="outline"
-                  onClick={handleToggleTasks}
-                >
+                <Toggle variant="outline" onClick={handleToggleTasks}>
                   {showInbox ? (
                     <Eye className="h-5 w-5" />
                   ) : (
@@ -239,43 +280,31 @@ export function InboxPage() {
           </div>
         </div>
         <div>
-          <div className="flex gap-4 mb-6">
-            <div className="flex gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Toggle 
-                    variant="outline" 
-                    pressed={!isThought}
-                    onClick={() => isThought && handleToggleIsThought()}
-                    className="rounded-r-none"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Toggle>
-                </TooltipTrigger>
-                <TooltipContent>Task mode</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Toggle 
-                    variant="outline" 
-                    pressed={isThought}
-                    onClick={() => !isThought && handleToggleIsThought()}
-                    className="rounded-l-none"
-                  >
-                    <BrainCircuit className="h-4 w-4" />
-                  </Toggle>
-                </TooltipTrigger>
-                <TooltipContent>Thought mode</TooltipContent>
-              </Tooltip>
-            </div>
+          <div className="relative flex gap-4 mb-6">
+            <Button
+              className="absolute top-0 left-0"
+              size="icon"
+              variant="ghost"
+              onClick={handleToggleIsThought}
+            >
+              {isThought ? (
+                <Minus className="h-4 w-4" />
+              ) : (
+                <SquareCheck className="h-4 w-4" />
+              )}
+            </Button>
             <Input
               autoFocus={true}
               type="text"
-              placeholder={isThought ? "Add a thought... (URLs will create resources)" : "Add a task... (URLs will create resources)"}
+              placeholder={
+                isThought
+                  ? "Add a thought..."
+                  : "Add a task..."
+              }
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="flex-1"
+              className="pl-10 flex-1"
             />
             <Button type="submit" onClick={handleCreateItem} size="icon">
               <Send className="h-4 w-4" />
@@ -288,23 +317,29 @@ export function InboxPage() {
               <Table>
                 <TableBody>
                   {inboxItems.map((item) => (
-                    <TableRow className="group grid grid-cols-[auto_1fr_auto] items-center" key={`${item.type}-${item.id}`}>
+                    <TableRow
+                      className="group grid grid-cols-[auto_1fr_auto] items-center"
+                      key={`${item.type}-${item.id}`}
+                    >
                       <TableCell className="w-8">
-                        {item.type === 'task' ? (
+                        {item.type === "task" ? (
                           <Checkbox
                             checked={item.complete}
                             onCheckedChange={() =>
-                              handleToggleTask(item.id as number, item.complete || false)
+                              handleToggleTask(
+                                item.id as number,
+                                item.complete || false
+                              )
                             }
                           />
-                        ) : item.type === 'resource' ? (
+                        ) : item.type === "resource" ? (
                           <ExternalLink className="h-4 w-4 text-muted-foreground" />
                         ) : (
                           <Minus className="h-4 w-4 text-muted-foreground" />
                         )}
                       </TableCell>
                       <TableCell className="flex items-center gap-2">
-                        {item.type === 'task' ? (
+                        {item.type === "task" ? (
                           <span
                             className={`mr-2 ${
                               item.complete
@@ -314,16 +349,28 @@ export function InboxPage() {
                           >
                             {item.title}
                           </span>
-                        ) : item.type === 'resource' ? (
+                        ) : item.type === "resource" ? (
                           <a
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="grid items-center gap-2 hover:underline"
-                            style={{ gridTemplateColumns: item.url ? '16px 1fr' : '1fr' }}
+                            style={{
+                              gridTemplateColumns: item.url
+                                ? "16px 1fr"
+                                : "1fr",
+                            }}
                           >
-                            {item.url ? <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="mt-0.5 w-4 h-4 bg-secondary rounded-sm" /> : null}
-                            <span className="line-clamp-2 text-sm">{item.title}</span>
+                            {item.url ? (
+                              <img
+                                src={getFaviconFromUrl(item.url)}
+                                alt="Favicon"
+                                className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
+                              />
+                            ) : null}
+                            <span className="line-clamp-2 text-sm">
+                              {item.title}
+                            </span>
                           </a>
                         ) : (
                           <div className="flex flex-col">
@@ -333,7 +380,7 @@ export function InboxPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
-                          {item.type !== 'thought' && (
+                          {item.type !== "thought" && (
                             <DropdownMenu>
                               <DropdownMenuTrigger>
                                 <Tooltip>
@@ -352,7 +399,9 @@ export function InboxPage() {
                                   projects?.map((project) => (
                                     <DropdownMenuItem
                                       key={project.id}
-                                      onClick={() => handleMoveItem(item, project.id)}
+                                      onClick={() =>
+                                        handleMoveItem(item, project.id)
+                                      }
                                     >
                                       Move to {project.title}
                                     </DropdownMenuItem>
@@ -371,12 +420,11 @@ export function InboxPage() {
                                 variant="outline"
                                 size="icon"
                                 onClick={() => {
-                                  if (item.type === 'task') 
+                                  if (item.type === "task")
                                     handleDeleteTask(item.id as number);
-                                  else if (item.type === 'resource')
+                                  else if (item.type === "resource")
                                     handleDeleteResource(item.id as number);
-                                  else
-                                    handleDeleteThought(item.id as string);
+                                  else handleDeleteThought(item.id as string);
                                 }}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -388,19 +436,22 @@ export function InboxPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {inboxItems.length === 0 && !isLoadingTasks && !isLoadingResources && !isLoadingThoughts && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className="text-center flex flex-col items-center justify-center text-muted-foreground"
-                      >
-                        <EmptyStateView
-                          Icon={<Coffee className="h-10 w-10" />}
-                          title="Inbox Zero"
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  {inboxItems.length === 0 &&
+                    !isLoadingTasks &&
+                    !isLoadingResources &&
+                    !isLoadingThoughts && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={3}
+                          className="text-center flex flex-col items-center justify-center text-muted-foreground"
+                        >
+                          <EmptyStateView
+                            Icon={<Coffee className="h-10 w-10" />}
+                            title="Inbox Zero"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
                 </TableBody>
               </Table>
             </div>
