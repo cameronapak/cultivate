@@ -4,18 +4,49 @@ import {
   createTLStore,
   getSnapshot,
   loadSnapshot,
+  TLUiOverrides,
+  TLUiActionsContextType,
 } from "tldraw";
-import { throttle } from "../../lib/utils";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FormEvent, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   useQuery,
   useAction,
   loadCanvas,
+  createCanvas,
   saveCanvas,
 } from "wasp/client/operations";
+import { useNavigate } from "react-router-dom";
 import "tldraw/tldraw.css";
 import { Layout } from "../../components/Layout";
 import { useParams } from "react-router-dom";
+import { useTheme } from "../../components/custom/ThemeProvider";
+import { toast } from "sonner";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+  FormLabel,
+} from "../../components/ui/form";
+import {
+  Dialog,
+  DialogTitle,
+  DialogHeader,
+  DialogContent,
+  DialogFooter,
+  DialogDescription,
+  DialogClose,
+  DialogTrigger,
+} from "../../components/ui/dialog";
+import { Button } from "../../components/ui/button";
+import { Copy, Pencil } from "lucide-react";
+import { Label } from "../../components/ui/label";
+import { Input } from "../../components/ui/input";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+
 /** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
   // ContextMenu: null,
@@ -33,7 +64,7 @@ const components: Partial<TLUiComponents> = {
   // HelperButtons: null,
   DebugPanel: null,
   DebugMenu: null,
-  MenuPanel: null,
+  // MenuPanel: null,
   TopPanel: null,
   // CursorChatBubble: null,
   RichTextToolbar: null,
@@ -43,9 +74,10 @@ const components: Partial<TLUiComponents> = {
 
 export function CanvasPage() {
   const store = useMemo(() => createTLStore(), []);
-  const { id } = useParams();
-  const canvasId = id ? parseInt(id) : null;
-
+  const [isNameDialogOpen, setIsNameDialogOpen] = useState(false);
+  const { id: canvasId } = useParams();
+  const navigate = useNavigate();
+  const { theme } = useTheme();
   const [loadingState, setLoadingState] = useState<
     | { status: "loading" }
     | { status: "ready" }
@@ -54,41 +86,96 @@ export function CanvasPage() {
     status: "loading",
   });
 
-  const { data: savedSnapshot, isLoading: isLoadingCanvas } = useQuery(
-    loadCanvas,
-    { id: canvasId || 0 }
-  );
+  const { data: canvas, isLoading: isLoadingCanvas } = useQuery(loadCanvas, {
+    id: canvasId || "",
+  });
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const formSchema = z.object({
+    title: z.string().min(1, { message: "Canvas name is required" }),
+    description: z.string().optional(),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: canvas?.title || "",
+      description: canvas?.description || "",
+    },
+  });
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const { id } = await createNewCanvas({
+        title: form.getValues("title"),
+        description: form.getValues("description"),
+        snapshot: getSnapshot(store),
+      });
+      navigate(`/canvas/${id}`, { replace: true });
+      formRef.current?.reset();
+      setIsNameDialogOpen(false);
+      toast.success("Canvas created");
+    } catch (err: any) {
+      toast.error("Error saving canvas: " + err?.message || "Unknown error");
+    }
+  };
+
+  const createNewCanvas = useAction(createCanvas);
   const saveCanvasToDb = useAction(saveCanvas);
 
+  // Add keyboard shortcut overrides
+  const overrides: TLUiOverrides = useMemo(
+    () => ({
+      actions(editor, actions): TLUiActionsContextType {
+        // This removes cmd+/,ctrl+/ from toggling dark mode so that its
+        // main purpose can continue to be toggling Cultivate's sidebar.
+        delete actions["toggle-dark-mode"];
+
+        // Save or create canvas
+        actions["save-canvas"] = {
+          ...actions["save-canvas"],
+          kbd: "cmd+s,ctrl+s",
+          async onSelect(_source: any) {
+            try {
+              if (canvasId === "new" || !canvasId) {
+                setIsNameDialogOpen(true);
+              } else {
+                await saveCanvasToDb({
+                  id: canvasId,
+                  snapshot: getSnapshot(store),
+                });
+                toast.success("Saved");
+              }
+            } catch (error: any) {
+              toast.error(error?.message || "Error saving canvas");
+            }
+          },
+        };
+
+        return actions;
+      },
+    }),
+    []
+  );
+
   useLayoutEffect(() => {
-    if (isLoadingCanvas) return;
+    if (isLoadingCanvas) {
+      return;
+    }
 
     setLoadingState({ status: "loading" });
 
     try {
-      if (savedSnapshot) {
-        loadSnapshot(store, savedSnapshot);
+      if (canvas) {
+        loadSnapshot(store, JSON.parse(canvas.snapshot));
       }
+
       setLoadingState({ status: "ready" });
     } catch (error: any) {
       setLoadingState({ status: "error", error: error.message });
     }
-  }, [store, savedSnapshot, isLoadingCanvas]);
-
-  useLayoutEffect(() => {
-    if (!canvasId) return;
-
-    const cleanupFn = store.listen(
-      throttle(() => {
-        const snapshot = getSnapshot(store);
-        saveCanvasToDb({ snapshot, id: canvasId });
-      }, 1000)
-    );
-
-    return () => {
-      cleanupFn();
-    };
-  }, [store, canvasId, saveCanvasToDb]);
+  }, [store, canvas, isLoadingCanvas]);
 
   if (loadingState.status === "error") {
     return (
@@ -111,16 +198,64 @@ export function CanvasPage() {
           url: "/canvases",
         },
         {
-          title: canvasId ? `Canvas ${canvasId}` : "New Canvas",
+          title: canvasId ? canvas?.title || "Untitled Canvas" : "New",
         },
       ]}
     >
+      <Dialog open={isNameDialogOpen} onOpenChange={setIsNameDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <Form {...form}>
+            <form onSubmit={handleSubmit} ref={formRef}>
+              <DialogHeader>
+                <DialogTitle>Name Your Canvas</DialogTitle>
+                {/* <DialogDescription>
+                  You can update the name of the canvas at any time.
+                </DialogDescription> */}
+              </DialogHeader>
+              <DialogDescription className="mt-4 mb-8">
+                <div className="flex items-center space-x-2">
+                  <div className="grid flex-1 gap-2">
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Canvas name"
+                              autoFocus
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </DialogDescription>
+              <DialogFooter className="sm:justify-start">
+                <Button type="submit" variant="default">
+                  Save
+                </Button>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">
+                    Close
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
       <div className="tldraw__editor h-full">
         <Tldraw
           className="h-full"
           components={components}
-          inferDarkMode
+          inferDarkMode={Boolean(theme === "system" || theme === "dark")}
           store={store}
+          overrides={overrides}
           options={{
             maxPages: 1,
             maxFilesAtOnce: 0,

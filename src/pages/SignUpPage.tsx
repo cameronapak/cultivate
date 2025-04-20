@@ -49,7 +49,6 @@ export function SignUpPage({
         <CardHeader className="text-center">
           <CardTitle className="flex gap-2 justify-center text-xl">
             <Logo />
-            <Badge variant="outline">Beta</Badge>
           </CardTitle>
           <CardDescription className="text-balance">
             A calm system for your thoughts, tasks, and resources

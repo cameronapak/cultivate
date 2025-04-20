@@ -600,19 +600,22 @@ export const deleteDocument = async (args: { id: string }, context: any) => {
 //#region Canvas
 type SaveCanvasPayload = {
   snapshot: any
-  id: number
+  id: string
 }
 
 export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     await context.entities.Canvas.upsert({
       where: { id: args.id },
-      update: { snapshot: JSON.stringify(args.snapshot) },
+      update: { 
+        snapshot: JSON.stringify(args.snapshot),
+        updatedAt: new Date()
+      },
       create: { 
-        id: args.id,
         snapshot: JSON.stringify(args.snapshot),
         user: { connect: { id: context.user.id } }
       }
@@ -626,19 +629,29 @@ export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
 };
 
 type LoadCanvasPayload = {
-  id: number
+  id: string
 }
 
 export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
+  if (!args.id) {
+    throw new HttpError(400, "Canvas ID is required");
+  }
+
+  // This will load an empty canvas for the user.
+  if (args.id === "new") {
+    return null;
+  }
+
   try {
     const canvas = await context.entities.Canvas.findUnique({
       where: { id: args.id }
     });
 
-    return canvas ? JSON.parse(canvas.snapshot) : null;
+    return canvas;
   } catch (error) {
     console.error('Failed to load canvas:', error);
     throw new HttpError(500, 'Failed to load canvas');
@@ -649,6 +662,7 @@ export const getCanvases = async (_args: {}, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     return context.entities.Canvas.findMany({
       where: { userId: context.user.id },
@@ -660,14 +674,17 @@ export const getCanvases = async (_args: {}, context: any) => {
   }
 };
 
-export const createCanvas = async (_args: {}, context: any) => {
+export const createCanvas = async (args: { title: string, description: string, snapshot: any }, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     const canvas = await context.entities.Canvas.create({
       data: {
-        snapshot: JSON.stringify({}),
+        snapshot: JSON.stringify(args.snapshot),
+        title: args.title,
+        description: args.description,
         user: { connect: { id: context.user.id } }
       }
     });
@@ -679,10 +696,11 @@ export const createCanvas = async (_args: {}, context: any) => {
   }
 };
 
-export const deleteCanvas = async (args: { id: number }, context: any) => {
+export const deleteCanvas = async (args: { id: string }, context: any) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   try {
     await context.entities.Canvas.delete({
       where: { id: args.id }
