@@ -1,5 +1,4 @@
-import { Task, Resource } from "wasp/entities";
-import { getInboxTasks, getInboxResources, useQuery } from "wasp/client/operations";
+import { getInboxTasks, getInboxResources, useQuery, getThoughts } from "wasp/client/operations";
 import {
   createTask,
   updateTaskStatus,
@@ -8,12 +7,14 @@ import {
   createResource,
   deleteResource,
   moveResource,
+  createThought,
+  deleteThought,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink, Send } from "lucide-react";
+import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink, Send, BrainCircuit } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -31,23 +32,14 @@ import {
 import { toast } from "sonner";
 import { Toggle } from "../components/ui/toggle";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
-import { getFaviconFromUrl, getMetadataFromUrl } from "../lib/utils";
-
-// Add URL detection utility function
-const isUrl = (text: string): boolean => {
-  try {
-    new URL(text);
-    return true;
-  } catch {
-    return false;
-  }
-};
+import { getFaviconFromUrl, getMetadataFromUrl, isUrl } from "../lib/utils";
 
 // Add common shape type
 type InboxItem = {
-  id: number;
+  id: number | string;
   title: string;
-  type: 'task' | 'resource';
+  content?: string;
+  type: 'task' | 'resource' | 'thought';
   createdAt: Date;
   complete?: boolean;
   url?: string;
@@ -56,8 +48,10 @@ type InboxItem = {
 export function InboxPage() {
   const { data: tasks, isLoading: isLoadingTasks, error: tasksError } = useQuery(getInboxTasks);
   const { data: resources, isLoading: isLoadingResources, error: resourcesError } = useQuery(getInboxResources);
+  const { data: thoughts, isLoading: isLoadingThoughts, error: thoughtsError } = useQuery(getThoughts);
   const { data: projects } = useQuery(getProjects);
-  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newItemText, setNewItemText] = useState("");
+  const [isThought, setIsThought] = useState(false);
   const [showInbox, setShowInbox] = useState(() => {
     const showTasksLocalStorage = JSON.parse(localStorage.getItem("shouldShowTasks") || "true");
     return showTasksLocalStorage;
@@ -70,38 +64,47 @@ export function InboxPage() {
     });
   };
 
-  const handleCreateTask = async () => {
-    if (!newTaskTitle.trim()) return;
+  const handleToggleIsThought = () => {
+    setIsThought(prev => !prev);
+  };
+
+  const handleCreateItem = async () => {
+    if (!newItemText.trim()) return;
     try {
-      if (isUrl(newTaskTitle.trim())) {
-        const metadata = await getMetadataFromUrl(newTaskTitle.trim());
+      if (isThought) {
+        // Create a thought
+        await createThought({
+          content: newItemText
+        });
+        toast.success(`Thought captured!`);
+      } else if (isUrl(newItemText.trim())) {
+        const metadata = await getMetadataFromUrl(newItemText.trim());
         // Create a resource instead of a task
         await createResource({
           title: metadata.title,
-          url: newTaskTitle.trim(),
+          url: newItemText.trim(),
           description: metadata.description,
-          projectId: 0,
           // No projectId means it goes to inbox
         });
-        toast.success(`Resource created: "${newTaskTitle}"`);
+        toast.success(`Resource created: "${newItemText}"`);
       } else {
         // Create a regular task
         await createTask({
-          title: newTaskTitle,
+          title: newItemText,
           // No projectId means it goes to inbox
         });
-        toast.success(`Task created: "${newTaskTitle}"`);
+        toast.success(`Task created: "${newItemText}"`);
       }
-      setNewTaskTitle("");
+      setNewItemText("");
     } catch (error) {
-      console.error("Failed to create task/resource:", error);
-      toast.error("Failed to create task/resource");
+      console.error("Failed to create item:", error);
+      toast.error("Failed to create item");
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      handleCreateTask();
+      handleCreateItem();
     }
   };
 
@@ -127,17 +130,6 @@ export function InboxPage() {
     }
   };
 
-  const handleMoveTask = async (taskId: number, projectId: number) => {
-    try {
-      await moveTask({
-        taskId,
-        projectId,
-      });
-    } catch (error) {
-      console.error("Failed to move task:", error);
-    }
-  };
-
   const handleDeleteResource = async (resourceId: number) => {
     try {
       if (confirm("Are you sure you want to delete this resource?")) {
@@ -149,18 +141,33 @@ export function InboxPage() {
     }
   };
 
+  const handleDeleteThought = async (thoughtId: string) => {
+    try {
+      if (confirm("Are you sure you want to delete this thought?")) {
+        await deleteThought({ id: thoughtId });
+        toast.success("Thought deleted");
+      }
+    } catch (error) {
+      console.error("Failed to delete thought:", error);
+    }
+  };
+
   const handleMoveItem = async (item: InboxItem, projectId: number) => {
     try {
       if (item.type === 'task') {
         await moveTask({
-          taskId: item.id,
+          taskId: item.id as number,
+          projectId,
+        });
+      } else if (item.type === 'resource') {
+        await moveResource({
+          resourceId: item.id as number,
           projectId,
         });
       } else {
-        await moveResource({
-          resourceId: item.id,
-          projectId,
-        });
+        // Thoughts cannot be moved to projects (for now)
+        toast.error("Thoughts cannot be moved to projects");
+        return;
       }
       toast.success(`${item.type} moved to project`);
     } catch (error) {
@@ -176,7 +183,7 @@ export function InboxPage() {
     return diffDays;
   };
 
-  // Transform tasks and resources into a common shape and sort by date
+  // Transform tasks, resources, and thoughts into a common shape and sort by date
   const inboxItems: InboxItem[] = [
     ...(tasks?.map(task => ({
       id: task.id,
@@ -192,18 +199,25 @@ export function InboxPage() {
       createdAt: resource.createdAt,
       url: resource.url,
     })) || []),
+    ...(thoughts?.map(thought => ({
+      id: thought.id,
+      title: thought.content.slice(0, 60) + (thought.content.length > 60 ? '...' : ''),
+      content: thought.content,
+      type: 'thought' as const,
+      createdAt: thought.createdAt,
+    })) || []),
   ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-  if (tasksError || resourcesError) {
-    return <div>Error: {tasksError?.message || resourcesError?.message}</div>;
+  if (tasksError || resourcesError || thoughtsError) {
+    return <div>Error: {tasksError?.message || resourcesError?.message || thoughtsError?.message}</div>;
   }
 
   return (
-    <Layout isLoading={isLoadingTasks || isLoadingResources} breadcrumbItems={[{ title: "Inbox" }]}>
+    <Layout isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts} breadcrumbItems={[{ title: "Brain Dump" }]}>
       <div>
         <div className="flex flex-col gap-2 items-start mb-4">
           <div className="flex gap-2 items-center">
-            <h1 className="heading-1">Inbox</h1>
+            <h1 className="heading-1">Brain Dump</h1>
             <Tooltip>
               <TooltipTrigger>
                 <Toggle
@@ -225,15 +239,24 @@ export function InboxPage() {
         </div>
         <div>
           <div className="flex gap-4 mb-6">
+            <Toggle 
+              variant="outline" 
+              pressed={isThought}
+              onClick={handleToggleIsThought}
+              className="mr-2"
+            >
+              <BrainCircuit className="h-4 w-4 mr-2" />
+              {isThought ? "Thought" : "Task/Resource"}
+            </Toggle>
             <Input
               autoFocus={true}
               type="text"
-              placeholder="Add to your inbox..."
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
+              placeholder={isThought ? "Add a thought..." : "Add to your inbox..."}
+              value={newItemText}
+              onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
             />
-            <Button type="submit" onClick={handleCreateTask} size="icon">
+            <Button type="submit" onClick={handleCreateItem} size="icon">
               <Send className="h-4 w-4" />
               <span className="sr-only">Add to inbox</span>
             </Button>
@@ -250,11 +273,13 @@ export function InboxPage() {
                           <Checkbox
                             checked={item.complete}
                             onCheckedChange={() =>
-                              handleToggleTask(item.id, item.complete || false)
+                              handleToggleTask(item.id as number, item.complete || false)
                             }
                           />
-                        ) : (
+                        ) : item.type === 'resource' ? (
                           <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <BrainCircuit className="h-4 w-4 text-muted-foreground" />
                         )}
                       </TableCell>
                       <TableCell className="flex items-center gap-2">
@@ -268,7 +293,7 @@ export function InboxPage() {
                           >
                             {item.title}
                           </span>
-                        ) : (
+                        ) : item.type === 'resource' ? (
                           <a
                             href={item.url}
                             target="_blank"
@@ -279,6 +304,10 @@ export function InboxPage() {
                             {item.url ? <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="mt-0.5 w-4 h-4 bg-secondary rounded-sm" /> : null}
                             <span className="line-clamp-2 text-sm">{item.title}</span>
                           </a>
+                        ) : (
+                          <div className="flex flex-col">
+                            <span className="text-sm">{item.content}</span>
+                          </div>
                         )}
                         <span className="text-xs text-muted-foreground">
                           {getDaysAgo(item.createdAt)
@@ -291,46 +320,51 @@ export function InboxPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button variant="outline" size="icon">
-                                    <MoveRight className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Move {item.type} to a project
-                                </TooltipContent>
-                              </Tooltip>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {projects?.length ? (
-                                projects?.map((project) => (
-                                  <DropdownMenuItem
-                                    key={project.id}
-                                    onClick={() => handleMoveItem(item, project.id)}
-                                  >
-                                    Move to {project.title}
+                          {item.type !== 'thought' && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button variant="outline" size="icon">
+                                      <MoveRight className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    Move {item.type} to a project
+                                  </TooltipContent>
+                                </Tooltip>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {projects?.length ? (
+                                  projects?.map((project) => (
+                                    <DropdownMenuItem
+                                      key={project.id}
+                                      onClick={() => handleMoveItem(item, project.id)}
+                                    >
+                                      Move to {project.title}
+                                    </DropdownMenuItem>
+                                  ))
+                                ) : (
+                                  <DropdownMenuItem className="text-muted-foreground">
+                                    No projects found
                                   </DropdownMenuItem>
-                                ))
-                              ) : (
-                                <DropdownMenuItem className="text-muted-foreground">
-                                  No projects found
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={() => 
-                                  item.type === 'task' 
-                                    ? handleDeleteTask(item.id)
-                                    : handleDeleteResource(item.id)
-                                }
+                                onClick={() => {
+                                  if (item.type === 'task') 
+                                    handleDeleteTask(item.id as number);
+                                  else if (item.type === 'resource')
+                                    handleDeleteResource(item.id as number);
+                                  else
+                                    handleDeleteThought(item.id as string);
+                                }}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -341,7 +375,7 @@ export function InboxPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {inboxItems.length === 0 && !isLoadingTasks && !isLoadingResources && (
+                  {inboxItems.length === 0 && !isLoadingTasks && !isLoadingResources && !isLoadingThoughts && (
                     <TableRow>
                       <TableCell
                         colSpan={3}
