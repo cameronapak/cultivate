@@ -13,9 +13,23 @@ import {
 } from "./ui/breadcrumb";
 import { Progress } from "./ui/progress";
 import { ThemeProvider } from "./custom/ThemeProvider";
-import { Folder } from "lucide-react";
+import { EllipsisVertical, Folder } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { useQuery } from "wasp/client/operations";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
+import { DropdownMenuTrigger } from "./ui/dropdown-menu";
+
+interface MenuItem {
+  title: string;
+  icon: ReactNode;
+  action: () => void;
+  isDestructive?: boolean;
+}
 
 interface LayoutProps {
   children: ReactNode;
@@ -26,6 +40,7 @@ interface LayoutProps {
   }[];
   activeProjectId?: number;
   mainContentClasses?: string;
+  menuItems?: MenuItem[];
 }
 
 export function Layout({
@@ -34,6 +49,7 @@ export function Layout({
   breadcrumbItems = [],
   activeProjectId,
   mainContentClasses,
+  menuItems = [],
 }: LayoutProps) {
   const isSidebarHidden = JSON.parse(
     localStorage.getItem("isSidebarHidden") || "false"
@@ -75,7 +91,7 @@ export function Layout({
           <header className="relative flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
+            <Breadcrumb className="flex-1">
               <BreadcrumbList>
                 {breadcrumbItems.map((item, index) => (
                   <Fragment key={index}>
@@ -84,13 +100,42 @@ export function Layout({
                       {item.url ? (
                         <a href={item.url}>{item.title}</a>
                       ) : (
-                        <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                        <BreadcrumbPage className="ellipsis">
+                          {item.title}
+                        </BreadcrumbPage>
                       )}
                     </BreadcrumbItem>
                   </Fragment>
                 ))}
               </BreadcrumbList>
             </Breadcrumb>
+
+            {menuItems.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <EllipsisVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {menuItems.map((item, index) => (
+                    <DropdownMenuItem
+                      key={index}
+                      className={`flex items-center gap-2 ${
+                        item.isDestructive
+                          ? "group hover:!text-destructive-foreground hover:!bg-destructive"
+                          : ""
+                      }`}
+                      onClick={item.action}
+                    >
+                      {item.icon}
+                      {item.title}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
+
             {isLoading ? (
               <div className="absolute -bottom-1 left-0 right-0">
                 <Progress indeterminate />
