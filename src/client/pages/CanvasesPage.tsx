@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { Button } from "../../components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { PencilRuler, Plus, Trash2 } from "lucide-react";
 import {
   EmptyStateRoot,
   EmptyStateDescription,
@@ -19,7 +19,6 @@ import {
   EmptyStateAction,
   EmptyStateIcon,
 } from "../../components/custom/EmptyStateView";
-import { File } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -50,7 +49,7 @@ export function CanvasesPage() {
       <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Canvases" }]}>
         <EmptyStateRoot className="mx-auto">
           <EmptyStateIcon>
-            <File />
+            <PencilRuler />
           </EmptyStateIcon>
           <EmptyStateTitle>Create your first canvas</EmptyStateTitle>
           <EmptyStateDescription>
