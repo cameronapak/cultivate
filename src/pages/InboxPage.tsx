@@ -375,7 +375,7 @@ export function InboxPage() {
             <Input
               autoFocus={true}
               type="text"
-              placeholder={isThought ? "Add a thought..." : "Add a task..."}
+              placeholder={isThought ? "Add a thought or URL..." : "Add a task..."}
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
