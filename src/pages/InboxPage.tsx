@@ -318,6 +318,15 @@ export function InboxPage() {
     );
   }
 
+  let itemTypeButton = null;
+  if (isThought && !isUrl(newItemText.trim())) {
+    itemTypeButton = <Minus className="h-4 w-4" />;
+  } else if (isUrl(newItemText.trim())) {
+    itemTypeButton = <Link2 className="h-4 w-4" />;
+  } else {
+    itemTypeButton = <SquareCheck className="h-4 w-4" />;
+  }
+
   return (
     <Layout
       isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
@@ -357,11 +366,7 @@ export function InboxPage() {
               variant="ghost"
               onClick={handleToggleIsThought}
             >
-              {isThought ? (
-                <Minus className="h-4 w-4" />
-              ) : (
-                <SquareCheck className="h-4 w-4" />
-              )}
+              {itemTypeButton}
               <span className="sr-only">
                 {isThought ? "Add a thought" : "Add a task"}
               </span>
