@@ -318,7 +318,7 @@ export function InboxPage() {
     );
   }
 
-  let itemTypeButton = null;
+  let itemTypeButton: React.ReactNode | null = null;
   if (isThought && !isUrl(newItemText.trim())) {
     itemTypeButton = <Minus className="h-4 w-4" />;
   } else if (isUrl(newItemText.trim())) {
