@@ -1,5 +1,10 @@
-import { Task, Resource } from "wasp/entities";
-import { getInboxTasks, getInboxResources, useQuery } from "wasp/client/operations";
+import React from "react";
+import {
+  getInboxTasks,
+  getInboxResources,
+  useQuery,
+  getThoughts,
+} from "wasp/client/operations";
 import {
   createTask,
   updateTaskStatus,
@@ -8,12 +13,26 @@ import {
   createResource,
   deleteResource,
   moveResource,
+  createThought,
+  deleteThought,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
-import { Trash2, MoveRight, Eye, EyeClosed, Coffee, ExternalLink } from "lucide-react";
+import {
+  Trash2,
+  MoveRight,
+  Eye,
+  EyeClosed,
+  Coffee,
+  ExternalLink,
+  Send,
+  BrainCircuit,
+  Pencil,
+  Minus,
+  SquareCheck,
+} from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import {
@@ -29,37 +48,89 @@ import {
   TooltipTrigger,
 } from "../components/ui/tooltip";
 import { toast } from "sonner";
-import { Toggle } from "../components/ui/toggle";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
-import { getFaviconFromUrl, getMetadataFromUrl } from "../lib/utils";
-
-// Add URL detection utility function
-const isUrl = (text: string): boolean => {
-  try {
-    new URL(text);
-    return true;
-  } catch {
-    return false;
-  }
-};
+import { getFaviconFromUrl, getMetadataFromUrl, isUrl } from "../lib/utils";
 
 // Add common shape type
 type InboxItem = {
-  id: number;
+  id: number | string;
   title: string;
-  type: 'task' | 'resource';
+  content?: string;
+  type: "task" | "resource" | "thought";
   createdAt: Date;
   complete?: boolean;
   url?: string;
 };
 
+// Create a type where the string is a date in the format "2025-04-20"
+type DateString = `${number}${number}${number}${number}-${number}${number}-${number}${number}`;
+
+// Add this helper function to format dates consistently
+const formatDate = (date: Date | DateString): string => {
+  // Convert to Date object if it's a string
+  const itemDate = typeof date === 'string' 
+    ? new Date(date + 'T00:00:00') // Add time component to ensure consistent timezone handling
+    : new Date(date);
+  
+  // Get current time in local timezone and set to midnight
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  
+  // Set item date to midnight in local timezone for comparison
+  const itemDateMidnight = new Date(itemDate);
+  itemDateMidnight.setHours(0, 0, 0, 0);
+  
+  // Compare dates using their time values
+  const nowTime = now.getTime();
+  const itemTime = itemDateMidnight.getTime();
+  
+  if (nowTime === itemTime) {
+    return "Today";
+  }
+  
+  // Check for yesterday
+  const yesterdayTime = nowTime - (24 * 60 * 60 * 1000); // 24 hours in milliseconds
+  if (itemTime === yesterdayTime) {
+    return "Yesterday";
+  }
+  
+  // For other dates, use native date formatting
+  return itemDate.toLocaleDateString(undefined, { 
+    weekday: 'long', 
+    month: 'long', 
+    day: 'numeric',
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  });
+};
+
+// Add this type for grouped items
+type GroupedInboxItems = {
+  [key: DateString]: InboxItem[];
+};
+
 export function InboxPage() {
-  const { data: tasks, isLoading: isLoadingTasks, error: tasksError } = useQuery(getInboxTasks);
-  const { data: resources, isLoading: isLoadingResources, error: resourcesError } = useQuery(getInboxResources);
+  const {
+    data: tasks,
+    isLoading: isLoadingTasks,
+    error: tasksError,
+  } = useQuery(getInboxTasks);
+  const {
+    data: resources,
+    isLoading: isLoadingResources,
+    error: resourcesError,
+  } = useQuery(getInboxResources);
+  const {
+    data: thoughts,
+    isLoading: isLoadingThoughts,
+    error: thoughtsError,
+  } = useQuery(getThoughts);
   const { data: projects } = useQuery(getProjects);
-  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newItemText, setNewItemText] = useState("");
+  const [isThought, setIsThought] = useState(false);
   const [showInbox, setShowInbox] = useState(() => {
-    const showTasksLocalStorage = JSON.parse(localStorage.getItem("shouldShowTasks") || "true");
+    const showTasksLocalStorage = JSON.parse(
+      localStorage.getItem("shouldShowTasks") || "true"
+    );
     return showTasksLocalStorage;
   });
 
@@ -70,38 +141,48 @@ export function InboxPage() {
     });
   };
 
-  const handleCreateTask = async () => {
-    if (!newTaskTitle.trim()) return;
+  const handleToggleIsThought = () => {
+    setIsThought((prev) => !prev);
+  };
+
+  const handleCreateItem = async () => {
+    if (!newItemText.trim()) return;
     try {
-      if (isUrl(newTaskTitle.trim())) {
-        const metadata = await getMetadataFromUrl(newTaskTitle.trim());
-        // Create a resource instead of a task
+      // Always check for URL first, regardless of mode
+      if (isUrl(newItemText.trim())) {
+        const metadata = await getMetadataFromUrl(newItemText.trim());
+        // Create a resource
         await createResource({
-          title: metadata.title,
-          url: newTaskTitle.trim(),
+          title: metadata.title || "Untitled Resource",
+          url: newItemText.trim(),
           description: metadata.description,
-          projectId: 0,
           // No projectId means it goes to inbox
         });
-        toast.success(`Resource created: "${newTaskTitle}"`);
+        toast.success(`Resource created: "${metadata.title || newItemText}"`);
+      } else if (isThought) {
+        // Create a thought
+        await createThought({
+          content: newItemText,
+        });
+        toast.success(`Thought captured!`);
       } else {
         // Create a regular task
         await createTask({
-          title: newTaskTitle,
+          title: newItemText,
           // No projectId means it goes to inbox
         });
-        toast.success(`Task created: "${newTaskTitle}"`);
+        toast.success(`Task created: "${newItemText}"`);
       }
-      setNewTaskTitle("");
+      setNewItemText("");
     } catch (error) {
-      console.error("Failed to create task/resource:", error);
-      toast.error("Failed to create task/resource");
+      console.error("Failed to create item:", error);
+      toast.error("Failed to create item");
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      handleCreateTask();
+      handleCreateItem();
     }
   };
 
@@ -127,17 +208,6 @@ export function InboxPage() {
     }
   };
 
-  const handleMoveTask = async (taskId: number, projectId: number) => {
-    try {
-      await moveTask({
-        taskId,
-        projectId,
-      });
-    } catch (error) {
-      console.error("Failed to move task:", error);
-    }
-  };
-
   const handleDeleteResource = async (resourceId: number) => {
     try {
       if (confirm("Are you sure you want to delete this resource?")) {
@@ -149,18 +219,33 @@ export function InboxPage() {
     }
   };
 
+  const handleDeleteThought = async (thoughtId: string) => {
+    try {
+      if (confirm("Are you sure you want to delete this thought?")) {
+        await deleteThought({ id: thoughtId });
+        toast.success("Thought deleted");
+      }
+    } catch (error) {
+      console.error("Failed to delete thought:", error);
+    }
+  };
+
   const handleMoveItem = async (item: InboxItem, projectId: number) => {
     try {
-      if (item.type === 'task') {
+      if (item.type === "task") {
         await moveTask({
-          taskId: item.id,
+          taskId: item.id as number,
+          projectId,
+        });
+      } else if (item.type === "resource") {
+        await moveResource({
+          resourceId: item.id as number,
           projectId,
         });
       } else {
-        await moveResource({
-          resourceId: item.id,
-          projectId,
-        });
+        // Thoughts cannot be moved to projects (for now)
+        toast.error("Thoughts cannot be moved to projects");
+        return;
       }
       toast.success(`${item.type} moved to project`);
     } catch (error) {
@@ -169,72 +254,139 @@ export function InboxPage() {
     }
   };
 
-  const getDaysAgo = (date: Date) => {
-    const today = new Date();
-    const diffTime = today.getTime() - date.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+  // Group items by date
+  const groupItemsByDate = (items: InboxItem[]): GroupedInboxItems => {
+    const grouped: GroupedInboxItems = {};
+    
+    items.forEach(item => {
+      // Format date as YYYY-MM-DD for consistent grouping, using local timezone
+      const date = new Date(item.createdAt);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateKey = `${year}-${month}-${day}` as DateString;
+      
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push(item);
+    });
+    
+    return grouped;
   };
 
-  // Transform tasks and resources into a common shape and sort by date
+  // Transform tasks, resources, and thoughts into a common shape
   const inboxItems: InboxItem[] = [
-    ...(tasks?.map(task => ({
+    ...(tasks?.map((task) => ({
       id: task.id,
       title: task.title,
-      type: 'task' as const,
-      createdAt: task.createdAt,
+      type: "task" as const,
+      createdAt: new Date(task.createdAt), // Ensure it's a Date object
       complete: task.complete,
     })) || []),
-    ...(resources?.map(resource => ({
+    ...(resources?.map((resource) => ({
       id: resource.id,
       title: resource.title,
-      type: 'resource' as const,
-      createdAt: resource.createdAt,
+      type: "resource" as const,
+      createdAt: new Date(resource.createdAt), // Ensure it's a Date object
       url: resource.url,
+    })) || []),
+    ...(thoughts?.map((thought) => ({
+      id: thought.id,
+      title:
+        thought.content.slice(0, 60) +
+        (thought.content.length > 60 ? "..." : ""),
+      content: thought.content,
+      type: "thought" as const,
+      createdAt: new Date(thought.createdAt), // Ensure it's a Date object
     })) || []),
   ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-  if (tasksError || resourcesError) {
-    return <div>Error: {tasksError?.message || resourcesError?.message}</div>;
+  // Group items by date
+  const groupedItems = groupItemsByDate(inboxItems);
+  
+  // Sort dates in descending order (most recent first)
+  const sortedDates = Object.keys(groupedItems).sort().reverse() as DateString[];
+
+  if (tasksError || resourcesError || thoughtsError) {
+    return (
+      <div>
+        Error:{" "}
+        {tasksError?.message ||
+          resourcesError?.message ||
+          thoughtsError?.message}
+      </div>
+    );
   }
 
   return (
-    <Layout isLoading={isLoadingTasks || isLoadingResources} breadcrumbItems={[{ title: "Inbox" }]}>
+    <Layout
+      isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
+      breadcrumbItems={[
+        {
+          title: "Inbox",
+        },
+      ]}
+      ctaButton={
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={showInbox ? "outline" : "default"}
+              type="submit"
+              onClick={handleToggleTasks}
+              size="icon"
+            >
+              {showInbox ? (
+                <Eye className="h-5 w-5" />
+              ) : (
+                <EyeClosed className="h-5 w-5" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {showInbox ? "Hide inbox" : "Show inbox"}
+          </TooltipContent>
+        </Tooltip>
+      }
+    >
       <div>
-        <div className="flex flex-col gap-2 items-start mb-4">
-          <div className="flex gap-2 items-center">
-            <h1 className="heading-1">Inbox</h1>
-            <Tooltip>
-              <TooltipTrigger>
-                <Toggle
-                  variant="outline"
-                  onClick={handleToggleTasks}
-                >
-                  {showInbox ? (
-                    <Eye className="h-5 w-5" />
-                  ) : (
-                    <EyeClosed className="h-5 w-5" />
-                  )}
-                </Toggle>
-              </TooltipTrigger>
-              <TooltipContent>
-                {showInbox ? "Hide inbox" : "Show inbox"}
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
         <div>
-          <div className="flex gap-4 mb-6">
+          <div className="relative flex gap-4 mb-6">
+            <Button
+              className="absolute top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
+              size="icon"
+              variant="ghost"
+              onClick={handleToggleIsThought}
+            >
+              {isThought ? (
+                <Minus className="h-4 w-4" />
+              ) : (
+                <SquareCheck className="h-4 w-4" />
+              )}
+              <span className="sr-only">
+                {isThought ? "Add a thought" : "Add a task"}
+              </span>
+            </Button>
+
             <Input
               autoFocus={true}
               type="text"
-              placeholder="Add a new task or paste a URL..."
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
+              placeholder={isThought ? "Add a thought..." : "Add a task..."}
+              value={newItemText}
+              onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
+              className="pl-10 flex-1 pr-10"
             />
-            <Button variant="outline" onClick={handleCreateTask}>
-              Add
+
+            <Button
+              disabled={!newItemText.trim()}
+              className="absolute top-0 right-0 rounded-tl-none rounded-bl-none"
+              type="submit"
+              onClick={handleCreateItem}
+              size="icon"
+            >
+              <Send className="h-4 w-4" />
+              <span className="sr-only">Add to inbox</span>
             </Button>
           </div>
 
@@ -242,105 +394,143 @@ export function InboxPage() {
             <div>
               <Table>
                 <TableBody>
-                  {inboxItems.map((item) => (
-                    <TableRow className="grid grid-cols-[auto_1fr_auto] items-center" key={`${item.type}-${item.id}`}>
-                      <TableCell className="w-8">
-                        {item.type === 'task' ? (
-                          <Checkbox
-                            checked={item.complete}
-                            onCheckedChange={() =>
-                              handleToggleTask(item.id, item.complete || false)
-                            }
-                          />
-                        ) : (
-                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </TableCell>
-                      <TableCell className="flex items-center gap-2">
-                        {item.type === 'task' ? (
-                          <span
-                            className={`mr-2 ${
-                              item.complete
-                                ? "line-through text-muted-foreground"
-                                : ""
-                            }`}
+                  {sortedDates.length > 0 ? (
+                    sortedDates.map(dateKey => (
+                      <React.Fragment key={dateKey}>
+                        {/* Date header row */}
+                        <TableRow>
+                          <TableCell
+                            colSpan={3}
+                            className="bg-muted/30 py-1 px-4 text-xs font-semibold text-muted-foreground"
                           >
-                            {item.title}
-                          </span>
-                        ) : (
-                          <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="grid items-center gap-2 hover:underline"
-                            style={{ gridTemplateColumns: item.url ? '16px 1fr' : '1fr' }}
+                            {formatDate(dateKey)}
+                          </TableCell>
+                        </TableRow>
+                        
+                        {/* Items for this date */}
+                        {groupedItems[dateKey].map((item) => (
+                          <TableRow
+                            className="group grid grid-cols-[auto_1fr_auto] items-center"
+                            key={`${item.type}-${item.id}`}
                           >
-                            {item.url ? <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="mt-0.5 w-4 h-4 bg-secondary rounded-sm" /> : null}
-                            <span className="line-clamp-2 text-sm">{item.title}</span>
-                          </a>
-                        )}
-                        <span className="text-xs text-muted-foreground">
-                          {getDaysAgo(item.createdAt)
-                            ? getDaysAgo(item.createdAt) +
-                              " day" +
-                              (getDaysAgo(item.createdAt) > 1 ? "s" : "") +
-                              " ago"
-                            : "today"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button variant="outline" size="icon">
-                                    <MoveRight className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Move {item.type} to a project
-                                </TooltipContent>
-                              </Tooltip>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {projects?.length ? (
-                                projects?.map((project) => (
-                                  <DropdownMenuItem
-                                    key={project.id}
-                                    onClick={() => handleMoveItem(item, project.id)}
-                                  >
-                                    Move to {project.title}
-                                  </DropdownMenuItem>
-                                ))
+                            <TableCell className="w-8">
+                              {item.type === "task" ? (
+                                <Checkbox
+                                  checked={item.complete}
+                                  onCheckedChange={() =>
+                                    handleToggleTask(
+                                      item.id as number,
+                                      item.complete || false
+                                    )
+                                  }
+                                />
+                              ) : item.type === "resource" ? (
+                                <ExternalLink className="h-4 w-4 text-muted-foreground" />
                               ) : (
-                                <DropdownMenuItem className="text-muted-foreground">
-                                  No projects found
-                                </DropdownMenuItem>
+                                <Minus className="h-4 w-4 text-muted-foreground" />
                               )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => 
-                                  item.type === 'task' 
-                                    ? handleDeleteTask(item.id)
-                                    : handleDeleteResource(item.id)
-                                }
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Delete {item.type}</TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {inboxItems.length === 0 && !isLoadingTasks && !isLoadingResources && (
+                            </TableCell>
+                            <TableCell className="flex items-center gap-2">
+                              {item.type === "task" ? (
+                                <span
+                                  className={`mr-2 ${
+                                    item.complete
+                                      ? "line-through text-muted-foreground"
+                                      : ""
+                                  }`}
+                                >
+                                  {item.title}
+                                </span>
+                              ) : item.type === "resource" ? (
+                                <a
+                                  href={item.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="grid items-center gap-2 hover:underline"
+                                  style={{
+                                    gridTemplateColumns: item.url
+                                      ? "16px 1fr"
+                                      : "1fr",
+                                  }}
+                                >
+                                  {item.url ? (
+                                    <img
+                                      src={getFaviconFromUrl(item.url)}
+                                      alt="Favicon"
+                                      className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
+                                    />
+                                  ) : null}
+                                  <span className="line-clamp-2 text-sm">
+                                    {item.title}
+                                  </span>
+                                </a>
+                              ) : (
+                                <div className="flex flex-col">
+                                  <span className="text-sm">{item.content}</span>
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
+                                {item.type !== "thought" && (
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button variant="outline" size="icon">
+                                            <MoveRight className="h-4 w-4" />
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          Move {item.type} to a project
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      {projects?.length ? (
+                                        projects?.map((project) => (
+                                          <DropdownMenuItem
+                                            key={project.id}
+                                            onClick={() =>
+                                              handleMoveItem(item, project.id)
+                                            }
+                                          >
+                                            Move to {project.title}
+                                          </DropdownMenuItem>
+                                        ))
+                                      ) : (
+                                        <DropdownMenuItem className="text-muted-foreground">
+                                          No projects found
+                                        </DropdownMenuItem>
+                                      )}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                )}
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      onClick={() => {
+                                        if (item.type === "task")
+                                          handleDeleteTask(item.id as number);
+                                        else if (item.type === "resource")
+                                          handleDeleteResource(item.id as number);
+                                        else handleDeleteThought(item.id as string);
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Delete {item.type}</TooltipContent>
+                                </Tooltip>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </React.Fragment>
+                    ))
+                  ) : (
                     <TableRow>
                       <TableCell
                         colSpan={3}

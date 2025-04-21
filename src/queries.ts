@@ -1,4 +1,4 @@
-import { Project, Task, Pitch, Resource } from 'wasp/entities'
+import { Project, Task, Pitch, Resource, Thought } from 'wasp/entities'
 import { HttpError } from 'wasp/server'
 import { 
   type GetProjects, 
@@ -22,6 +22,11 @@ import {
   type GetInboxTasks,
   type GetInboxResources,
   type MoveResource,
+  type GetThoughts,
+  type GetThought,
+  type CreateThought,
+  type UpdateThought,
+  type DeleteThought,
 } from 'wasp/server/operations'
 
 // Define our own GetProject type since we need to include related entities
@@ -778,3 +783,119 @@ export const updateProjectTaskOrder = async (args: UpdateProjectTaskOrderPayload
     }
   })
 }
+
+//#region Thoughts
+export const getThoughts: GetThoughts<void, Thought[]> = async (_args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  return context.entities.Thought.findMany({
+    where: { 
+      userId: context.user.id 
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+type GetThoughtInput = {
+  id: string
+}
+
+export const getThought: GetThought<GetThoughtInput, Thought> = async (args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const thought = await context.entities.Thought.findUnique({
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    }
+  })
+  
+  if (!thought) {
+    throw new HttpError(404, "Thought not found")
+  }
+  
+  return thought
+}
+
+type CreateThoughtPayload = {
+  content: string
+}
+
+export const createThought: CreateThought<CreateThoughtPayload, Thought> = async (
+  args,
+  context
+) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  
+  return context.entities.Thought.create({
+    data: {
+      content: args.content,
+      user: { connect: { id: context.user.id } }
+    }
+  })
+}
+
+type UpdateThoughtPayload = {
+  id: string
+  content: string
+}
+
+export const updateThought: UpdateThought<UpdateThoughtPayload, Thought> = async (
+  args,
+  context
+) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  
+  const thought = await context.entities.Thought.findUnique({
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    }
+  })
+  
+  if (!thought) {
+    throw new HttpError(404, "Thought not found")
+  }
+  
+  return context.entities.Thought.update({
+    where: { id: args.id },
+    data: {
+      content: args.content
+    }
+  })
+}
+
+type DeleteThoughtPayload = {
+  id: string
+}
+
+export const deleteThought: DeleteThought<DeleteThoughtPayload, Thought> = async (
+  args,
+  context
+) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  
+  const thought = await context.entities.Thought.findUnique({
+    where: { 
+      id: args.id,
+      userId: context.user.id 
+    }
+  })
+  
+  if (!thought) {
+    throw new HttpError(404, "Thought not found")
+  }
+  
+  return context.entities.Thought.delete({
+    where: { id: args.id }
+  })
+}
+//#endregion

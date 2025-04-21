@@ -41,6 +41,7 @@ interface LayoutProps {
   activeProjectId?: number;
   mainContentClasses?: string;
   menuItems?: MenuItem[];
+  ctaButton?: ReactNode;
 }
 
 export function Layout({
@@ -50,6 +51,7 @@ export function Layout({
   activeProjectId,
   mainContentClasses,
   menuItems = [],
+  ctaButton,
 }: LayoutProps) {
   const isSidebarHidden = JSON.parse(
     localStorage.getItem("isSidebarHidden") || "false"
@@ -109,6 +111,8 @@ export function Layout({
                 ))}
               </BreadcrumbList>
             </Breadcrumb>
+
+            {ctaButton || null}
 
             {menuItems.length > 0 ? (
               <DropdownMenu>
