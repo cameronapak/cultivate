@@ -21,6 +21,7 @@ import {
   Trash,
   Pencil,
   ExternalLink,
+  Link2,
   Plus,
   Trash2,
   Settings2Icon,
@@ -472,7 +473,7 @@ const ResourceItem = ({
   return (
     <TableRow className="grid grid-cols-[auto_1fr_auto] items-center group">
       <TableCell className="w-8">
-        <ExternalLink className="h-4 w-4 text-muted-foreground" />
+        <Link2 className="h-4 w-4 text-muted-foreground" />
       </TableCell>
       <TableCell className="flex justify-between w-full">
         <a
