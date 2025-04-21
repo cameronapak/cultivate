@@ -26,10 +26,9 @@ import {
   Eye,
   EyeClosed,
   Coffee,
-  ExternalLink,
+  // ExternalLink,
   Send,
-  BrainCircuit,
-  Pencil,
+  Link2,
   Minus,
   SquareCheck,
 } from "lucide-react";
@@ -425,7 +424,7 @@ export function InboxPage() {
                                   }
                                 />
                               ) : item.type === "resource" ? (
-                                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                <Link2 className="h-4 w-4 text-muted-foreground" />
                               ) : (
                                 <Minus className="h-4 w-4 text-muted-foreground" />
                               )}
