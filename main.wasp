@@ -286,3 +286,14 @@ action deleteThought {
   entities: [Thought]
 }
 //#endregion
+
+api getUrlMetadata {
+  auth: true,
+  fn: import { getUrlMetadata } from "@src/server/apis/urlMetadata",
+  httpRoute: (GET, "/api/url-metadata"),
+}
+
+apiNamespace urlMetadata {
+  middlewareConfigFn: import { urlMetadataNamespaceMiddlewareFn } from "@src/server/apis/urlMetadata",
+  path: "/api"
+}
