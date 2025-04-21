@@ -66,20 +66,23 @@ type InboxItem = {
 type DateString = `${number}${number}${number}${number}-${number}${number}-${number}${number}`;
 
 // Add this helper function to format dates consistently
-const formatDate = (date: DateString): string => {
+const formatDate = (date: Date | DateString): string => {
+  // Convert to Date object if it's a string
+  const itemDate = typeof date === 'string' 
+    ? new Date(date + 'T00:00:00') // Add time component to ensure consistent timezone handling
+    : new Date(date);
+  
   // Get current time in local timezone and set to midnight
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   
-  // Parse the date string properly by adding the time component
-  // This ensures the date is interpreted in the local timezone
-  const [year, month, day] = date.split('-').map(Number);
-  const itemDate = new Date(year, month - 1, day); // month is 0-based in JS
-  itemDate.setHours(0, 0, 0, 0);
+  // Set item date to midnight in local timezone for comparison
+  const itemDateMidnight = new Date(itemDate);
+  itemDateMidnight.setHours(0, 0, 0, 0);
   
   // Compare dates using their time values
   const nowTime = now.getTime();
-  const itemTime = itemDate.getTime();
+  const itemTime = itemDateMidnight.getTime();
   
   if (nowTime === itemTime) {
     return "Today";
@@ -256,8 +259,13 @@ export function InboxPage() {
     const grouped: GroupedInboxItems = {};
     
     items.forEach(item => {
-      // Format date as YYYY-MM-DD for consistent grouping
-      const dateKey = item.createdAt.toISOString().split('T')[0] as DateString;
+      // Format date as YYYY-MM-DD for consistent grouping, using local timezone
+      const date = new Date(item.createdAt);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateKey = `${year}-${month}-${day}` as DateString;
+      
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
