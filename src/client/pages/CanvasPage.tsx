@@ -8,7 +8,7 @@ import {
   TLUiActionsContextType,
 } from "tldraw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormEvent, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   useQuery,
   useAction,
@@ -41,11 +41,10 @@ import {
   DialogTrigger,
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
-import { Copy, Pencil } from "lucide-react";
-import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { debounce } from "../../lib/utils";
 
 /** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
@@ -124,6 +123,22 @@ export function CanvasPage() {
   const createNewCanvas = useAction(createCanvas);
   const saveCanvasToDb = useAction(saveCanvas);
 
+  const debouncedSave = useCallback(
+    debounce(async (_update) => {
+      if (!canvasId) {
+        return;
+      }
+
+      await saveCanvasToDb({
+        id: canvasId,
+        snapshot: getSnapshot(store),
+      });
+
+      console.log("Saving canvas")
+    }, 1000),
+    [canvasId]
+  );
+
   // Add keyboard shortcut overrides
   const overrides: TLUiOverrides = useMemo(
     () => ({
@@ -153,7 +168,12 @@ export function CanvasPage() {
           },
         };
 
-        return actions;
+        // https://tldraw.dev/docs/persistence#Listening-for-changes
+        editor.store.listen(
+          debouncedSave,
+          { scope: 'document', source: 'user' }
+        )
+
       },
     }),
     []
