@@ -156,11 +156,7 @@ export function CanvasPage() {
               if (canvasId === "new" || !canvasId) {
                 setIsNameDialogOpen(true);
               } else {
-                await saveCanvasToDb({
-                  id: canvasId,
-                  snapshot: getSnapshot(store),
-                });
-                toast.success("Saved");
+                toast.success("Saves automatically :)");
               }
             } catch (error: any) {
               toast.error(error?.message || "Error saving canvas");
