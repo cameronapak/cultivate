@@ -114,7 +114,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
         <Card className="w-full">
           <CardHeader>
             <CardDescription className="flex flex-col gap-4">
-              <p className="text-xs text-muted-foreground">Thanks for being an early tester of Cultivate, an indie project created by <a href="https://cameronpak.com" target="_blank" className="hover:underline">Cam</a>. Your feedback is invaluable to me.</p>
+              <p className="text-xs text-muted-foreground">Thanks for being an early tester of Cultivate, an indie project created by <a href="https://cameronpak.com" target="_blank" className="hover:underline">Cam</a>. Honestly, things will be buggy. Your feedback is invaluable to me.</p>
               <a className="flex flex-row items-center gap-1 text-xs text-muted-foreground hover:text-primary hover:underline p-0 m-0" href="mailto:cam@cultivatepkm.com?subject=Cultivate%20Feedback" target="_blank">
                 <Mail className="w-3 h-3" />
                 Send Feedback
