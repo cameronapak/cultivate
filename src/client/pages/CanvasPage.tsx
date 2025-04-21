@@ -174,6 +174,7 @@ export function CanvasPage() {
           { scope: 'document', source: 'user' }
         )
 
+        return actions;
       },
     }),
     []
