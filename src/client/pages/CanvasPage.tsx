@@ -135,7 +135,7 @@ export function CanvasPage() {
       });
 
       console.log("Saving canvas")
-    }, 1000),
+    }, 3000),
     [canvasId]
   );
 
