@@ -11,8 +11,8 @@ export const urlMetadataNamespaceMiddlewareFn: MiddlewareConfigFn = (config) => 
 
 // https://wasp.sh/docs/advanced/apis#defining-the-apis-nodejs-implementation
 export const getUrlMetadata: GetUrlMetadata<{ url: string }> = async (req: Request, res: Response, _context: any) => {
+  const url = decodeURIComponent(req.query.url as string);
   try {
-    const url = decodeURIComponent(req.query.url as string);
     const metadata = await urlMetadata(url);
     const result = {
       title: metadata.title || '',
@@ -25,6 +25,13 @@ export const getUrlMetadata: GetUrlMetadata<{ url: string }> = async (req: Reque
     res.json(result);
   } catch (error) {
     console.error('Error fetching URL metadata:', error);
-    throw new HttpError(400, 'Failed to fetch URL metadata');
+    res.json({
+      title: url,
+      description: '',
+      image: '',
+      favicon: '',
+      siteName: '',
+      url: url,
+    });
   }
 }; 
