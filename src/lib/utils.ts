@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { api } from "wasp/client/api";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -23,15 +24,15 @@ export async function getMetadataFromUrl(url: string): Promise<{
   title: string;
   description: string;
   image: string;
+  favicon: string;
+  siteName: string;
+  url: string;
 }> {
-  const response = await fetch(`https://api.dub.co/metatags?url=${url}`);
-  const data = await response.json();
-  
-  return {
-    title: data.title,
-    description: data.description,
-    image: data.image,
-  };
+  const response = await api.get(`/api/url-metadata?url=${encodeURIComponent(url)}`);
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch URL metadata');
+  }
+  return response.data;
 }
 
 // Custom throttle function implementation
