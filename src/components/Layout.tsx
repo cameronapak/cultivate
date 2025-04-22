@@ -93,7 +93,7 @@ export function Layout({
         <AppSidebar items={sidebarItems} />
         <SidebarInset>
           {import.meta.env.DEV && (
-            <div className="pointer-events-none absolute px-12 py-1 -right-12 bottom-4 bg-muted text-muted-foreground rotate-[-38deg] text-base font-medium">
+            <div className="pointer-events-none fixed px-12 py-1 -right-12 bottom-4 bg-muted text-muted-foreground rotate-[-38deg] text-base font-medium">
               STAGING
             </div>
           )}
