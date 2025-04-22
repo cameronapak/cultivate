@@ -613,6 +613,10 @@ export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
     throw new HttpError(401)
   }
 
+  if (args.id === "new") {
+    throw new HttpError(400, "Canvas ID is required");
+  }
+
   try {
     await context.entities.Canvas.upsert({
       where: { id: args.id },
