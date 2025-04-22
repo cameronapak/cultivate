@@ -121,22 +121,31 @@ export function CanvasPage() {
   };
 
   const createNewCanvas = useAction(createCanvas);
-  const saveCanvasToDb = useAction(saveCanvas);
 
+  console.count("re-render")
+
+  // Create a stable reference to the save function
+  const saveCanvasStable = useCallback(
+    (id: string, snapshot: any) => {
+      saveCanvas({
+        id,
+        snapshot,
+      }).catch((error) => {
+        toast.error("Error saving canvas: " + error?.message || "Unknown error");
+      });
+    },
+    [saveCanvas]  // This dependency is fine since it's memoized
+  );
+
+  // Create a stable debounced function
   const debouncedSave = useCallback(
     debounce(async (_update) => {
       if (!canvasId) {
         return;
       }
-
-      await saveCanvasToDb({
-        id: canvasId,
-        snapshot: getSnapshot(store),
-      });
-
-      console.log("Saving canvas")
+      saveCanvasStable(canvasId, getSnapshot(store));
     }, 3000),
-    [canvasId]
+    [canvasId, saveCanvasStable]  // These dependencies are now stable
   );
 
   // Add keyboard shortcut overrides
