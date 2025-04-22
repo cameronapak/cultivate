@@ -16,6 +16,7 @@ import { ThemeProvider } from "./custom/ThemeProvider";
 import { EllipsisVertical, Folder } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { useQuery } from "wasp/client/operations";
+import { Link } from "wasp/client/router";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -36,7 +37,7 @@ interface LayoutProps {
   isLoading?: boolean;
   breadcrumbItems?: {
     title: string;
-    url?: string;
+    url: any;
   }[];
   activeProjectId?: number;
   mainContentClasses?: string;
@@ -100,7 +101,7 @@ export function Layout({
                     {index > 0 && <BreadcrumbSeparator />}
                     <BreadcrumbItem>
                       {item.url ? (
-                        <a href={item.url}>{item.title}</a>
+                        <Link to={item.url}>{item.title}</Link>
                       ) : (
                         <BreadcrumbPage className="ellipsis">
                           {item.title}
