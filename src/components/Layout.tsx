@@ -4,6 +4,7 @@ import { AppSidebar, type SidebarItem } from "./custom/AppSidebar";
 import { CommandMenu } from "./custom/CommandMenu";
 import { Separator } from "./ui/separator";
 import { Toaster } from "sonner";
+import { env } from "wasp/client";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -91,6 +92,11 @@ export function Layout({
         <Toaster />
         <AppSidebar items={sidebarItems} />
         <SidebarInset>
+          {import.meta.env.DEV && (
+            <div className="pointer-events-none absolute px-12 py-1 -right-12 bottom-4 bg-muted text-muted-foreground rotate-[-38deg] text-base font-medium">
+              STAGING
+            </div>
+          )}
           <header className="relative flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
