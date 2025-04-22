@@ -30,7 +30,7 @@ import {
   TooltipTrigger,
 } from "../components/ui/tooltip";
 import { Skeleton } from "../components/ui/skeleton";
-
+import { useUnsavedChanges } from "../client/hooks/useUnsavedChanges";
 function DeleteDocumentWithAlertDialog({
   id,
   children,
@@ -166,18 +166,7 @@ export function DocumentPage() {
     setTitle(document?.title || "");
   }, [document]);
 
-  // Add beforeunload handler
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
+  useUnsavedChanges(hasUnsavedChanges);
 
   // Update hasUnsavedChanges when content or title changes
   useEffect(() => {
