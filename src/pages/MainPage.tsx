@@ -983,13 +983,6 @@ const ProjectCard = ({
             <CardDescription>{project.description}</CardDescription>
           )}
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-2 text-sm text-muted-foreground">
-            <span>{project.tasks?.length || 0} tasks</span>
-            <span>•</span>
-            <span>{project.resources?.length || 0} resources</span>
-          </div>
-        </CardContent>
       </Card>
     </Link>
   );
