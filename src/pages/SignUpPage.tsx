@@ -1,5 +1,6 @@
 import { signup } from "wasp/client/auth";
 import type { HttpError } from "wasp/server";
+import "https://platform.twitter.com/widgets.js";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "wasp/client/router";
@@ -10,15 +11,16 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+// import { Button } from "../components/ui/button";
+// import { Input } from "../components/ui/input";
+// import { Label } from "../components/ui/label";
 import { cn } from "../lib/utils";
 import Logo from "../components/custom/Logo";
-import { Badge } from "../components/ui/badge";
+// import { Badge } from "../components/ui/badge";
 import { toast } from "sonner";
 import { Toaster } from "../components/ui/sonner";
 import { Footer } from "../components/custom/Footer";
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 
 export function SignUpPage({
   className,
@@ -82,7 +84,7 @@ export function SignUpPage({
                   Or continue with
                 </span>
               </div> */}
-              <div className="grid gap-6">
+              {/* <div className="grid gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="Username">Username</Label>
                   <Input
@@ -98,12 +100,12 @@ export function SignUpPage({
                 <div className="grid gap-2">
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
-                    {/* <a
+                    {/ * <a
                       href="#"
                       className="ml-auto text-sm underline-offset-4 hover:underline"
                     >
                       Forgot your password?
-                    </a> */}
+                    </a> * /}
                   </div>
                   <Input
                     id="password"
@@ -128,7 +130,29 @@ export function SignUpPage({
                   Privacy Policy
                 </a>
                 .
-              </div>
+              </div> */}
+              <Alert variant="default" className="bg-secondary">
+                <AlertTitle>Cultivate is cookin' 👨‍🍳</AlertTitle>
+                <AlertDescription className="w-full">
+                  We're not yet ready for prime time. Until then, here's a sneak peek. 
+                  <blockquote
+                    className="twitter-tweet aspect-video"
+                    data-media-max-width="560"
+                  >
+                    <p lang="es" dir="ltr">
+                      Introducing Cultivate{" "}
+                      <a href="https://t.co/jF3k4GfMBI">
+                        pic.twitter.com/jF3k4GfMBI
+                      </a>
+                    </p>
+                    &mdash; Cam Pak 🐟 (@CameronPak){" "}
+                    <a href="https://twitter.com/CameronPak/status/1913477359547584700?ref_src=twsrc%5Etfw">
+                      April 19, 2025
+                    </a>
+                  </blockquote>{" "}
+                  <p className="text-muted-foreground">Cultivate is open-source and self-hostable. The cloud-hosted version will have a affordable subscription.</p>
+                </AlertDescription>
+              </Alert>
               <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Link to="/login" className="underline underline-offset-4">
