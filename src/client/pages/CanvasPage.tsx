@@ -168,7 +168,6 @@ export function CanvasPage() {
         return;
       }
 
-      console.log(_update);
       saveCanvasStable(canvasId, getSnapshot(store));
     }, 3000),
     [canvasId, saveCanvasStable] // These dependencies are now stable
@@ -191,7 +190,11 @@ export function CanvasPage() {
               if (canvasId === "new" || !canvasId) {
                 setIsNameDialogOpen(true);
               } else {
-                toast.success("Saves automatically :)");
+                debouncedSave({
+                  id: canvasId,
+                  snapshot: editor.getSnapshot(),
+                });
+                toast.success("Saved! And, don't worry, it saves automatically :)");
               }
             } catch (error: any) {
               toast.error(error?.message || "Error saving canvas");
