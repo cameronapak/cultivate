@@ -22,6 +22,11 @@ export function Footer() {
             GitHub
           </a>
         </Button>
+        <Button asChild variant="link" size="sm" className="text-muted-foreground font-normal">
+          <a target="_blank" href="mailto:cam@cultivatepkm.com">
+            Contact
+          </a>
+        </Button>
       </div>
     </footer>
   );
