@@ -46,7 +46,6 @@ import {
   DialogFooter,
   DialogDescription,
   DialogClose,
-  DialogTrigger,
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -92,7 +91,7 @@ export function CanvasPage() {
   >({
     status: "loading",
   });
-  const hasChanges = useRef(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const {
     data: canvas,
@@ -164,11 +163,11 @@ export function CanvasPage() {
           );
         })
         .finally(() => {
-          hasChanges.current = false;
+          setHasChanges(false);
           toast.success("Saved canvas!");
         });
     },
-    [saveCanvasToDb] // This dependency is fine since it's memoized
+    [saveCanvasToDb]
   );
 
   // Add keyboard shortcut overrides
@@ -196,17 +195,30 @@ export function CanvasPage() {
           },
         };
 
-        // https://tldraw.dev/docs/persistence#Listening-for-changes
-        editor.store.listen((_update) => { hasChanges.current = true }, {
-          scope: "document",
-          source: "user",
-        });
-
         return actions;
       },
     }),
-    []
+    [canvasId, saveCanvasStable]
   );
+
+  // Set up store listener in useEffect
+  useEffect(() => {
+    if (!store) return;
+
+    const unsubscribe = store.listen(
+      (_update) => {
+        setHasChanges(true);
+      },
+      {
+        scope: "document",
+        source: "user",
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [store]);
 
   useLayoutEffect(() => {
     if (isLoadingCanvas) {
