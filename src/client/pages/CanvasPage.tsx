@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
   useCallback,
+  useEffect,
 } from "react";
 import {
   useQuery,
@@ -92,10 +93,17 @@ export function CanvasPage() {
     status: "loading",
   });
 
-  const { data: canvas, isLoading: isLoadingCanvas } = useQuery(
+  const { data: canvas, isLoading: isLoadingCanvas, refetch } = useQuery(
     loadCanvas,
     {
       id: canvasId || "",
+    },
+    // [1] I have disabled this so that it can be fetched once per page load
+    // versus once per change. For example, when I save the canvas, it will
+    // refetch the canvas data from the database and cause a re-render and
+    // sometimes stale data appears on the screen.
+    {
+      enabled: false,
     }
   );
 
@@ -130,14 +138,18 @@ export function CanvasPage() {
     }
   };
 
-  const createNewCanvas = useAction(createCanvas);
+  // See [1]
+  useEffect(() => {
+    refetch?.();
+  }, [refetch]);
 
-  console.count("re-render");
+  const createNewCanvas = useAction(createCanvas);
+  const saveCanvasToDb = useAction(saveCanvas);
 
   // Create a stable reference to the save function
   const saveCanvasStable = useCallback(
     (id: string, snapshot: any) => {
-      saveCanvas({
+      saveCanvasToDb({
         id,
         snapshot,
       }).catch((error) => {
@@ -146,7 +158,7 @@ export function CanvasPage() {
         );
       });
     },
-    [saveCanvas] // This dependency is fine since it's memoized
+    [saveCanvasToDb] // This dependency is fine since it's memoized
   );
 
   // Create a stable debounced function
@@ -155,6 +167,8 @@ export function CanvasPage() {
       if (!canvasId) {
         return;
       }
+
+      console.log(_update);
       saveCanvasStable(canvasId, getSnapshot(store));
     }, 3000),
     [canvasId, saveCanvasStable] // These dependencies are now stable
@@ -289,6 +303,7 @@ export function CanvasPage() {
 
       <div className="tldraw__editor h-full">
         <Tldraw
+          key={canvasId}
           className="h-full"
           components={components}
           inferDarkMode={Boolean(theme === "system" || theme === "dark")}
@@ -299,6 +314,8 @@ export function CanvasPage() {
             maxFilesAtOnce: 0,
             enableToolbarKeyboardShortcuts: false,
           }}
+          // @ts-ignore - Not sure why this is throwing an error. (see: https://tldraw.dev/docs/persistence)
+          persistenceKey={canvasId}
         />
       </div>
     </Layout>
