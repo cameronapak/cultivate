@@ -317,8 +317,6 @@ export function CanvasPage() {
             maxFilesAtOnce: 0,
             enableToolbarKeyboardShortcuts: false,
           }}
-          // @ts-ignore - Not sure why this is throwing an error. (see: https://tldraw.dev/docs/persistence)
-          persistenceKey={canvasId}
         />
       </div>
     </Layout>
