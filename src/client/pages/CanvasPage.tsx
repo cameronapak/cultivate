@@ -52,6 +52,7 @@ import { Input } from "../../components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { SaveIcon } from "lucide-react";
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 
 /** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
@@ -92,6 +93,9 @@ export function CanvasPage() {
     status: "loading",
   });
   const [hasChanges, setHasChanges] = useState(false);
+
+  // Add route guard for unsaved changes
+  useUnsavedChanges(hasChanges);
 
   const {
     data: canvas,
