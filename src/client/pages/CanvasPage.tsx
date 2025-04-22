@@ -52,7 +52,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { debounce } from "../../lib/utils";
+import { SaveIcon } from "lucide-react";
 
 /** src: https://tldraw.dev/examples/ui/ui-components-hidden */
 const components: Partial<TLUiComponents> = {
@@ -92,8 +92,13 @@ export function CanvasPage() {
   >({
     status: "loading",
   });
+  const hasChanges = useRef(false);
 
-  const { data: canvas, isLoading: isLoadingCanvas, refetch } = useQuery(
+  const {
+    data: canvas,
+    isLoading: isLoadingCanvas,
+    refetch,
+  } = useQuery(
     loadCanvas,
     {
       id: canvasId || "",
@@ -152,25 +157,18 @@ export function CanvasPage() {
       saveCanvasToDb({
         id,
         snapshot,
-      }).catch((error) => {
-        toast.error(
-          "Error saving canvas: " + error?.message || "Unknown error"
-        );
-      });
+      })
+        .catch((error) => {
+          toast.error(
+            "Error saving canvas: " + error?.message || "Unknown error"
+          );
+        })
+        .finally(() => {
+          hasChanges.current = false;
+          toast.success("Saved canvas!");
+        });
     },
     [saveCanvasToDb] // This dependency is fine since it's memoized
-  );
-
-  // Create a stable debounced function
-  const debouncedSave = useCallback(
-    debounce(async (_update) => {
-      if (!canvasId) {
-        return;
-      }
-
-      saveCanvasStable(canvasId, getSnapshot(store));
-    }, 3000),
-    [canvasId, saveCanvasStable] // These dependencies are now stable
   );
 
   // Add keyboard shortcut overrides
@@ -190,11 +188,7 @@ export function CanvasPage() {
               if (canvasId === "new" || !canvasId) {
                 setIsNameDialogOpen(true);
               } else {
-                debouncedSave({
-                  id: canvasId,
-                  snapshot: editor.getSnapshot(),
-                });
-                toast.success("Saved! And, don't worry, it saves automatically :)");
+                saveCanvasStable(canvasId, editor.getSnapshot());
               }
             } catch (error: any) {
               toast.error(error?.message || "Error saving canvas");
@@ -203,7 +197,7 @@ export function CanvasPage() {
         };
 
         // https://tldraw.dev/docs/persistence#Listening-for-changes
-        editor.store.listen(debouncedSave, {
+        editor.store.listen((_update) => { hasChanges.current = true }, {
           scope: "document",
           source: "user",
         });
@@ -245,7 +239,7 @@ export function CanvasPage() {
 
   return (
     <Layout
-      isLoading={loadingState.status === "loading"}
+      isLoading={loadingState.status === "loading" || !canvasId}
       mainContentClasses="w-full max-w-full !p-0 h-full"
       breadcrumbItems={[
         {
@@ -256,6 +250,21 @@ export function CanvasPage() {
           title: canvasId ? canvas?.title || "Untitled Canvas" : "New",
         },
       ]}
+      ctaButton={
+        <Button
+          disabled={!hasChanges}
+          variant="default"
+          onClick={() => {
+            if (!canvasId) {
+              return;
+            }
+            saveCanvasStable(canvasId, getSnapshot(store));
+          }}
+        >
+          <SaveIcon className="w-4 h-4" />
+          Save
+        </Button>
+      }
     >
       <Dialog open={isNameDialogOpen} onOpenChange={setIsNameDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -306,7 +315,6 @@ export function CanvasPage() {
 
       <div className="tldraw__editor h-full">
         <Tldraw
-          key={canvasId}
           className="h-full"
           components={components}
           inferDarkMode={Boolean(theme === "system" || theme === "dark")}
