@@ -8,7 +8,14 @@ import {
   TLUiActionsContextType,
 } from "tldraw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormEvent, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
+import {
+  FormEvent,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import {
   useQuery,
   useAction,
@@ -85,9 +92,12 @@ export function CanvasPage() {
     status: "loading",
   });
 
-  const { data: canvas, isLoading: isLoadingCanvas } = useQuery(loadCanvas, {
-    id: canvasId || "",
-  });
+  const { data: canvas, isLoading: isLoadingCanvas } = useQuery(
+    loadCanvas,
+    {
+      id: canvasId || "",
+    }
+  );
 
   const formRef = useRef<HTMLFormElement>(null);
   const formSchema = z.object({
@@ -108,7 +118,7 @@ export function CanvasPage() {
     try {
       const { id } = await createNewCanvas({
         title: form.getValues("title"),
-        description: form.getValues("description") || '',
+        description: form.getValues("description") || "",
         snapshot: getSnapshot(store),
       });
       navigate(`/canvas/${id}`, { replace: true });
@@ -122,7 +132,7 @@ export function CanvasPage() {
 
   const createNewCanvas = useAction(createCanvas);
 
-  console.count("re-render")
+  console.count("re-render");
 
   // Create a stable reference to the save function
   const saveCanvasStable = useCallback(
@@ -131,10 +141,12 @@ export function CanvasPage() {
         id,
         snapshot,
       }).catch((error) => {
-        toast.error("Error saving canvas: " + error?.message || "Unknown error");
+        toast.error(
+          "Error saving canvas: " + error?.message || "Unknown error"
+        );
       });
     },
-    [saveCanvas]  // This dependency is fine since it's memoized
+    [saveCanvas] // This dependency is fine since it's memoized
   );
 
   // Create a stable debounced function
@@ -145,7 +157,7 @@ export function CanvasPage() {
       }
       saveCanvasStable(canvasId, getSnapshot(store));
     }, 3000),
-    [canvasId, saveCanvasStable]  // These dependencies are now stable
+    [canvasId, saveCanvasStable] // These dependencies are now stable
   );
 
   // Add keyboard shortcut overrides
@@ -174,10 +186,10 @@ export function CanvasPage() {
         };
 
         // https://tldraw.dev/docs/persistence#Listening-for-changes
-        editor.store.listen(
-          debouncedSave,
-          { scope: 'document', source: 'user' }
-        )
+        editor.store.listen(debouncedSave, {
+          scope: "document",
+          source: "user",
+        });
 
         return actions;
       },
