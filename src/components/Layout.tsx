@@ -38,7 +38,7 @@ interface LayoutProps {
   isLoading?: boolean;
   breadcrumbItems?: {
     title: string;
-    url: any;
+    url?: any;
   }[];
   activeProjectId?: number;
   mainContentClasses?: string;
