@@ -20,6 +20,7 @@ import {
   PanelLeftOpen,
   BookOpen,
   InboxIcon,
+  PencilRuler,
 } from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
 import { useSidebar } from "../ui/sidebar";
@@ -119,6 +120,12 @@ export function CommandMenu() {
               Open "{project.title}"
             </CommandItem>
           ))}
+        </CommandGroup>
+        <CommandGroup heading="Canvas">
+          <CommandItem>
+            <PencilRuler className="mr-2 h-4 w-4" />
+            Open Canvas
+          </CommandItem>
         </CommandGroup>
       </CommandList>
     </CommandDialog>
