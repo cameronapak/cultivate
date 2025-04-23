@@ -35,6 +35,7 @@ import {
   List,
   Dot,
   Square,
+  ExternalLink,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
@@ -302,9 +303,12 @@ export function InboxPage() {
     setEditingTaskId(null);
   };
 
-  const handleThoughtContentChange = async (thoughtId: string, newContent: string) => {
+  const handleThoughtContentChange = async (
+    thoughtId: string,
+    newContent: string
+  ) => {
     // Find the original thought content
-    const originalThought = thoughts?.find(t => t.id === thoughtId);
+    const originalThought = thoughts?.find((t) => t.id === thoughtId);
     if (!originalThought || originalThought.content === newContent) {
       setEditingThoughtId(null);
       return;
@@ -663,11 +667,8 @@ export function InboxPage() {
                                       />
                                     )
                                   ) : item.type === "resource" ? (
-                                    <a
-                                      href={item.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="grid items-center gap-2 hover:underline"
+                                    <div
+                                      className="grid items-center gap-2"
                                       style={{
                                         gridTemplateColumns: item.url
                                           ? "16px 1fr"
@@ -684,7 +685,7 @@ export function InboxPage() {
                                       <span className="line-clamp-2 text-sm">
                                         {item.title}
                                       </span>
-                                    </a>
+                                    </div>
                                   ) : (
                                     <>
                                       {editingThoughtId === item.id ? (
@@ -728,6 +729,29 @@ export function InboxPage() {
                                 </TableCell>
                                 <TableCell className="text-right">
                                   <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
+                                    {/* If item is a resource then show a button to open the resource in a new tab */}
+                                    {item.type === "resource" && (
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <a
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                          >
+                                            <Button
+                                              variant="outline"
+                                              size="icon"
+                                            >
+                                              <ExternalLink className="h-4 w-4" />
+                                            </Button>
+                                          </a>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          Open in new tab
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    )}
+
                                     {item.type !== "thought" && (
                                       <DropdownMenu>
                                         <DropdownMenuTrigger>
@@ -768,6 +792,7 @@ export function InboxPage() {
                                         </DropdownMenuContent>
                                       </DropdownMenu>
                                     )}
+
                                     <Tooltip>
                                       <TooltipTrigger asChild>
                                         <Button
