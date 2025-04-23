@@ -319,7 +319,7 @@ export function InboxPage() {
   };
 
   const handleThoughtContentKeyDown = async (
-    e: React.KeyboardEvent<HTMLTextAreaElement>,
+    e: React.KeyboardEvent<HTMLInputElement>,
     thoughtId: string
   ) => {
     if (e.key === "Enter") {
