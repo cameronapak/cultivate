@@ -32,6 +32,7 @@ import {
   Minus,
   List,
   Dot,
+  Square,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
@@ -444,7 +445,7 @@ export function InboxPage() {
                   aria-controls="tasks-tab"
                   id="tasks-tab"
                 >
-                  <Dot className="h-4 w-4" aria-hidden="true" />
+                  <Square className="h-4 w-4" aria-hidden="true" />
                   <span>Tasks</span>
                   <span className="sr-only">{getItemCount('task')} tasks</span>
                 </Button>
@@ -522,16 +523,15 @@ export function InboxPage() {
                               >
                                 <TableCell className="w-8">
                                   {item.type === "task" ? (
-                                    // <Checkbox
-                                    //   checked={item.complete}
-                                    //   onCheckedChange={() =>
-                                    //     handleToggleTask(
-                                    //       item.id as number,
-                                    //       item.complete || false
-                                    //     )
-                                    //   }
-                                    // />
-                                    <Dot className="h-4 w-4 text-muted-foreground" />
+                                    <Checkbox
+                                      checked={item.complete}
+                                      onCheckedChange={() =>
+                                        handleToggleTask(
+                                          item.id as number,
+                                          item.complete || false
+                                        )
+                                      }
+                                    />
                                   ) : item.type === "resource" ? (
                                     <Link2 className="h-4 w-4 text-muted-foreground" />
                                   ) : (
@@ -540,15 +540,20 @@ export function InboxPage() {
                                 </TableCell>
                                 <TableCell className="flex items-center gap-2">
                                   {item.type === "task" ? (
-                                    <span
-                                      className={`mr-2 ${
-                                        item.complete
-                                          ? "line-through text-muted-foreground"
-                                          : ""
-                                      }`}
-                                    >
-                                      {item.title}
-                                    </span>
+                                    // <span
+                                    //   className={`mr-2 ${
+                                    //     item.complete
+                                    //       ? "line-through text-muted-foreground"
+                                    //       : ""
+                                    //   }`}
+                                    // >
+                                    //   {item.title}
+                                    // </span>
+                                    <input 
+                                      type="text" 
+                                      value={item.title} 
+                                      className="w-full bg-transparent text-sm outline-none"
+                                    />
                                   ) : item.type === "resource" ? (
                                     <a
                                       href={item.url}
