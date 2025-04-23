@@ -170,7 +170,10 @@ export function DocumentPage() {
 
   // Update hasUnsavedChanges when content or title changes
   useEffect(() => {
-    if (isEditing && (content !== document?.content || title !== document?.title)) {
+    if (
+      isEditing &&
+      (content !== document?.content || title !== document?.title)
+    ) {
       setHasUnsavedChanges(true);
     } else {
       setHasUnsavedChanges(false);
@@ -185,7 +188,7 @@ export function DocumentPage() {
     if (!document) {
       return;
     }
-    
+
     try {
       await updateDocument({
         id: document.id,
@@ -205,7 +208,7 @@ export function DocumentPage() {
     if (!document) {
       return;
     }
-    
+
     const shareUrl = `${window.location.origin}/shared/${document.id}`;
     navigator.clipboard.writeText(shareUrl);
     toast.success("Share link copied to clipboard");
@@ -218,6 +221,90 @@ export function DocumentPage() {
         { title: "Docs", url: "/documents" },
         { title: document?.title || "Loading..." },
       ]}
+      ctaButton={
+        <div className="flex gap-2">
+          {isEditing ? (
+            <Button size="default" onClick={handleSave}>
+              <Save className="w-4 h-4" />
+              Save
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2">
+              {document?.isPublished && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={handleShareClick}
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Share document</TooltipContent>
+                </Tooltip>
+              )}
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => setIsEditing(true)}
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+
+              {document ? (
+                document.isPublished ? (
+                  <PublishDocumentWithAlertDialog
+                    id={document.id}
+                    title={document.title}
+                    content={document.content}
+                    isPublished={document.isPublished}
+                  >
+                    <Button
+                      className="hover:text-destructive"
+                      size="icon"
+                      variant="outline"
+                    >
+                      <BadgeX className="w-4 h-4" />
+                    </Button>
+                  </PublishDocumentWithAlertDialog>
+                ) : (
+                  <PublishDocumentWithAlertDialog
+                    id={document.id}
+                    title={document.title}
+                    content={document.content}
+                    isPublished={document.isPublished}
+                  >
+                    <Button size="icon" variant="outline">
+                      <BadgeCheck className="w-4 h-4" />
+                    </Button>
+                  </PublishDocumentWithAlertDialog>
+                )
+              ) : null}
+
+              {document ? (
+                <DeleteDocumentWithAlertDialog id={document.id}>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="hover:text-destructive"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </DeleteDocumentWithAlertDialog>
+              ) : null}
+            </div>
+          )}
+        </div>
+      }
+      // menuItems={[
+      //   {
+      //     title: "Publish",
+      //     icon: <Share2 className="w-4 h-4" />,
+      //     action: publish,
+      //   },
+
+      // ]}
     >
       <div>
         <div className="flex justify-between items-center mb-4">
@@ -256,78 +343,6 @@ export function DocumentPage() {
               )}
             </>
           )}
-          <div className="flex gap-2">
-            {isEditing ? (
-              <Button size="default" onClick={handleSave}>
-                <Save className="w-4 h-4" />
-                Save
-              </Button>
-            ) : (
-              <div className="flex items-center gap-2">
-                {document?.isPublished && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={handleShareClick}
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Share document</TooltipContent>
-                  </Tooltip>
-                )}
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => setIsEditing(true)}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-                {document ? (
-                  <DeleteDocumentWithAlertDialog id={document.id}>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </DeleteDocumentWithAlertDialog>
-                ) : null}
-                {document ? (
-                  document.isPublished ? (
-                    <PublishDocumentWithAlertDialog
-                      id={document.id}
-                      title={document.title}
-                      content={document.content}
-                      isPublished={document.isPublished}
-                    >
-                      <Button
-                        className="hover:text-destructive"
-                        size="icon"
-                        variant="outline"
-                      >
-                        <BadgeX className="w-4 h-4" />
-                      </Button>
-                    </PublishDocumentWithAlertDialog>
-                  ) : (
-                    <PublishDocumentWithAlertDialog
-                      id={document.id}
-                      title={document.title}
-                      content={document.content}
-                      isPublished={document.isPublished}
-                    >
-                      <Button size="icon" variant="outline">
-                        <BadgeCheck className="w-4 h-4" />
-                      </Button>
-                    </PublishDocumentWithAlertDialog>
-                  )
-                ) : null}
-              </div>
-            )}
-          </div>
         </div>
         <div className="mt-4">
           <BlockNoteEditor
