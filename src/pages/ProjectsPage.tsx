@@ -133,9 +133,9 @@ export const ProjectsPage = () => {
       ctaButton={
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Create
+            <Button variant="outline" size="icon">
+              <Plus className="w-4 h-4" />
+              <span className="sr-only">New Project</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80">
