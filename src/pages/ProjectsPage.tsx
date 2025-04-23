@@ -168,7 +168,7 @@ export const ProjectsPage = () => {
               </TableHeader>
               <TableBody>
                 {projects.map((project: Project) => (
-                  <TableRow className="w-full" key={project.id}>
+                  <TableRow className="group w-full" key={project.id}>
                     <TableCell 
                       className="w-full flex flex-col items-start cursor-pointer"
                       onClick={() => navigate(`/projects/${project.id}`)}
@@ -186,6 +186,7 @@ export const ProjectsPage = () => {
                         onClick={() => handlePinToggle(project)}
                         variant="ghost"
                         size="icon"
+                        className="group-hover:opacity-100 opacity-0 transition-opacity duration-150"
                       >
                         {project.pinned ? (
                           <PinOff className="w-4 h-4" />
