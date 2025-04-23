@@ -82,7 +82,7 @@ export function CanvasesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
+              <TableHead>Title</TableHead>
               <TableHead>Created</TableHead>
               <TableHead className="w-[100px]"></TableHead>
             </TableRow>
