@@ -15,6 +15,7 @@ import {
   moveResource,
   createThought,
   deleteThought,
+  updateTask,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
@@ -139,6 +140,8 @@ export function InboxPage() {
     return showTasksLocalStorage;
   });
   const [filter, setFilter] = useState<InboxFilter>('all');
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+  const [editingTaskTitle, setEditingTaskTitle] = useState<string>("");
 
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
@@ -258,6 +261,36 @@ export function InboxPage() {
       console.error(`Failed to move ${item.type}:`, error);
       toast.error(`Failed to move ${item.type}`);
     }
+  };
+
+  const handleTaskTitleChange = async (taskId: number, newTitle: string) => {
+    try {
+      await updateTask({
+        id: taskId,
+        title: newTitle,
+      });
+      toast.success("Task updated");
+    } catch (error) {
+      console.error("Failed to update task:", error);
+      toast.error("Failed to update task");
+    }
+  };
+
+  const handleTaskTitleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>, taskId: number) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      await handleTaskTitleChange(taskId, editingTaskTitle);
+      setEditingTaskId(null);
+    } else if (e.key === "Escape") {
+      setEditingTaskId(null);
+    }
+  };
+
+  const handleTaskTitleBlur = async (taskId: number) => {
+    if (editingTaskTitle.trim()) {
+      await handleTaskTitleChange(taskId, editingTaskTitle);
+    }
+    setEditingTaskId(null);
   };
 
   // Group items by date
@@ -540,20 +573,27 @@ export function InboxPage() {
                                 </TableCell>
                                 <TableCell className="flex items-center gap-2">
                                   {item.type === "task" ? (
-                                    // <span
-                                    //   className={`mr-2 ${
-                                    //     item.complete
-                                    //       ? "line-through text-muted-foreground"
-                                    //       : ""
-                                    //   }`}
-                                    // >
-                                    //   {item.title}
-                                    // </span>
-                                    <input 
-                                      type="text" 
-                                      value={item.title} 
-                                      className="w-full bg-transparent text-sm outline-none"
-                                    />
+                                    editingTaskId === item.id ? (
+                                      <input 
+                                        type="text" 
+                                        value={editingTaskTitle}
+                                        onChange={(e) => setEditingTaskTitle(e.target.value)}
+                                        onKeyDown={(e) => handleTaskTitleKeyDown(e, item.id as number)}
+                                        onBlur={() => handleTaskTitleBlur(item.id as number)}
+                                        className="w-full bg-transparent text-sm outline-none"
+                                        autoFocus
+                                      />
+                                    ) : (
+                                      <input 
+                                        type="text" 
+                                        value={item.title} 
+                                        className="w-full bg-transparent text-sm outline-none"
+                                        onFocus={() => {
+                                          setEditingTaskId(item.id as number);
+                                          setEditingTaskTitle(item.title);
+                                        }}
+                                      />
+                                    )
                                   ) : item.type === "resource" ? (
                                     <a
                                       href={item.url}
