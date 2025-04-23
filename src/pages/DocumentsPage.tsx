@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "wasp/client/operations";
+import { deleteDocument, useQuery } from "wasp/client/operations";
 import { getDocuments } from "wasp/client/operations";
 import { Document } from "wasp/entities";
 import { Layout } from "../components/Layout";
@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Button } from "../components/ui/button";
-import { BadgeCheck, Plus, File } from "lucide-react";
+import { BadgeCheck, Plus, File, MoreHorizontal, Trash2 } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import {
   Tooltip,
@@ -26,10 +26,23 @@ import {
   EmptyStateAction,
   EmptyStateIcon,
 } from "../components/custom/EmptyStateView";
+import { toast } from "sonner";
 
 export function DocumentsPage() {
   const navigate = useNavigate();
   const { data: documents, isLoading, error } = useQuery(getDocuments);
+
+  const handleDeleteDocument = async (documentId: string) => {
+    try {
+      if (confirm("Are you sure you want to delete this document?")) {
+        await deleteDocument({ id: documentId });
+        toast.success("Document deleted");
+      }
+    } catch (error) {
+      console.error("Failed to delete doc:", error);
+      toast.error("Failed to delete doc");
+    }
+  };
 
   if (error) {
     return <div className="text-red-500">Error: {error.message}</div>;
@@ -75,35 +88,51 @@ export function DocumentsPage() {
             <TableRow>
               <TableHead>Title</TableHead>
               <TableHead>Updated</TableHead>
+              <TableHead className="w-[64px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {documents?.map((document: Document) => (
               <TableRow
                 key={document.id}
-                className="cursor-pointer hover:bg-muted/50"
+                className="group cursor-pointer hover:bg-muted/50"
                 onClick={() => navigate(`/documents/${document.id}`)}
               >
-                <TableCell className="font-medium flex items-center gap-2">
-                  {document.title}
-                  {document.isPublished ? (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <BadgeCheck className="w-4 h-4 text-primary" />
-                      </TooltipTrigger>
-                      <TooltipContent>Published</TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <Badge
-                      variant="secondary"
-                      className="text-muted-foreground font-normal"
-                    >
-                      Draft
-                    </Badge>
-                  )}
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <p className="line-clamp-1">{document.title}</p>
+                    {document.isPublished ? (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <BadgeCheck className="w-4 h-4 text-primary" />
+                        </TooltipTrigger>
+                        <TooltipContent>Published</TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <Badge
+                        variant="secondary"
+                        className="text-muted-foreground font-normal"
+                      >
+                        Draft
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {new Date(document.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteDocument(document.id);
+                    }}
+                    className="group-hover:opacity-100 opacity-0 transition-opacity duration-150"
+                    variant="outline"
+                    size="icon"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
