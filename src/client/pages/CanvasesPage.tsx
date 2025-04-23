@@ -91,7 +91,7 @@ export function CanvasesPage() {
             {canvases?.map((canvas: Canvas) => (
               <TableRow
                 key={canvas.id}
-                className="cursor-pointer hover:bg-muted/50"
+                className="group cursor-pointer hover:bg-muted/50"
               >
                 <TableCell 
                   className="font-medium"
@@ -116,6 +116,7 @@ export function CanvasesPage() {
                             e.stopPropagation();
                             handleDeleteCanvas(canvas.id);
                           }}
+                          className="group-hover:opacity-100 opacity-0 transition-opacity duration-150"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
