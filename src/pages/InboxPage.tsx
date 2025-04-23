@@ -16,6 +16,7 @@ import {
   createThought,
   deleteThought,
   updateTask,
+  updateThought,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
@@ -66,43 +67,45 @@ type InboxItem = {
 };
 
 // Create a type where the string is a date in the format "2025-04-20"
-type DateString = `${number}${number}${number}${number}-${number}${number}-${number}${number}`;
+type DateString =
+  `${number}${number}${number}${number}-${number}${number}-${number}${number}`;
 
 // Add this helper function to format dates consistently
 const formatDate = (date: Date | DateString): string => {
   // Convert to Date object if it's a string
-  const itemDate = typeof date === 'string' 
-    ? new Date(date + 'T00:00:00') // Add time component to ensure consistent timezone handling
-    : new Date(date);
-  
+  const itemDate =
+    typeof date === "string"
+      ? new Date(date + "T00:00:00") // Add time component to ensure consistent timezone handling
+      : new Date(date);
+
   // Get current time in local timezone and set to midnight
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  
+
   // Set item date to midnight in local timezone for comparison
   const itemDateMidnight = new Date(itemDate);
   itemDateMidnight.setHours(0, 0, 0, 0);
-  
+
   // Compare dates using their time values
   const nowTime = now.getTime();
   const itemTime = itemDateMidnight.getTime();
-  
+
   if (nowTime === itemTime) {
     return "Today";
   }
-  
+
   // Check for yesterday
-  const yesterdayTime = nowTime - (24 * 60 * 60 * 1000); // 24 hours in milliseconds
+  const yesterdayTime = nowTime - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
   if (itemTime === yesterdayTime) {
     return "Yesterday";
   }
-  
+
   // For other dates, use native date formatting
-  return itemDate.toLocaleDateString(undefined, { 
-    weekday: 'long', 
-    month: 'long', 
-    day: 'numeric',
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  return itemDate.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 };
 
@@ -112,7 +115,7 @@ type GroupedInboxItems = {
 };
 
 // Add this type for filter options
-type InboxFilter = 'all' | 'task' | 'resource' | 'thought';
+type InboxFilter = "all" | "task" | "resource" | "thought";
 
 export function InboxPage() {
   const {
@@ -139,9 +142,12 @@ export function InboxPage() {
     );
     return showTasksLocalStorage;
   });
-  const [filter, setFilter] = useState<InboxFilter>('all');
+  const [filter, setFilter] = useState<InboxFilter>("all");
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTaskTitle, setEditingTaskTitle] = useState<string>("");
+  const [editingThoughtId, setEditingThoughtId] = useState<string | null>(null);
+  const [editingThoughtContent, setEditingThoughtContent] =
+    useState<string>("");
 
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
@@ -276,7 +282,10 @@ export function InboxPage() {
     }
   };
 
-  const handleTaskTitleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>, taskId: number) => {
+  const handleTaskTitleKeyDown = async (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    taskId: number
+  ) => {
     if (e.key === "Enter") {
       e.preventDefault();
       await handleTaskTitleChange(taskId, editingTaskTitle);
@@ -293,24 +302,60 @@ export function InboxPage() {
     setEditingTaskId(null);
   };
 
+  const handleThoughtContentChange = async (
+    thoughtId: string,
+    newContent: string
+  ) => {
+    try {
+      await updateThought({
+        id: thoughtId,
+        content: newContent,
+      });
+      toast.success("Note updated");
+    } catch (error) {
+      console.error("Failed to update note:", error);
+      toast.error("Failed to update note");
+    }
+  };
+
+  const handleThoughtContentKeyDown = async (
+    e: React.KeyboardEvent<HTMLTextAreaElement>,
+    thoughtId: string
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      await handleThoughtContentChange(thoughtId, editingThoughtContent);
+      setEditingThoughtId(null);
+    } else if (e.key === "Escape") {
+      setEditingThoughtId(null);
+    }
+  };
+
+  const handleThoughtContentBlur = async (thoughtId: string) => {
+    if (editingThoughtContent.trim()) {
+      await handleThoughtContentChange(thoughtId, editingThoughtContent);
+    }
+    setEditingThoughtId(null);
+  };
+
   // Group items by date
   const groupItemsByDate = (items: InboxItem[]): GroupedInboxItems => {
     const grouped: GroupedInboxItems = {};
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       // Format date as YYYY-MM-DD for consistent grouping, using local timezone
       const date = new Date(item.createdAt);
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
       const dateKey = `${year}-${month}-${day}` as DateString;
-      
+
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
       grouped[dateKey].push(item);
     });
-    
+
     return grouped;
   };
 
@@ -343,14 +388,16 @@ export function InboxPage() {
 
   // Group items by date
   const groupedItems = groupItemsByDate(inboxItems);
-  
+
   // Sort dates in descending order (most recent first)
-  const sortedDates = Object.keys(groupedItems).sort().reverse() as DateString[];
+  const sortedDates = Object.keys(groupedItems)
+    .sort()
+    .reverse() as DateString[];
 
   // Add this function to get item counts
   const getItemCount = (type: InboxFilter) => {
-    if (type === 'all') return inboxItems.length;
-    return inboxItems.filter(item => item.type === type).length;
+    if (type === "all") return inboxItems.length;
+    return inboxItems.filter((item) => item.type === type).length;
   };
 
   if (tasksError || resourcesError || thoughtsError) {
@@ -421,7 +468,9 @@ export function InboxPage() {
             <Input
               autoFocus={true}
               type="text"
-              placeholder={isThought ? "Add a thought or URL..." : "Add a task..."}
+              placeholder={
+                isThought ? "Add a thought or URL..." : "Add a task..."
+              }
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -443,82 +492,86 @@ export function InboxPage() {
           {showInbox ? (
             <div>
               {/* Replace Tabs with segmented control */}
-              <div 
+              <div
                 className="flex items-center mb-6 w-fit"
                 role="tablist"
                 aria-label="Filter inbox items"
               >
                 <Button
-                  variant={filter === 'all' ? 'secondary' : 'ghost'}
+                  variant={filter === "all" ? "secondary" : "ghost"}
                   size="sm"
-                  onClick={() => setFilter('all')}
+                  onClick={() => setFilter("all")}
                   className={cn(
                     "relative px-3 rounded-full text-muted-foreground shadow-none",
-                    filter === 'all' && 'text-primary'
+                    filter === "all" && "text-primary"
                   )}
                   role="tab"
-                  aria-selected={filter === 'all'}
+                  aria-selected={filter === "all"}
                   aria-controls="all-items-tab"
                   id="all-tab"
                 >
                   <List className="h-4 w-4" aria-hidden="true" />
                   <span>All</span>
-                  <span className="sr-only">{getItemCount('all')} items</span>
+                  <span className="sr-only">{getItemCount("all")} items</span>
                 </Button>
                 <Button
-                  variant={filter === 'task' ? 'secondary' : 'ghost'}
+                  variant={filter === "task" ? "secondary" : "ghost"}
                   size="sm"
-                  onClick={() => setFilter('task')}
+                  onClick={() => setFilter("task")}
                   className={cn(
                     "relative px-3 rounded-full text-muted-foreground shadow-none",
-                    filter === 'task' && 'text-primary'
+                    filter === "task" && "text-primary"
                   )}
                   role="tab"
-                  aria-selected={filter === 'task'}
+                  aria-selected={filter === "task"}
                   aria-controls="tasks-tab"
                   id="tasks-tab"
                 >
                   <Square className="h-4 w-4" aria-hidden="true" />
                   <span>Tasks</span>
-                  <span className="sr-only">{getItemCount('task')} tasks</span>
+                  <span className="sr-only">{getItemCount("task")} tasks</span>
                 </Button>
                 <Button
-                  variant={filter === 'resource' ? 'secondary' : 'ghost'}
+                  variant={filter === "resource" ? "secondary" : "ghost"}
                   size="sm"
-                  onClick={() => setFilter('resource')}
+                  onClick={() => setFilter("resource")}
                   className={cn(
                     "relative px-3 rounded-full text-muted-foreground shadow-none",
-                    filter === 'resource' && 'text-primary'
+                    filter === "resource" && "text-primary"
                   )}
                   role="tab"
-                  aria-selected={filter === 'resource'}
+                  aria-selected={filter === "resource"}
                   aria-controls="resources-tab"
                   id="resources-tab"
                 >
                   <Link2 className="h-4 w-4" aria-hidden="true" />
                   <span>Links</span>
-                  <span className="sr-only">{getItemCount('resource')} links</span>
+                  <span className="sr-only">
+                    {getItemCount("resource")} links
+                  </span>
                 </Button>
                 <Button
-                  variant={filter === 'thought' ? 'secondary' : 'ghost'}
+                  variant={filter === "thought" ? "secondary" : "ghost"}
                   size="sm"
-                  onClick={() => setFilter('thought')}
+                  onClick={() => setFilter("thought")}
                   className={cn(
                     "relative px-3 rounded-full text-muted-foreground shadow-none",
-                    filter === 'thought' && 'text-primary'
+                    filter === "thought" && "text-primary"
                   )}
                   role="tab"
-                  aria-selected={filter === 'thought'}
+                  aria-selected={filter === "thought"}
                   aria-controls="thoughts-tab"
                   id="thoughts-tab"
                 >
                   <Minus className="h-4 w-4" aria-hidden="true" />
                   <span>Notes</span>
-                  <span className="sr-only">{getItemCount('thought')} notes</span>
+                  <span className="sr-only">
+                    {getItemCount("thought")} notes
+                  </span>
                 </Button>
               </div>
 
-              <div 
+              <div
                 role="tabpanel"
                 id={`${filter}-items-tab`}
                 aria-labelledby={`${filter}-tab`}
@@ -527,12 +580,14 @@ export function InboxPage() {
                 <Table>
                   <TableBody>
                     {sortedDates.length > 0 ? (
-                      sortedDates.map(dateKey => {
+                      sortedDates.map((dateKey) => {
                         // Filter items for this date based on the current filter
-                        const dateItems = groupedItems[dateKey].filter(item => {
-                          if (filter === 'all') return true;
-                          return item.type === filter;
-                        });
+                        const dateItems = groupedItems[dateKey].filter(
+                          (item) => {
+                            if (filter === "all") return true;
+                            return item.type === filter;
+                          }
+                        );
 
                         if (dateItems.length === 0) return null;
 
@@ -547,7 +602,7 @@ export function InboxPage() {
                                 {formatDate(dateKey)}
                               </TableCell>
                             </TableRow>
-                            
+
                             {/* Items for this date */}
                             {dateItems.map((item) => (
                               <TableRow
@@ -574,19 +629,28 @@ export function InboxPage() {
                                 <TableCell className="flex items-center gap-2">
                                   {item.type === "task" ? (
                                     editingTaskId === item.id ? (
-                                      <input 
-                                        type="text" 
+                                      <input
+                                        type="text"
                                         value={editingTaskTitle}
-                                        onChange={(e) => setEditingTaskTitle(e.target.value)}
-                                        onKeyDown={(e) => handleTaskTitleKeyDown(e, item.id as number)}
-                                        onBlur={() => handleTaskTitleBlur(item.id as number)}
+                                        onChange={(e) =>
+                                          setEditingTaskTitle(e.target.value)
+                                        }
+                                        onKeyDown={(e) =>
+                                          handleTaskTitleKeyDown(
+                                            e,
+                                            item.id as number
+                                          )
+                                        }
+                                        onBlur={() =>
+                                          handleTaskTitleBlur(item.id as number)
+                                        }
                                         className="w-full bg-transparent text-sm outline-none"
                                         autoFocus
                                       />
                                     ) : (
-                                      <input 
-                                        type="text" 
-                                        value={item.title} 
+                                      <input
+                                        type="text"
+                                        value={item.title}
                                         className="w-full bg-transparent text-sm outline-none"
                                         onFocus={() => {
                                           setEditingTaskId(item.id as number);
@@ -618,9 +682,44 @@ export function InboxPage() {
                                       </span>
                                     </a>
                                   ) : (
-                                    <div className="flex flex-col">
-                                      <span className="text-sm">{item.content}</span>
-                                    </div>
+                                    <>
+                                      {editingThoughtId === item.id ? (
+                                        <input
+                                          value={editingThoughtContent}
+                                          onChange={(e) =>
+                                            setEditingThoughtContent(
+                                              e.target.value
+                                            )
+                                          }
+                                          onKeyDown={(e) =>
+                                            handleThoughtContentKeyDown(
+                                              e,
+                                              item.id as string
+                                            )
+                                          }
+                                          onBlur={() =>
+                                            handleThoughtContentBlur(
+                                              item.id as string
+                                            )
+                                          }
+                                          className="w-full bg-transparent text-sm outline-none"
+                                        />
+                                      ) : (
+                                        <span
+                                          className="text-sm cursor-text"
+                                          onClick={() => {
+                                            setEditingThoughtId(
+                                              item.id as string
+                                            );
+                                            setEditingThoughtContent(
+                                              item.content || ""
+                                            );
+                                          }}
+                                        >
+                                          {item.content}
+                                        </span>
+                                      )}
+                                    </>
                                   )}
                                 </TableCell>
                                 <TableCell className="text-right">
@@ -630,7 +729,10 @@ export function InboxPage() {
                                         <DropdownMenuTrigger>
                                           <Tooltip>
                                             <TooltipTrigger asChild>
-                                              <Button variant="outline" size="icon">
+                                              <Button
+                                                variant="outline"
+                                                size="icon"
+                                              >
                                                 <MoveRight className="h-4 w-4" />
                                               </Button>
                                             </TooltipTrigger>
@@ -645,7 +747,10 @@ export function InboxPage() {
                                               <DropdownMenuItem
                                                 key={project.id}
                                                 onClick={() =>
-                                                  handleMoveItem(item, project.id)
+                                                  handleMoveItem(
+                                                    item,
+                                                    project.id
+                                                  )
                                                 }
                                               >
                                                 Move to {project.title}
@@ -666,16 +771,25 @@ export function InboxPage() {
                                           size="icon"
                                           onClick={() => {
                                             if (item.type === "task")
-                                              handleDeleteTask(item.id as number);
+                                              handleDeleteTask(
+                                                item.id as number
+                                              );
                                             else if (item.type === "resource")
-                                              handleDeleteResource(item.id as number);
-                                            else handleDeleteThought(item.id as string);
+                                              handleDeleteResource(
+                                                item.id as number
+                                              );
+                                            else
+                                              handleDeleteThought(
+                                                item.id as string
+                                              );
                                           }}
                                         >
                                           <Trash2 className="h-4 w-4" />
                                         </Button>
                                       </TooltipTrigger>
-                                      <TooltipContent>Delete {item.type}</TooltipContent>
+                                      <TooltipContent>
+                                        Delete {item.type}
+                                      </TooltipContent>
                                     </Tooltip>
                                   </div>
                                 </TableCell>
