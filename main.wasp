@@ -29,21 +29,25 @@ page MainPage {
 
 route SignUpRoute { path: "/signup", to: SignUpPage }
 page SignUpPage {
+  authRequired: true,
   component: import { SignUpPage } from "@src/pages/SignUpPage"
 }
 
 route LoginRoute { path: "/login", to: LoginPage }
 page LoginPage {
+  authRequired: true,
   component: import { LoginPage } from "@src/pages/LoginPage"
 }
 
 route CanvasesRoute { path: "/canvases", to: CanvasesPage }
 page CanvasesPage {
+  authRequired: true,
   component: import { CanvasesPage } from "@src/client/pages/CanvasesPage"
 }
 
 route CanvasRoute { path: "/canvas/:id", to: CanvasPage }
 page CanvasPage {
+  authRequired: true,
   component: import { CanvasPage } from "@src/client/pages/CanvasPage"
 }
 
