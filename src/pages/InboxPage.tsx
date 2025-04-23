@@ -274,6 +274,12 @@ export function InboxPage() {
   };
 
   const handleTaskTitleChange = async (taskId: number, newTitle: string) => {
+    // Find the original task
+    const originalTask = tasks?.find((t) => t.id === taskId);
+    if (!originalTask || originalTask.title === newTitle) {
+      return;
+    }
+
     try {
       await updateTask({
         id: taskId,
