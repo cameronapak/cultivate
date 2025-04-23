@@ -27,8 +27,11 @@ import { useSidebar } from "../ui/sidebar";
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
   const navigate = useNavigate();
-  const { data: projects } = useQuery(getProjects);
+  const { data: projects } = useQuery(getProjects, undefined, {
+    enabled: search.length > 0,
+  });
   const {
     hideCompletedTasks,
     toggleHideCompleted,
@@ -57,7 +60,11 @@ export function CommandMenu() {
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
-      <CommandInput placeholder="Type a command or search..." />
+      <CommandInput 
+        placeholder="Type a command or search..." 
+        value={search}
+        onValueChange={setSearch}
+      />
       <CommandList>
         <CommandGroup heading="Actions">
           {isProjectPage && (
@@ -106,21 +113,23 @@ export function CommandMenu() {
         </CommandGroup>
         <CommandSeparator />
         <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Projects">
-          {projects?.map((project: Project) => (
-            <CommandItem
-              key={project.id}
-              onSelect={() =>
-                runCommand(() =>
-                  navigate(`/projects/${project.id}${window.location.search}`)
-                )
-              }
-            >
-              <Folder className="mr-2 h-4 w-4" />
-              Open "{project.title}"
-            </CommandItem>
-          ))}
-        </CommandGroup>
+        {search.length > 0 && (
+          <CommandGroup heading="Projects">
+            {projects?.map((project: Project) => (
+              <CommandItem
+                key={project.id}
+                onSelect={() =>
+                  runCommand(() =>
+                    navigate(`/projects/${project.id}${window.location.search}`)
+                  )
+                }
+              >
+                <Folder className="mr-2 h-4 w-4" />
+                Open "{project.title}"
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
         <CommandGroup heading="Canvas">
           <CommandItem>
             <PencilRuler className="mr-2 h-4 w-4" />
