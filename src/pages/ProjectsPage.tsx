@@ -184,7 +184,7 @@ export const ProjectsPage = () => {
                     <TableCell className="text-sm text-muted-foreground">
                       <Button
                         onClick={() => handlePinToggle(project)}
-                        variant="ghost"
+                        variant="outline"
                         size="icon"
                         className="group-hover:opacity-100 opacity-0 transition-opacity duration-150"
                       >
