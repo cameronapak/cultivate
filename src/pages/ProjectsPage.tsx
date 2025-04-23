@@ -4,7 +4,7 @@ import {
   Task as BaseTask,
   Resource as BaseResource,
 } from "wasp/entities";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Link } from "wasp/client/router";
 import {
   getProjects,
@@ -109,6 +109,7 @@ type ProjectFormValues = z.infer<typeof projectFormSchema>;
 
 export const ProjectsPage = () => {
   const { data: projects, isLoading, error } = useQuery(getProjects);
+  const navigate = useNavigate();
 
   const pinnedProjects =
     projects?.filter((project: Project) => project.pinned) || [];
@@ -168,19 +169,17 @@ export const ProjectsPage = () => {
               <TableBody>
                 {projects.map((project: Project) => (
                   <TableRow className="w-full" key={project.id}>
-                    <TableCell className="hover:underline">
-                      <Link
-                        className="w-full flex flex-col items-start"
-                        to={`/projects/:projectId`}
-                        params={{ projectId: project.id }}
-                      >
-                        <p>{project.title}</p>
-                        {project.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {project.description}
-                          </p>
-                        )}
-                      </Link>
+                    <TableCell 
+                      className="w-full flex flex-col items-start cursor-pointer"
+                      onClick={() => navigate(`/projects/${project.id}`)}
+                      role="link"
+                    >
+                      <p>{project.title}</p>
+                      {project.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {project.description}
+                        </p>
+                      )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       <Button
