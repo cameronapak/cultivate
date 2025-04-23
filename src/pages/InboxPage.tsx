@@ -17,6 +17,7 @@ import {
   deleteThought,
   updateTask,
   updateThought,
+  updateResource,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
@@ -149,6 +150,8 @@ export function InboxPage() {
   const [editingThoughtId, setEditingThoughtId] = useState<string | null>(null);
   const [editingThoughtContent, setEditingThoughtContent] =
     useState<string>("");
+  const [editingResourceId, setEditingResourceId] = useState<number | null>(null);
+  const [editingResourceTitle, setEditingResourceTitle] = useState<string>("");
 
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
@@ -344,6 +347,47 @@ export function InboxPage() {
       await handleThoughtContentChange(thoughtId, editingThoughtContent);
     }
     setEditingThoughtId(null);
+  };
+
+  const handleResourceTitleChange = async (resourceId: number, newTitle: string) => {
+    // Find the original resource title
+    const originalResource = resources?.find(r => r.id === resourceId);
+    if (!originalResource || originalResource.title === newTitle) {
+      setEditingResourceId(null);
+      return;
+    }
+
+    try {
+      await updateResource({
+        id: resourceId,
+        title: newTitle,
+        url: originalResource.url,
+      });
+      toast.success("Resource updated");
+    } catch (error) {
+      console.error("Failed to update resource:", error);
+      toast.error("Failed to update resource");
+    }
+  };
+
+  const handleResourceTitleKeyDown = async (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    resourceId: number
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      await handleResourceTitleChange(resourceId, editingResourceTitle);
+      setEditingResourceId(null);
+    } else if (e.key === "Escape") {
+      setEditingResourceId(null);
+    }
+  };
+
+  const handleResourceTitleBlur = async (resourceId: number) => {
+    if (editingResourceTitle.trim()) {
+      await handleResourceTitleChange(resourceId, editingResourceTitle);
+    }
+    setEditingResourceId(null);
   };
 
   // Group items by date
@@ -668,7 +712,7 @@ export function InboxPage() {
                                     )
                                   ) : item.type === "resource" ? (
                                     <div
-                                      className="grid items-center gap-2"
+                                      className="w-full grid items-center gap-2"
                                       style={{
                                         gridTemplateColumns: item.url
                                           ? "16px 1fr"
@@ -682,9 +726,36 @@ export function InboxPage() {
                                           className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
                                         />
                                       ) : null}
-                                      <span className="line-clamp-2 text-sm">
-                                        {item.title}
-                                      </span>
+                                      {editingResourceId === item.id ? (
+                                        <input
+                                          type="text"
+                                          value={editingResourceTitle}
+                                          onChange={(e) =>
+                                            setEditingResourceTitle(e.target.value)
+                                          }
+                                          onKeyDown={(e) =>
+                                            handleResourceTitleKeyDown(
+                                              e,
+                                              item.id as number
+                                            )
+                                          }
+                                          onBlur={() =>
+                                            handleResourceTitleBlur(item.id as number)
+                                          }
+                                          className="w-full rounded-md bg-transparent text-sm outline-none"
+                                          autoFocus
+                                        />
+                                      ) : (
+                                        <span
+                                          className="text-sm cursor-text"
+                                          onClick={() => {
+                                            setEditingResourceId(item.id as number);
+                                            setEditingResourceTitle(item.title);
+                                          }}
+                                        >
+                                          {item.title}
+                                        </span>
+                                      )}
                                     </div>
                                   ) : (
                                     <>
