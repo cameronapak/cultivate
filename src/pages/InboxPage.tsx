@@ -30,8 +30,8 @@ import {
   Send,
   Link2,
   Minus,
-  SquareCheck,
   List,
+  Dot,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
@@ -336,7 +336,7 @@ export function InboxPage() {
   } else if (isUrl(newItemText.trim())) {
     itemTypeButton = <Link2 className="h-4 w-4" />;
   } else {
-    itemTypeButton = <SquareCheck className="h-4 w-4" />;
+    itemTypeButton = <Dot className="h-4 w-4" />;
   }
 
   return (
@@ -444,7 +444,7 @@ export function InboxPage() {
                   aria-controls="tasks-tab"
                   id="tasks-tab"
                 >
-                  <SquareCheck className="h-4 w-4" aria-hidden="true" />
+                  <Dot className="h-4 w-4" aria-hidden="true" />
                   <span>Tasks</span>
                   <span className="sr-only">{getItemCount('task')} tasks</span>
                 </Button>
@@ -522,15 +522,16 @@ export function InboxPage() {
                               >
                                 <TableCell className="w-8">
                                   {item.type === "task" ? (
-                                    <Checkbox
-                                      checked={item.complete}
-                                      onCheckedChange={() =>
-                                        handleToggleTask(
-                                          item.id as number,
-                                          item.complete || false
-                                        )
-                                      }
-                                    />
+                                    // <Checkbox
+                                    //   checked={item.complete}
+                                    //   onCheckedChange={() =>
+                                    //     handleToggleTask(
+                                    //       item.id as number,
+                                    //       item.complete || false
+                                    //     )
+                                    //   }
+                                    // />
+                                    <Dot className="h-4 w-4 text-muted-foreground" />
                                   ) : item.type === "resource" ? (
                                     <Link2 className="h-4 w-4 text-muted-foreground" />
                                   ) : (
