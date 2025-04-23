@@ -962,14 +962,14 @@ const ProjectCard = ({
       params={{ projectId: project.id }}
       className="no-underline"
     >
-      <Card className="h-full relative hover:shadow-md transition-shadow">
+      <Card className="group h-full relative hover:shadow-md transition-shadow">
         <CardHeader>
           <div className="flex justify-between items-start">
             <CardTitle>{project.title}</CardTitle>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground absolute top-2 right-2"
+              className="group-hover:opacity-100 opacity-0 transition-opacity duration-150 h-8 w-8 text-muted-foreground absolute top-2 right-2"
               onClick={handleTogglePin}
             >
               {project.pinned ? (
