@@ -506,9 +506,9 @@ export function InboxPage() {
         <div>
           <div className="relative flex gap-4 mb-6">
             <Button
-              className="absolute top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
+              className="absolute shadow-none top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
               size="icon"
-              variant="ghost"
+              variant="outline"
               onClick={handleToggleIsThought}
             >
               {itemTypeButton}
@@ -526,7 +526,7 @@ export function InboxPage() {
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="pl-10 flex-1 pr-10"
+              className="pl-11 flex-1 pr-10"
             />
 
             <Button
