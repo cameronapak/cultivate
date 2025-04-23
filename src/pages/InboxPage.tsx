@@ -302,10 +302,14 @@ export function InboxPage() {
     setEditingTaskId(null);
   };
 
-  const handleThoughtContentChange = async (
-    thoughtId: string,
-    newContent: string
-  ) => {
+  const handleThoughtContentChange = async (thoughtId: string, newContent: string) => {
+    // Find the original thought content
+    const originalThought = thoughts?.find(t => t.id === thoughtId);
+    if (!originalThought || originalThought.content === newContent) {
+      setEditingThoughtId(null);
+      return;
+    }
+
     try {
       await updateThought({
         id: thoughtId,
@@ -702,7 +706,7 @@ export function InboxPage() {
                                               item.id as string
                                             )
                                           }
-                                          className="w-full bg-transparent text-sm outline-none"
+                                          className="w-full rounded-md bg-transparent text-sm outline-none"
                                         />
                                       ) : (
                                         <span
