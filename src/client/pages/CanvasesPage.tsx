@@ -96,12 +96,14 @@ export function CanvasesPage() {
                 <TableCell 
                   className="font-medium"
                   onClick={() => navigate(`/canvas/${canvas.id}`)}
+                  role="link"
                 >
                   {canvas.title}
                 </TableCell>
                 <TableCell 
                   className="text-sm text-muted-foreground"
                   onClick={() => navigate(`/canvas/${canvas.id}`)}
+                  role="link"
                 >
                   {new Date(canvas.createdAt).toLocaleDateString()}
                 </TableCell>
