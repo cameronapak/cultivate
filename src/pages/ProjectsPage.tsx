@@ -127,25 +127,27 @@ export const ProjectsPage = () => {
   };
 
   return (
-    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Projects" }]}>
+    <Layout
+      isLoading={isLoading}
+      breadcrumbItems={[{ title: "Projects" }]}
+      ctaButton={
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">
+              <Plus className="w-4 h-4 mr-2" />
+              Create
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <NewProjectForm onCancel={() => {}} />
+          </PopoverContent>
+        </Popover>
+      }
+    >
       {error && <p className="text-red-500">Error: {error.message}</p>}
 
       {projects && projects.length > 0 ? (
         <>
-          <div className="flex justify-between items-center mb-8">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create New Project
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <NewProjectForm onCancel={() => {}} />
-              </PopoverContent>
-            </Popover>
-          </div>
-
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {pinnedProjects.length > 0
               ? pinnedProjects.map((project: Project) => (
@@ -169,7 +171,7 @@ export const ProjectsPage = () => {
               <TableBody>
                 {projects.map((project: Project) => (
                   <TableRow className="group w-full" key={project.id}>
-                    <TableCell 
+                    <TableCell
                       className="w-full flex flex-col items-start cursor-pointer"
                       onClick={() => navigate(`/projects/${project.id}`)}
                       role="link"
