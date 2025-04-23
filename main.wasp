@@ -24,7 +24,7 @@ app shapeUp {
 route RootRoute { path: "/", to: MainPage }
 page MainPage {
   authRequired: true,
-  component: import { MainPage } from "@src/pages/MainPage"
+  component: import { ProjectsPage } from "@src/pages/ProjectsPage"
 }
 
 route SignUpRoute { path: "/signup", to: SignUpPage }
