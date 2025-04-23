@@ -409,7 +409,11 @@ export function InboxPage() {
           {showInbox ? (
             <div>
               {/* Replace Tabs with segmented control */}
-              <div className="flex items-center mb-6 w-fit">
+              <div 
+                className="flex items-center mb-6 w-fit"
+                role="tablist"
+                aria-label="Filter inbox items"
+              >
                 <Button
                   variant={filter === 'all' ? 'secondary' : 'ghost'}
                   size="sm"
@@ -418,9 +422,14 @@ export function InboxPage() {
                     "relative px-3 rounded-full text-muted-foreground shadow-none",
                     filter === 'all' && 'text-primary'
                   )}
+                  role="tab"
+                  aria-selected={filter === 'all'}
+                  aria-controls="all-items-tab"
+                  id="all-tab"
                 >
-                  <List className="h-4 w-4" />
+                  <List className="h-4 w-4" aria-hidden="true" />
                   <span>All</span>
+                  <span className="sr-only">{getItemCount('all')} items</span>
                 </Button>
                 <Button
                   variant={filter === 'task' ? 'secondary' : 'ghost'}
@@ -430,9 +439,14 @@ export function InboxPage() {
                     "relative px-3 rounded-full text-muted-foreground shadow-none",
                     filter === 'task' && 'text-primary'
                   )}
+                  role="tab"
+                  aria-selected={filter === 'task'}
+                  aria-controls="tasks-tab"
+                  id="tasks-tab"
                 >
-                  <SquareCheck className="h-4 w-4" />
+                  <SquareCheck className="h-4 w-4" aria-hidden="true" />
                   <span>Tasks</span>
+                  <span className="sr-only">{getItemCount('task')} tasks</span>
                 </Button>
                 <Button
                   variant={filter === 'resource' ? 'secondary' : 'ghost'}
@@ -442,9 +456,14 @@ export function InboxPage() {
                     "relative px-3 rounded-full text-muted-foreground shadow-none",
                     filter === 'resource' && 'text-primary'
                   )}
+                  role="tab"
+                  aria-selected={filter === 'resource'}
+                  aria-controls="resources-tab"
+                  id="resources-tab"
                 >
-                  <Link2 className="h-4 w-4" />
+                  <Link2 className="h-4 w-4" aria-hidden="true" />
                   <span>Links</span>
+                  <span className="sr-only">{getItemCount('resource')} links</span>
                 </Button>
                 <Button
                   variant={filter === 'thought' ? 'secondary' : 'ghost'}
@@ -454,175 +473,187 @@ export function InboxPage() {
                     "relative px-3 rounded-full text-muted-foreground shadow-none",
                     filter === 'thought' && 'text-primary'
                   )}
+                  role="tab"
+                  aria-selected={filter === 'thought'}
+                  aria-controls="thoughts-tab"
+                  id="thoughts-tab"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-4 w-4" aria-hidden="true" />
                   <span>Notes</span>
+                  <span className="sr-only">{getItemCount('thought')} notes</span>
                 </Button>
               </div>
 
-              <Table>
-                <TableBody>
-                  {sortedDates.length > 0 ? (
-                    sortedDates.map(dateKey => {
-                      // Filter items for this date based on the current filter
-                      const dateItems = groupedItems[dateKey].filter(item => {
-                        if (filter === 'all') return true;
-                        return item.type === filter;
-                      });
+              <div 
+                role="tabpanel"
+                id={`${filter}-items-tab`}
+                aria-labelledby={`${filter}-tab`}
+                tabIndex={0}
+              >
+                <Table>
+                  <TableBody>
+                    {sortedDates.length > 0 ? (
+                      sortedDates.map(dateKey => {
+                        // Filter items for this date based on the current filter
+                        const dateItems = groupedItems[dateKey].filter(item => {
+                          if (filter === 'all') return true;
+                          return item.type === filter;
+                        });
 
-                      if (dateItems.length === 0) return null;
+                        if (dateItems.length === 0) return null;
 
-                      return (
-                        <React.Fragment key={dateKey}>
-                          {/* Date header row */}
-                          <TableRow>
-                            <TableCell
-                              colSpan={3}
-                              className="bg-muted/30 py-1 px-4 text-xs font-semibold text-muted-foreground"
-                            >
-                              {formatDate(dateKey)}
-                            </TableCell>
-                          </TableRow>
-                          
-                          {/* Items for this date */}
-                          {dateItems.map((item) => (
-                            <TableRow
-                              className="group grid grid-cols-[auto_1fr_auto] items-center"
-                              key={`${item.type}-${item.id}`}
-                            >
-                              <TableCell className="w-8">
-                                {item.type === "task" ? (
-                                  <Checkbox
-                                    checked={item.complete}
-                                    onCheckedChange={() =>
-                                      handleToggleTask(
-                                        item.id as number,
-                                        item.complete || false
-                                      )
-                                    }
-                                  />
-                                ) : item.type === "resource" ? (
-                                  <Link2 className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                  <Minus className="h-4 w-4 text-muted-foreground" />
-                                )}
-                              </TableCell>
-                              <TableCell className="flex items-center gap-2">
-                                {item.type === "task" ? (
-                                  <span
-                                    className={`mr-2 ${
-                                      item.complete
-                                        ? "line-through text-muted-foreground"
-                                        : ""
-                                    }`}
-                                  >
-                                    {item.title}
-                                  </span>
-                                ) : item.type === "resource" ? (
-                                  <a
-                                    href={item.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="grid items-center gap-2 hover:underline"
-                                    style={{
-                                      gridTemplateColumns: item.url
-                                        ? "16px 1fr"
-                                        : "1fr",
-                                    }}
-                                  >
-                                    {item.url ? (
-                                      <img
-                                        src={getFaviconFromUrl(item.url)}
-                                        alt="Favicon"
-                                        className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
-                                      />
-                                    ) : null}
-                                    <span className="line-clamp-2 text-sm">
-                                      {item.title}
-                                    </span>
-                                  </a>
-                                ) : (
-                                  <div className="flex flex-col">
-                                    <span className="text-sm">{item.content}</span>
-                                  </div>
-                                )}
-                              </TableCell>
-                              <TableCell className="text-right">
-                                <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
-                                  {item.type !== "thought" && (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger>
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <Button variant="outline" size="icon">
-                                              <MoveRight className="h-4 w-4" />
-                                            </Button>
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            Move {item.type} to a project
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        {projects?.length ? (
-                                          projects?.map((project) => (
-                                            <DropdownMenuItem
-                                              key={project.id}
-                                              onClick={() =>
-                                                handleMoveItem(item, project.id)
-                                              }
-                                            >
-                                              Move to {project.title}
-                                            </DropdownMenuItem>
-                                          ))
-                                        ) : (
-                                          <DropdownMenuItem className="text-muted-foreground">
-                                            No projects found
-                                          </DropdownMenuItem>
-                                        )}
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  )}
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() => {
-                                          if (item.type === "task")
-                                            handleDeleteTask(item.id as number);
-                                          else if (item.type === "resource")
-                                            handleDeleteResource(item.id as number);
-                                          else handleDeleteThought(item.id as string);
-                                        }}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>Delete {item.type}</TooltipContent>
-                                  </Tooltip>
-                                </div>
+                        return (
+                          <React.Fragment key={dateKey}>
+                            {/* Date header row */}
+                            <TableRow>
+                              <TableCell
+                                colSpan={3}
+                                className="bg-muted/30 py-1 px-4 text-xs font-semibold text-muted-foreground"
+                              >
+                                {formatDate(dateKey)}
                               </TableCell>
                             </TableRow>
-                          ))}
-                        </React.Fragment>
-                      );
-                    })
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className="text-center flex flex-col items-center justify-center text-muted-foreground"
-                      >
-                        <EmptyStateView
-                          Icon={<Coffee className="h-10 w-10" />}
-                          title="Inbox Zero"
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                            
+                            {/* Items for this date */}
+                            {dateItems.map((item) => (
+                              <TableRow
+                                className="group grid grid-cols-[auto_1fr_auto] items-center"
+                                key={`${item.type}-${item.id}`}
+                              >
+                                <TableCell className="w-8">
+                                  {item.type === "task" ? (
+                                    <Checkbox
+                                      checked={item.complete}
+                                      onCheckedChange={() =>
+                                        handleToggleTask(
+                                          item.id as number,
+                                          item.complete || false
+                                        )
+                                      }
+                                    />
+                                  ) : item.type === "resource" ? (
+                                    <Link2 className="h-4 w-4 text-muted-foreground" />
+                                  ) : (
+                                    <Minus className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                </TableCell>
+                                <TableCell className="flex items-center gap-2">
+                                  {item.type === "task" ? (
+                                    <span
+                                      className={`mr-2 ${
+                                        item.complete
+                                          ? "line-through text-muted-foreground"
+                                          : ""
+                                      }`}
+                                    >
+                                      {item.title}
+                                    </span>
+                                  ) : item.type === "resource" ? (
+                                    <a
+                                      href={item.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="grid items-center gap-2 hover:underline"
+                                      style={{
+                                        gridTemplateColumns: item.url
+                                          ? "16px 1fr"
+                                          : "1fr",
+                                      }}
+                                    >
+                                      {item.url ? (
+                                        <img
+                                          src={getFaviconFromUrl(item.url)}
+                                          alt="Favicon"
+                                          className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
+                                        />
+                                      ) : null}
+                                      <span className="line-clamp-2 text-sm">
+                                        {item.title}
+                                      </span>
+                                    </a>
+                                  ) : (
+                                    <div className="flex flex-col">
+                                      <span className="text-sm">{item.content}</span>
+                                    </div>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
+                                    {item.type !== "thought" && (
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <Button variant="outline" size="icon">
+                                                <MoveRight className="h-4 w-4" />
+                                              </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              Move {item.type} to a project
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                          {projects?.length ? (
+                                            projects?.map((project) => (
+                                              <DropdownMenuItem
+                                                key={project.id}
+                                                onClick={() =>
+                                                  handleMoveItem(item, project.id)
+                                                }
+                                              >
+                                                Move to {project.title}
+                                              </DropdownMenuItem>
+                                            ))
+                                          ) : (
+                                            <DropdownMenuItem className="text-muted-foreground">
+                                              No projects found
+                                            </DropdownMenuItem>
+                                          )}
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    )}
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="outline"
+                                          size="icon"
+                                          onClick={() => {
+                                            if (item.type === "task")
+                                              handleDeleteTask(item.id as number);
+                                            else if (item.type === "resource")
+                                              handleDeleteResource(item.id as number);
+                                            else handleDeleteThought(item.id as string);
+                                          }}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>Delete {item.type}</TooltipContent>
+                                    </Tooltip>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </React.Fragment>
+                        );
+                      })
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={3}
+                          className="text-center flex flex-col items-center justify-center text-muted-foreground"
+                        >
+                          <EmptyStateView
+                            Icon={<Coffee className="h-10 w-10" />}
+                            title="Inbox Zero"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           ) : (
             <div className="opacity-50 flex justify-center items-center h-full">
