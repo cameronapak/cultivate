@@ -22,6 +22,6 @@ primary_region = 'mia'
   cpus = 1
 
 [domains]
-  hostname = "cultivatepkm.com"
+  hostname = "cultivate.so"
   [domains.config]
     type = "primary"

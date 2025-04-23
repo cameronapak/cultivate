@@ -23,7 +23,7 @@ export function Footer() {
           </a>
         </Button>
         <Button asChild variant="link" size="sm" className="text-muted-foreground font-normal">
-          <a target="_blank" href="mailto:cam@cultivatepkm.com">
+          <a target="_blank" href="mailto:cam@cultivate.so">
             Contact
           </a>
         </Button>
