@@ -69,16 +69,17 @@ export function CanvasesPage() {
   }
 
   return (
-    <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Canvas" }]}>
+    <Layout 
+      isLoading={isLoading} 
+      breadcrumbItems={[{ title: "Canvas" }]}
+      ctaButton={
+        <Button variant="outline" onClick={() => navigate("/canvas/new")}>
+          <Plus className="w-4 h-4 mr-2" />
+          New Canvas
+        </Button>
+      }
+    >
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h1 className="heading-1">Canvas</h1>
-          <Button variant="outline" onClick={() => navigate("/canvas/new")}>
-            <Plus className="w-4 h-4 mr-2" />
-            New Canvas
-          </Button>
-        </div>
-
         <Table>
           <TableHeader>
             <TableRow>
