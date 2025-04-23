@@ -421,7 +421,7 @@ export function InboxPage() {
   } else if (isUrl(newItemText.trim())) {
     itemTypeButton = <Link2 className="h-4 w-4" />;
   } else {
-    itemTypeButton = <Dot className="h-4 w-4" />;
+    itemTypeButton = <Square className="h-4 w-4" />;
   }
 
   return (
