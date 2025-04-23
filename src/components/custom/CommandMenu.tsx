@@ -110,6 +110,26 @@ export function CommandMenu() {
             <BookOpen className="mr-2 h-4 w-4" />
             Open Docs
           </CommandItem>
+          <CommandItem
+            onSelect={() =>
+              runCommand(() => {
+                navigate(`/`);
+              })
+            }
+          >
+            <Folder className="mr-2 h-4 w-4" />
+            Open Projects
+          </CommandItem>
+          <CommandItem
+            onSelect={() =>
+              runCommand(() => {
+                navigate(`/canvases`);
+              })
+            }
+          >
+            <PencilRuler className="mr-2 h-4 w-4" />
+            Open Canvases
+          </CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandEmpty>No results found.</CommandEmpty>
@@ -130,12 +150,6 @@ export function CommandMenu() {
             ))}
           </CommandGroup>
         )}
-        <CommandGroup heading="Canvas">
-          <CommandItem>
-            <PencilRuler className="mr-2 h-4 w-4" />
-            Open Canvas
-          </CommandItem>
-        </CommandGroup>
       </CommandList>
     </CommandDialog>
   );
