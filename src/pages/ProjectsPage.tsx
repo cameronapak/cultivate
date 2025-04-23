@@ -107,7 +107,7 @@ const projectFormSchema = z.object({
 
 type ProjectFormValues = z.infer<typeof projectFormSchema>;
 
-export const MainPage = () => {
+export const ProjectsPage = () => {
   const { data: projects, isLoading, error } = useQuery(getProjects);
 
   const pinnedProjects =
