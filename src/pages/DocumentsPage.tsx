@@ -77,10 +77,15 @@ export function DocumentsPage() {
       isLoading={isLoading} 
       breadcrumbItems={[{ title: "Docs" }]}
       ctaButton={
-        <Button variant="outline" onClick={() => navigate("/documents/new")}>
-          <Plus className="w-4 h-4 mr-2" />
-          New Doc
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon" onClick={() => navigate("/documents/new")}>
+              <Plus className="w-4 h-4" />
+              <span className="sr-only">New Document</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>New Document</TooltipContent>
+        </Tooltip>
       }
     >
       <div className="space-y-4">

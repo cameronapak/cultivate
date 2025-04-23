@@ -56,10 +56,7 @@ export function CanvasesPage() {
             Start drawing and organizing your ideas visually.
           </EmptyStateDescription>
           <EmptyStateAction>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/canvas/new")}
-            >
+            <Button variant="outline" onClick={() => navigate("/canvas/new")}>
               New Canvas
             </Button>
           </EmptyStateAction>
@@ -69,14 +66,23 @@ export function CanvasesPage() {
   }
 
   return (
-    <Layout 
-      isLoading={isLoading} 
+    <Layout
+      isLoading={isLoading}
       breadcrumbItems={[{ title: "Canvas" }]}
       ctaButton={
-        <Button variant="outline" onClick={() => navigate("/canvas/new")}>
-          <Plus className="w-4 h-4 mr-2" />
-          New Canvas
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate("/canvas/new")}
+            >
+              <Plus className="w-4 h-4" />
+              <span className="sr-only">New Canvas</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>New Canvas</TooltipContent>
+        </Tooltip>
       }
     >
       <div className="space-y-4">
@@ -94,14 +100,14 @@ export function CanvasesPage() {
                 key={canvas.id}
                 className="group cursor-pointer hover:bg-muted/50"
               >
-                <TableCell 
+                <TableCell
                   className="font-medium"
                   onClick={() => navigate(`/canvas/${canvas.id}`)}
                   role="link"
                 >
                   {canvas.title}
                 </TableCell>
-                <TableCell 
+                <TableCell
                   className="text-sm text-muted-foreground"
                   onClick={() => navigate(`/canvas/${canvas.id}`)}
                   role="link"
@@ -135,4 +141,4 @@ export function CanvasesPage() {
       </div>
     </Layout>
   );
-} 
+}
