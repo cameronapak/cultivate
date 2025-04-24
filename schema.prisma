@@ -22,6 +22,7 @@ model Project {
   taskOrder   Int[]      @default([]) // Array of task IDs in sorted order
   pitch       Pitch?
   resources   Resource[]
+  thoughts    Thought[]
   pinned      Boolean    @default(false)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -65,6 +66,8 @@ model Thought {
   content     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   Int?
   user        User?    @relation(fields: [userId], references: [id])
   userId      Int?
 }
