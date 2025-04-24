@@ -76,7 +76,6 @@ import { CircleCheckIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "./ui/switch";
 import React from "react";
-import { Kbd } from "./custom/Kbd";
 import { useTabShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useLayoutState, type TabType } from "../hooks/useLayoutState";
 import { Project } from "../types";

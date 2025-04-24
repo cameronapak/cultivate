@@ -6,7 +6,7 @@ export type TabType = 'about' | 'task' | 'resource' | 'thought'
 export function useLayoutState() {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const currentTab = searchParams.get('tab') as TabType;
+  const currentTab = searchParams.get('tab') || 'task' as TabType;
   const [hideCompletedTasks, setHideCompletedTasks] = useState(JSON.parse(localStorage.getItem("hideCompletedTasks") || "false"));
 
   // Helper to preserve all existing params when updating
