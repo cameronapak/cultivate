@@ -27,6 +27,7 @@ import {
   Square,
   Info,
   Minus,
+  SendIcon,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -914,7 +915,7 @@ const NotesForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="relative">
         <FormField
           control={form.control}
           name="content"
@@ -923,6 +924,7 @@ const NotesForm = ({
               <FormControl>
                 <Input
                   placeholder="Write your note here..."
+                  className="pr-10"
                   {...field}
                 />
               </FormControl>
@@ -931,7 +933,14 @@ const NotesForm = ({
           )}
         />
 
-        <Button type="submit">Save Note</Button>
+        <Button 
+          disabled={form.formState.isSubmitting || !form.formState.isDirty} 
+          size="icon" 
+          type="submit"
+          className="absolute right-0 top-0 rounded-l-none"
+        >
+          <SendIcon className="w-4 h-4" />
+        </Button>
       </form>
     </Form>
   );
@@ -1194,12 +1203,16 @@ export const ProjectView = ({ project }: { project: Project }) => {
             <Card>
               <CardHeader>
                 <CardTitle>Notes</CardTitle>
-                <CardDescription>
-                  Add notes and thoughts about your project
-                </CardDescription>
+                {!sortedThoughts?.length && <CardDescription>
+                  Add notes to your project
+                </CardDescription>}
               </CardHeader>
               <CardContent>
-                <Table>
+                <NotesForm
+                  projectId={project.id}
+                  handleCreateThought={handleCreateThought}
+                />
+                <Table className="mt-4">
                   <TableBody>
                     {sortedThoughts?.map((thought: Thought) => (
                       <TableRow className="group grid grid-cols-[auto_1fr_auto] items-center">
@@ -1237,10 +1250,6 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     ))}
                   </TableBody>
                 </Table>
-                <NotesForm
-                  projectId={project.id}
-                  handleCreateThought={handleCreateThought}
-                />
               </CardContent>
             </Card>
           </div>
