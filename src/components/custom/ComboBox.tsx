@@ -45,13 +45,10 @@ export function Combobox({
           <CommandInput placeholder="Search..." className="h-9" />
           <CommandList>
             <CommandEmpty>No option found.</CommandEmpty>
-            <CommandGroup>
+            <CommandGroup onClick={(e) => e.stopPropagation()}>
               {options?.map((option) => (
                 // @TODO: Figure out how to get this to not propogate to the link.
                 <CommandItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
                   key={option.value}
                   value={option.label}
                   onSelect={async (currentValue) => {
