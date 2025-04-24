@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useQuery, getCanvases, deleteCanvas } from "wasp/client/operations";
+import { useQuery, getCanvases, deleteCanvas, createResource, getProjects } from "wasp/client/operations";
 import { Canvas } from "wasp/entities";
 import { Layout } from "../../components/Layout";
 import {
@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { Button } from "../../components/ui/button";
-import { PencilRuler, Plus, Trash2 } from "lucide-react";
+import { PencilRuler, Plus, Trash2, ArrowRight } from "lucide-react";
 import {
   EmptyStateRoot,
   EmptyStateDescription,
@@ -25,10 +25,12 @@ import {
   TooltipTrigger,
 } from "../../components/ui/tooltip";
 import { toast } from "sonner";
+import { Combobox } from "../../components/custom/ComboBox";
 
 export function CanvasesPage() {
   const navigate = useNavigate();
   const { data: canvases, isLoading, error } = useQuery(getCanvases);
+  const { data: projects } = useQuery(getProjects);
 
   const handleDeleteCanvas = async (canvasId: string) => {
     try {
@@ -114,8 +116,37 @@ export function CanvasesPage() {
                 >
                   {new Date(canvas.createdAt).toLocaleDateString()}
                 </TableCell>
-                <TableCell>
-                  <div className="flex justify-end">
+                <TableCell className="group-hover:opacity-100 opacity-0 transition-opacity duration-150">
+                  <div className="flex justify-end gap-2">
+                    <Combobox
+                      button={(
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          variant="outline"
+                          size="icon"
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </Button>
+                      )}
+                      options={projects?.map((project) => ({
+                        label: project.title,
+                        value: project.id.toString(),
+                      })) || []}
+                      onChange={async (projectTitle: string, projectId: string) => {
+                        try {
+                          await createResource({
+                            url: window.location.origin + "/canvas/" + canvas.id,
+                            title: canvas.title,
+                            projectId: parseInt(projectId, 10)
+                          })
+                          toast.success(`Canvas "${canvas.title}" added to Project "${projectTitle}"`);
+                        } catch (error) {
+                          toast.error("Failed to add canvas to project");
+                        }
+                      }}
+                    />
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -125,7 +156,6 @@ export function CanvasesPage() {
                             e.stopPropagation();
                             handleDeleteCanvas(canvas.id);
                           }}
-                          className="group-hover:opacity-100 opacity-0 transition-opacity duration-150"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
