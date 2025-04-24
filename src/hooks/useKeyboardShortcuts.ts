@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { type TabType } from './useLayoutState';
 
 type KeyboardShortcut = {
   key: string;
@@ -39,16 +40,16 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
 }
 
 // Helper hook for tab navigation shortcuts
-export function useTabShortcuts(handleTabChange: (tab: 'tasks' | 'resources' | 'about') => void) {
+export function useTabShortcuts(handleTabChange: (tab: TabType) => void) {
   useKeyboardShortcuts([
     {
       key: '1',
-      handler: () => handleTabChange('tasks'),
+      handler: () => handleTabChange('task'),
       description: 'Switch to Tasks tab',
     },
     {
       key: '2',
-      handler: () => handleTabChange('resources'),
+      handler: () => handleTabChange('resource'),
       description: 'Switch to Resources tab',
     },
     {

@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-type TabType = 'tasks' | 'resources' | 'about'
+
+export type TabType = 'about' | 'task' | 'resource' | 'thought'
 
 export function useLayoutState() {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const currentTab = searchParams.get('tab') as TabType || 'tasks'
+  const currentTab = searchParams.get('tab') as TabType;
   const [hideCompletedTasks, setHideCompletedTasks] = useState(JSON.parse(localStorage.getItem("hideCompletedTasks") || "false"));
 
   // Helper to preserve all existing params when updating
