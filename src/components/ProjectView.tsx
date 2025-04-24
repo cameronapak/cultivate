@@ -921,9 +921,8 @@ const NotesForm = ({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea
+                <Input
                   placeholder="Write your note here..."
-                  className="min-h-[200px]"
                   {...field}
                 />
               </FormControl>
