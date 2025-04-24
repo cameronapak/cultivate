@@ -669,9 +669,9 @@ export function InboxPage() {
       ]}
       ctaButton={
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={startReviewingTasks}>
+          {/* <Button variant="outline" onClick={startReviewingTasks}>
             Review tasks
-          </Button>
+          </Button> */}
 
           <Tooltip>
             <TooltipTrigger asChild>
