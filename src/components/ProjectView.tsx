@@ -1251,10 +1251,13 @@ export const ProjectView = ({ project }: { project: Project }) => {
                         <TableCell className="w-8">
                           <Minus className="h-4 w-4 text-muted-foreground" />
                         </TableCell>
-                        <TableCell className="flex items-center gap-2">
-                          <span className="text-sm cursor-text">
+                        <TableCell className="grid grid-cols-[1fr_auto] gap-2">
+                          <p className="text-sm cursor-text">
                             {thought.content}
-                          </span>
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(thought.createdAt).toLocaleDateString()}
+                          </p>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
