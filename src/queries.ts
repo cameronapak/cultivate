@@ -20,6 +20,7 @@ import {
   type UpdateTask,
   type MoveTask,
   type GetInboxTasks,
+  type GetInboxThoughts,
   type GetInboxResources,
   type MoveResource,
   type GetThoughts,
@@ -907,4 +908,18 @@ export const deleteThought: DeleteThought<DeleteThoughtPayload, Thought> = async
     where: { id: args.id }
   })
 }
+
+export const getInboxThoughts: GetInboxThoughts<void, Thought[]> = async (_args, context) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  return context.entities.Thought.findMany({
+    where: {
+      projectId: null,
+      userId: context.user.id
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
 //#endregion

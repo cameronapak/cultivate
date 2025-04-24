@@ -3,7 +3,7 @@ import {
   getInboxTasks,
   getInboxResources,
   useQuery,
-  getThoughts,
+  getInboxThoughts,
 } from "wasp/client/operations";
 import { type Project } from "wasp/entities";
 import {
@@ -260,7 +260,7 @@ export function InboxPage() {
     data: thoughts,
     isLoading: isLoadingThoughts,
     error: thoughtsError,
-  } = useQuery(getThoughts);
+  } = useQuery(getInboxThoughts);
   const { data: projects } = useQuery(getProjects);
   const [newItemText, setNewItemText] = useState("");
   const [isThought, setIsThought] = useState(false);
