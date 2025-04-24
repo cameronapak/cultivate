@@ -301,12 +301,12 @@ action createThought {
 
 action updateThought {
   fn: import { updateThought } from "@src/queries",
-  entities: [Thought]
+  entities: [Project, Thought]
 }
 
 action deleteThought {
   fn: import { deleteThought } from "@src/queries",
-  entities: [Thought]
+  entities: [Project, Thought]
 }
 //#endregion
 

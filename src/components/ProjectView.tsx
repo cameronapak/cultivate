@@ -1231,17 +1231,18 @@ export const ProjectView = ({ project }: { project: Project }) => {
                                 <Button
                                   variant="outline"
                                   size="icon"
-                                  onClick={() => {
-                                    deleteThought({
+                                  onClick={async () => {
+                                    await deleteThought({
                                       id: thought.id as string,
                                     });
+                                    toast.success("Note deleted successfully");
                                   }}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {/* Delete {item.type} */}
+                                Delete Note
                               </TooltipContent>
                             </Tooltip>
                           </div>
