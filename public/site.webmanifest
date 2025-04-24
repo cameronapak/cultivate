@@ -1,0 +1,20 @@
+{
+  "name": "Cultivate",
+  "short_name": "Cultivate",
+  "description": "Imagine if Notion & Basecamp had a baby. Cultivate is a PKM tool where you can calmly brain dump, write, manage projects, and get things done.",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}
