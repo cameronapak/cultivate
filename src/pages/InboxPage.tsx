@@ -19,6 +19,7 @@ import {
   updateTask,
   updateThought,
   updateResource,
+  moveThought,
 } from "wasp/client/operations";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
@@ -391,10 +392,11 @@ export function InboxPage() {
           resourceId: item.id as number,
           projectId,
         });
-      } else {
-        // Thoughts cannot be moved to projects (for now)
-        toast.error("Thoughts cannot be moved to projects");
-        return;
+      } else if (item.type === "thought") {
+        await moveThought({
+          thoughtId: item.id as string,
+          projectId,
+        });
       }
       toast.success(`${item.type} moved to project`);
     } catch (error) {
@@ -1033,32 +1035,30 @@ export function InboxPage() {
                                       </Tooltip>
                                     )}
 
-                                    {item.type !== "thought" && (
-                                      <Combobox
-                                        button={(
-                                          <Button variant="outline" size="icon">
-                                            <MoveRight className="h-4 w-4" />
-                                          </Button>
-                                        )}
-                                        options={projects?.map((project) => ({
-                                          // The label is what's searchable.
-                                          label: project.title,
-                                          value: project.id.toString(),
-                                        })) || []}
-                                        onChange={async (projectId: string) => {
-                                          console.log("projectId", projectId);
-                                          try {
-                                            const projectIdInt = parseInt(projectId, 10)
-                                            await handleMoveItem(
-                                              item,
-                                              projectIdInt
-                                            )
-                                          } catch (error) {
-                                            toast.error("Failed to move item");
-                                          }
-                                        }}
-                                      />
-                                    )}
+                                    <Combobox
+                                      button={(
+                                        <Button variant="outline" size="icon">
+                                          <MoveRight className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                      options={projects?.map((project) => ({
+                                        // The label is what's searchable.
+                                        label: project.title,
+                                        value: project.id.toString(),
+                                      })) || []}
+                                      onChange={async (projectId: string) => {
+                                        console.log("projectId", projectId);
+                                        try {
+                                          const projectIdInt = parseInt(projectId, 10)
+                                          await handleMoveItem(
+                                            item,
+                                            projectIdInt
+                                          )
+                                        } catch (error) {
+                                          toast.error("Failed to move item");
+                                        }
+                                      }}
+                                    />
 
                                     <Tooltip>
                                       <TooltipTrigger asChild>

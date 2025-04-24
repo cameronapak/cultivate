@@ -28,6 +28,7 @@ import {
   type CreateThought,
   type UpdateThought,
   type DeleteThought,
+  type MoveThought,
 } from 'wasp/server/operations'
 
 // Define our own GetProject type since we need to include related entities
@@ -906,6 +907,35 @@ export const deleteThought: DeleteThought<DeleteThoughtPayload, Thought> = async
   
   return context.entities.Thought.delete({
     where: { id: args.id }
+  })
+}
+
+type MoveThoughtArgs = {
+  thoughtId: string
+  projectId: number | null
+}
+
+export const moveThought: MoveThought<MoveThoughtArgs, Thought> = async (args: MoveThoughtArgs, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  
+  const thought = await context.entities.Thought.findUnique({
+    where: { 
+      id: args.thoughtId,
+      userId: context.user.id 
+    }
+  })
+  
+  if (!thought) {
+    throw new HttpError(404, "Thought not found")
+  }
+  
+  return context.entities.Thought.update({
+    where: { id: args.thoughtId },
+    data: {
+      projectId: args.projectId || null
+    }
   })
 }
 

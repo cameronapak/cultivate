@@ -308,6 +308,11 @@ action deleteThought {
   fn: import { deleteThought } from "@src/queries",
   entities: [Project, Thought]
 }
+
+action moveThought {
+  fn: import { moveThought } from "@src/queries",
+  entities: [Project, Thought]
+}
 //#endregion
 
 api getUrlMetadata {
