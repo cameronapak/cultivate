@@ -30,7 +30,7 @@ export function Combobox({
 }: {
   options: Status[];
   button: React.ReactNode;
-  onChange: (value: string) => Promise<void>;
+  onChange: (label: string, value: string) => Promise<void>;
 }) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("")
@@ -47,14 +47,18 @@ export function Combobox({
             <CommandEmpty>No option found.</CommandEmpty>
             <CommandGroup>
               {options?.map((option) => (
+                // @TODO: Figure out how to get this to not propogate to the link.
                 <CommandItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
                   key={option.value}
                   value={option.label}
                   onSelect={async (currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
                     setOpen(false);
                     try {
-                      await onChange(option.value)
+                      await onChange(option.label, option.value)
                     } catch (error) {
                       // Do nothing
                     }

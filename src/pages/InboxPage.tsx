@@ -1046,7 +1046,7 @@ export function InboxPage() {
                                         label: project.title,
                                         value: project.id.toString(),
                                       })) || []}
-                                      onChange={async (projectId: string) => {
+                                      onChange={async (_projectTitle: string, projectId: string) => {
                                         console.log("projectId", projectId);
                                         try {
                                           const projectIdInt = parseInt(projectId, 10)
