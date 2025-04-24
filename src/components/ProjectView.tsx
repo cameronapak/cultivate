@@ -28,6 +28,8 @@ import {
   Info,
   Minus,
   SendIcon,
+  PencilRuler,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -490,13 +492,18 @@ const ResourceItem = ({
               className="grid items-center gap-2"
               style={{ gridTemplateColumns: faviconUrl ? "16px 1fr" : "1fr" }}
             >
-              {faviconUrl && (
+              {!isSameOrigin && faviconUrl && (
                 <img
                   src={faviconUrl}
                   alt="Favicon"
                   className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
                 />
               )}
+              {isSameOrigin && resource.url.includes("canvas") ? (
+                <PencilRuler className="h-4 w-4 text-muted-foreground" />
+              ) : isSameOrigin && resource.url.includes("document") ? (
+                <BookOpen className="h-4 w-4 text-muted-foreground" />
+              ) : null}
               <div className="flex flex-col">
                 <p className="text-sm hover:underline">{resource.title}</p>
                 {resource.description && (
