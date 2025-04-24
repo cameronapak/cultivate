@@ -155,7 +155,7 @@ export function DocumentsPage() {
                           title: document.title,
                           projectId: parseInt(projectId, 10)
                         })
-                        toast.success(`Document added to ${projectTitle}`);
+                        toast.success(`Document "${document.title}" added to Project "${projectTitle}"`);
                       } catch (error) {
                         toast.error("Failed to move item");
                       }
