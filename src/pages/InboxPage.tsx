@@ -577,8 +577,10 @@ export function InboxPage() {
           type: "thought" as const,
           createdAt: new Date(thought.createdAt), // Ensure it's a Date object
         })) || []),
-      ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
-    [tasks, resources, thoughts]
+      ]
+      .filter((item) => filter !== 'all' ? filter === item.type : true)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+    [tasks, resources, thoughts, filter]
   );
 
   // Group items by date
@@ -665,9 +667,9 @@ export function InboxPage() {
       ]}
       ctaButton={
         <div className="flex items-center gap-2">
-          {/* <Button variant="outline" onClick={startReviewingTasks}>
+          <Button variant="outline" onClick={startReviewingTasks}>
             Review tasks
-          </Button> */}
+          </Button>
 
           <Tooltip>
             <TooltipTrigger asChild>
