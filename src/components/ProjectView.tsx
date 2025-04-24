@@ -1,10 +1,6 @@
 import { useState, useRef, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import type {
-  Task,
-  Resource,
-  Pitch,
-} from "wasp/entities";
+import type { Task, Resource, Pitch, Thought } from "wasp/entities";
 import {
   deleteTask,
   updateTask,
@@ -15,7 +11,10 @@ import {
   updateProject,
   deleteProject,
   updateTaskStatus,
-  updateProjectTaskOrder
+  updateProjectTaskOrder,
+  createThought,
+  deleteThought,
+  useAction,
 } from "wasp/client/operations";
 import {
   Trash,
@@ -27,6 +26,7 @@ import {
   Settings2Icon,
   Square,
   Info,
+  Minus,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -49,12 +49,14 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-} from "../components/ui/tabs";
+import { Tabs, TabsContent } from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
-import { Table, TableBody, TableCell, TableRow } from "../components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "../components/ui/table";
 import { getFaviconFromUrl, isUrl, getMetadataFromUrl, cn } from "../lib/utils";
 import {
   Popover,
@@ -80,6 +82,9 @@ import { useTabShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useLayoutState, type TabType } from "../hooks/useLayoutState";
 import { Project } from "../types";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
+import { TooltipContent } from "./ui/tooltip";
+import { TooltipTrigger } from "./ui/tooltip";
+import { Tooltip } from "./ui/tooltip";
 
 const EditTaskForm = ({
   task,
@@ -254,8 +259,11 @@ const TaskItem = ({ task }: { task: Task }) => {
   );
 };
 
-const TaskList = ({ tasks, projectId }: { 
-  tasks: Task[]; 
+const TaskList = ({
+  tasks,
+  projectId,
+}: {
+  tasks: Task[];
   projectId: number;
 }) => {
   const [parentRef, values, setValues] = useDragAndDrop<HTMLDivElement, Task>(
@@ -266,7 +274,7 @@ const TaskList = ({ tasks, projectId }: {
         try {
           await updateProjectTaskOrder({
             projectId: projectId,
-            taskOrder: newTaskOrder
+            taskOrder: newTaskOrder,
           });
         } catch (error) {
           console.error("Failed to update task order:", error);
@@ -292,9 +300,7 @@ const TaskList = ({ tasks, projectId }: {
   );
 };
 
-const NewTaskForm = ({ projectId }: { 
-  projectId: number;
-}) => {
+const NewTaskForm = ({ projectId }: { projectId: number }) => {
   const [isAdding, setIsAdding] = useState(false);
   const formSchema = z.object({
     title: z.string().min(1, { message: "Task title is required" }),
@@ -336,7 +342,10 @@ const NewTaskForm = ({ projectId }: {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-2"
+      >
         <FormField
           control={form.control}
           name="title"
@@ -480,12 +489,16 @@ const ResourceItem = ({
           rel="noopener noreferrer"
           className="flex items-center gap-2"
         >
-          <div 
+          <div
             className="grid items-center gap-2"
-            style={{ gridTemplateColumns: faviconUrl ? '16px 1fr' : '1fr' }}
+            style={{ gridTemplateColumns: faviconUrl ? "16px 1fr" : "1fr" }}
           >
             {faviconUrl && (
-              <img src={faviconUrl} alt="Favicon" className="mt-0.5 w-4 h-4 bg-secondary rounded-sm" />
+              <img
+                src={faviconUrl}
+                alt="Favicon"
+                className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
+              />
             )}
             <div className="flex flex-col">
               <p className="text-sm hover:underline">{resource.title}</p>
@@ -510,11 +523,7 @@ const ResourceItem = ({
   );
 };
 
-const NewResourceForm = ({
-  projectId,
-}: {
-  projectId: number;
-}) => {
+const NewResourceForm = ({ projectId }: { projectId: number }) => {
   const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
   const formSchema = z.object({
     title: z.string().min(1, { message: "Title is required" }),
@@ -577,9 +586,9 @@ const NewResourceForm = ({
             <FormItem>
               <FormControl>
                 <div className="relative">
-                  <Input 
-                    autoFocus 
-                    placeholder="https://example.com" 
+                  <Input
+                    autoFocus
+                    placeholder="https://example.com"
                     {...field}
                     onChange={handleUrlChange}
                     className={isFetchingMetadata ? "pr-8" : ""}
@@ -602,10 +611,7 @@ const NewResourceForm = ({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
-                  placeholder="Resource title or name"
-                  {...field}
-                />
+                <Input placeholder="Resource title or name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -875,6 +881,63 @@ const AboutForm = ({
   );
 };
 
+const NotesForm = ({
+  projectId,
+  handleCreateThought,
+}: {
+  projectId: number;
+  handleCreateThought: any;
+}) => {
+  const formSchema = z.object({
+    content: z.string().min(1, { message: "Note content is required" }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      content: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await handleCreateThought({
+        content: values.content,
+        projectId: projectId,
+      });
+      toast.success("Note created successfully");
+      form.reset();
+    } catch (err: any) {
+      toast.error("Error creating note: " + err.message);
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea
+                  placeholder="Write your note here..."
+                  className="min-h-[200px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit">Save Note</Button>
+      </form>
+    </Form>
+  );
+};
+
 type ProjectWithRelations = Project & {
   tasks?: Task[];
   resources?: Resource[];
@@ -890,6 +953,8 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const handleTabChange = (tab: TabType) => {
     setTab(tab);
   };
+
+  const handleCreateThought = useAction(createThought);
 
   // Use the new hook for tab shortcuts
   useTabShortcuts(handleTabChange);
@@ -933,7 +998,9 @@ export const ProjectView = ({ project }: { project: Project }) => {
   return (
     <main>
       <h1 className="heading-1">{project.title}</h1>
-      <p className="paragraph text-muted-foreground !mt-0 line-clamp-2">{project.description}</p>
+      <p className="paragraph text-muted-foreground !mt-0 line-clamp-2">
+        {project.description}
+      </p>
       <div
         className="flex items-center my-6 w-fit"
         role="tablist"
@@ -988,29 +1055,23 @@ export const ProjectView = ({ project }: { project: Project }) => {
         >
           <Link2 className="h-4 w-4" aria-hidden="true" />
           <span>Links</span>
-          {/* <span className="sr-only">
-            {getItemCount("resource")} links
-          </span> */}
         </Button>
-        {/* <Button
-          variant={currentTab === "thought" ? "secondary" : "ghost"}
+        <Button
+          variant={currentTab === "notes" ? "secondary" : "ghost"}
           size="sm"
-          onClick={() => handleTabChange("thought")}
+          onClick={() => handleTabChange("notes")}
           className={cn(
             "relative px-3 rounded-full text-muted-foreground shadow-none",
-            currentTab === "thought" && "text-primary"
+            currentTab === "notes" && "text-primary"
           )}
           role="tab"
-          aria-selected={currentTab === "thought"}
-          aria-controls="thoughts-tab"
-          id="thoughts-tab"
+          aria-selected={currentTab === "notes"}
+          aria-controls="notes-tab"
+          id="notes-tab"
         >
           <Minus className="h-4 w-4" aria-hidden="true" />
           <span>Notes</span>
-          {/ * <span className="sr-only">
-            {getItemCount("thought")} notes
-          </span> * /}
-        </Button> */}
+        </Button>
         <Button
           variant={currentTab === "about" ? "secondary" : "ghost"}
           size="sm"
@@ -1032,7 +1093,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
       <Tabs
         value={currentTab}
         onValueChange={(value) =>
-          handleTabChange(value as "about" | "task" | "resource" | "thought")
+          handleTabChange(value as "about" | "task" | "resource" | "notes")
         }
       >
         <TabsContent value="task">
@@ -1044,8 +1105,10 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     <CardTitle>Tasks</CardTitle>
                     <CardDescription className="flex items-center gap-1">
                       <CircleCheckIcon className="w-4 h-4" />
-                      {project.tasks?.filter((task) => !task.complete).length} tasks
-                      remaining
+                      {
+                        project.tasks?.filter((task) => !task.complete).length
+                      }{" "}
+                      tasks remaining
                     </CardDescription>
                   </div>
                   <Popover>
@@ -1074,10 +1137,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
               </CardHeader>
               <CardContent>
                 {sortedTasks && sortedTasks.length > 0 ? (
-                  <TaskList 
-                    tasks={sortedTasks} 
-                    projectId={project.id} 
-                  />
+                  <TaskList tasks={sortedTasks} projectId={project.id} />
                 ) : (
                   <p className="text-sm text-muted-foreground">
                     {project?.tasks?.length
@@ -1086,9 +1146,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                   </p>
                 )}
                 <div className="mt-4">
-                  <NewTaskForm 
-                    projectId={project.id} 
-                  />
+                  <NewTaskForm projectId={project.id} />
                 </div>
               </CardContent>
             </Card>
@@ -1109,18 +1167,13 @@ export const ProjectView = ({ project }: { project: Project }) => {
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                      >
+                      <Button size="sm" variant="outline">
                         <Plus className="w-4 h-4" />
                         Add Resource
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent>
-                      <NewResourceForm
-                        projectId={project.id}
-                      />
+                      <NewResourceForm projectId={project.id} />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -1132,21 +1185,62 @@ export const ProjectView = ({ project }: { project: Project }) => {
           </div>
         </TabsContent>
 
-        {/* <TabsContent value="thought">
+        <TabsContent value="notes">
           <div className="mt-4 space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Notes</CardTitle>
                 <CardDescription>
-                  Update your project information
+                  Add notes and thoughts about your project
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Notes go here</p>
+                <Table>
+                  <TableBody>
+                    {project?.thoughts?.map((thought: Thought) => (
+                      <TableRow className="group grid grid-cols-[auto_1fr_auto] items-center">
+                        <TableCell className="w-8">
+                          <Minus className="h-4 w-4 text-muted-foreground" />
+                        </TableCell>
+                        <TableCell className="flex items-center gap-2">
+                          <span className="text-sm cursor-text">
+                            {thought.content}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  onClick={() => {
+                                    deleteThought({
+                                      id: thought.id as string,
+                                    });
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {/* Delete {item.type} */}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <NotesForm
+                  projectId={project.id}
+                  handleCreateThought={handleCreateThought}
+                />
               </CardContent>
             </Card>
           </div>
-        </TabsContent> */}
+        </TabsContent>
 
         <TabsContent value="about">
           <div className="mt-4 space-y-6">

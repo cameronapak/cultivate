@@ -291,7 +291,7 @@ query getThought {
 
 action createThought {
   fn: import { createThought } from "@src/queries",
-  entities: [Thought]
+  entities: [Project, Thought]
 }
 
 action updateThought {
