@@ -982,6 +982,11 @@ export const ProjectView = ({ project }: { project: Project }) => {
     return indexA - indexB;
   });
 
+  // Sort thoughts by createdAt date (newest first)
+  const sortedThoughts = project.thoughts?.sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
   if (isEditing) {
     return (
       <div>
@@ -1196,7 +1201,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
               <CardContent>
                 <Table>
                   <TableBody>
-                    {project?.thoughts?.map((thought: Thought) => (
+                    {sortedThoughts?.map((thought: Thought) => (
                       <TableRow className="group grid grid-cols-[auto_1fr_auto] items-center">
                         <TableCell className="w-8">
                           <Minus className="h-4 w-4 text-muted-foreground" />
