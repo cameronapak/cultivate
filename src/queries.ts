@@ -62,7 +62,8 @@ export const getProject: GetProject<GetProjectInput, Project> = async (args, con
     include: { 
       tasks: true,
       resources: true,
-      pitch: true
+      pitch: true,
+      thoughts: true
     }
   })
 }
@@ -825,6 +826,7 @@ export const getThought: GetThought<GetThoughtInput, Thought> = async (args, con
 
 type CreateThoughtPayload = {
   content: string
+  projectId?: number
 }
 
 export const createThought: CreateThought<CreateThoughtPayload, Thought> = async (
@@ -838,7 +840,8 @@ export const createThought: CreateThought<CreateThoughtPayload, Thought> = async
   return context.entities.Thought.create({
     data: {
       content: args.content,
-      user: { connect: { id: context.user.id } }
+      user: { connect: { id: context.user.id } },
+      ...(args.projectId && { project: { connect: { id: args.projectId } } })
     }
   })
 }
@@ -846,6 +849,7 @@ export const createThought: CreateThought<CreateThoughtPayload, Thought> = async
 type UpdateThoughtPayload = {
   id: string
   content: string
+  projectId?: number
 }
 
 export const updateThought: UpdateThought<UpdateThoughtPayload, Thought> = async (
@@ -870,7 +874,8 @@ export const updateThought: UpdateThought<UpdateThoughtPayload, Thought> = async
   return context.entities.Thought.update({
     where: { id: args.id },
     data: {
-      content: args.content
+      content: args.content,
+      ...(args.projectId && { projectId: args.projectId })
     }
   })
 }

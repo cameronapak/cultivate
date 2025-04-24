@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
-export type TabType = 'about' | 'task' | 'resource' | 'thought'
+export type TabType = "task" | "resource" | "about" | "notes";
 
 export function useLayoutState() {
   const [searchParams, setSearchParams] = useSearchParams()
