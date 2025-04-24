@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   getInboxTasks,
   getInboxResources,
   useQuery,
   getThoughts,
 } from "wasp/client/operations";
+import { type Project } from "wasp/entities";
 import {
   createTask,
   updateTaskStatus,
@@ -37,15 +38,11 @@ import {
   Dot,
   Square,
   ExternalLink,
+  Heart,
+  HandHeart,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
 import { Layout } from "../components/Layout";
 import {
   Tooltip,
@@ -56,6 +53,17 @@ import { toast } from "sonner";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
 import { getFaviconFromUrl, getMetadataFromUrl, isUrl } from "../lib/utils";
 import { cn } from "../lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../components/ui/dialog";
+import { Textarea } from "../components/ui/textarea";
+import { Toggle } from "../components/ui/toggle";
+import { Combobox } from "../components/custom/ComboBox";
 
 // Add common shape type
 type InboxItem = {
@@ -119,6 +127,124 @@ type GroupedInboxItems = {
 // Add this type for filter options
 type InboxFilter = "all" | "task" | "resource" | "thought";
 
+// Add these types after the InboxItem type
+type TaskReviewState = {
+  isVital: boolean | null;
+  doesMatter: boolean | null;
+  notes: string;
+  showContext: boolean;
+};
+
+type TaskReviewDialogProps = {
+  task: InboxItem;
+  isOpen: boolean;
+  onClose: () => void;
+  onComplete: (
+    taskId: number | string,
+    decision: "keep" | "defer" | "discard",
+    notes: string
+  ) => void;
+  projects: Project[];
+};
+
+const TaskReviewDialog = ({
+  task,
+  isOpen,
+  onClose,
+  onComplete,
+  projects,
+}: TaskReviewDialogProps) => {
+  const [reviewState, setReviewState] = useState<TaskReviewState>({
+    isVital: null,
+    doesMatter: null,
+    notes: "",
+    showContext: false,
+  });
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+
+  const handleDecision = (decision: "keep" | "defer" | "discard") => {
+    onComplete(task.id, decision, reviewState.notes);
+    setReviewState({
+      isVital: null,
+      doesMatter: null,
+      notes: "",
+      showContext: false,
+    });
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {task.title}
+          </DialogTitle>
+          {/* <Input
+            type="text"
+            value={task.title}
+          /> */}
+        </DialogHeader>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Toggle variant="outline">
+            <Heart className="h-4 w-4" />
+            This task is vital
+          </Toggle>
+          <Toggle variant="outline">
+            <HandHeart className="h-4 w-4" />
+            This task matters
+          </Toggle>
+        </div>
+
+        {/* I want to have a combobox to select a project */}
+        {/* <Combobox
+          options={projects?.map((project) => ({
+            label: project.title,
+            value: project.id.toString(),
+          }))}
+          value={selectedProjectId || ""}
+          onChange={setSelectedProjectId}
+          placeholder="Select a project"
+        /> */}
+
+        {/* <DialogFooter className="flex justify-center gap-2">
+          <Button
+            variant="default"
+            onClick={() => handleDecision("keep")}
+            disabled={
+              reviewState.isVital === null || reviewState.doesMatter === null
+            }
+          >
+            <Check className="h-4 w-4 mr-2" />
+            Keep
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleDecision("defer")}
+            disabled={
+              reviewState.isVital === null || reviewState.doesMatter === null
+            }
+          >
+            <Clock className="h-4 w-4 mr-2" />
+            Defer
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => handleDecision("discard")}
+            disabled={
+              reviewState.isVital === null || reviewState.doesMatter === null
+            }
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Discard
+          </Button>
+        </DialogFooter> */}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export function InboxPage() {
   const {
     data: tasks,
@@ -150,8 +276,12 @@ export function InboxPage() {
   const [editingThoughtId, setEditingThoughtId] = useState<string | null>(null);
   const [editingThoughtContent, setEditingThoughtContent] =
     useState<string>("");
-  const [editingResourceId, setEditingResourceId] = useState<number | null>(null);
+  const [editingResourceId, setEditingResourceId] = useState<number | null>(
+    null
+  );
   const [editingResourceTitle, setEditingResourceTitle] = useState<string>("");
+  const [reviewingTask, setReviewingTask] = useState<InboxItem | null>(null);
+  const [showReviewDialog, setShowReviewDialog] = useState<boolean>(false);
 
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
@@ -355,9 +485,12 @@ export function InboxPage() {
     setEditingThoughtId(null);
   };
 
-  const handleResourceTitleChange = async (resourceId: number, newTitle: string) => {
+  const handleResourceTitleChange = async (
+    resourceId: number,
+    newTitle: string
+  ) => {
     // Find the original resource title
-    const originalResource = resources?.find(r => r.id === resourceId);
+    const originalResource = resources?.find((r) => r.id === resourceId);
     if (!originalResource || originalResource.title === newTitle) {
       setEditingResourceId(null);
       return;
@@ -418,31 +551,35 @@ export function InboxPage() {
   };
 
   // Transform tasks, resources, and thoughts into a common shape
-  const inboxItems: InboxItem[] = [
-    ...(tasks?.map((task) => ({
-      id: task.id,
-      title: task.title,
-      type: "task" as const,
-      createdAt: new Date(task.createdAt), // Ensure it's a Date object
-      complete: task.complete,
-    })) || []),
-    ...(resources?.map((resource) => ({
-      id: resource.id,
-      title: resource.title,
-      type: "resource" as const,
-      createdAt: new Date(resource.createdAt), // Ensure it's a Date object
-      url: resource.url,
-    })) || []),
-    ...(thoughts?.map((thought) => ({
-      id: thought.id,
-      title:
-        thought.content.slice(0, 60) +
-        (thought.content.length > 60 ? "..." : ""),
-      content: thought.content,
-      type: "thought" as const,
-      createdAt: new Date(thought.createdAt), // Ensure it's a Date object
-    })) || []),
-  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const inboxItems: InboxItem[] = useMemo(
+    () =>
+      [
+        ...(tasks?.map((task) => ({
+          id: task.id,
+          title: task.title,
+          type: "task" as const,
+          createdAt: new Date(task.createdAt), // Ensure it's a Date object
+          complete: task.complete,
+        })) || []),
+        ...(resources?.map((resource) => ({
+          id: resource.id,
+          title: resource.title,
+          type: "resource" as const,
+          createdAt: new Date(resource.createdAt), // Ensure it's a Date object
+          url: resource.url,
+        })) || []),
+        ...(thoughts?.map((thought) => ({
+          id: thought.id,
+          title:
+            thought.content.slice(0, 60) +
+            (thought.content.length > 60 ? "..." : ""),
+          content: thought.content,
+          type: "thought" as const,
+          createdAt: new Date(thought.createdAt), // Ensure it's a Date object
+        })) || []),
+      ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+    [tasks, resources, thoughts]
+  );
 
   // Group items by date
   const groupedItems = groupItemsByDate(inboxItems);
@@ -456,6 +593,46 @@ export function InboxPage() {
   const getItemCount = (type: InboxFilter) => {
     if (type === "all") return inboxItems.length;
     return inboxItems.filter((item) => item.type === type).length;
+  };
+
+  // Add this handler after other handlers
+  const handleTaskReviewComplete = async (
+    taskId: number | string,
+    decision: "keep" | "defer" | "discard",
+    notes: string
+  ) => {
+    try {
+      if (decision === "discard") {
+        await deleteTask({ id: taskId as number });
+        toast.success("Task discarded");
+      } else if (decision === "defer") {
+        // You might want to implement defer logic here
+        toast.success("Task deferred");
+      } else {
+        // For "keep", you might want to mark it as complete or move it to a project
+        await updateTaskStatus({ id: taskId as number, complete: true });
+        toast.success("Task kept and marked as complete");
+      }
+    } catch (error) {
+      console.error("Failed to process task:", error);
+      toast.error("Failed to process task");
+    }
+  };
+
+  const startReviewingTasks = () => {
+    if (!reviewingTask && tasks && tasks.length > 0) {
+      const firstUncompletedTask = tasks.find((task) => !task.complete);
+      if (firstUncompletedTask) {
+        setReviewingTask({
+          id: firstUncompletedTask.id,
+          title: firstUncompletedTask.title,
+          content: firstUncompletedTask.description || "",
+          type: "task",
+          createdAt: firstUncompletedTask.createdAt,
+          complete: firstUncompletedTask.complete,
+        });
+      }
+    }
   };
 
   if (tasksError || resourcesError || thoughtsError) {
@@ -487,29 +664,48 @@ export function InboxPage() {
         },
       ]}
       ctaButton={
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={showInbox ? "outline" : "default"}
-              type="submit"
-              onClick={handleToggleTasks}
-              size="icon"
-            >
-              {showInbox ? (
-                <Eye className="h-5 w-5" />
-              ) : (
-                <EyeClosed className="h-5 w-5" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {showInbox ? "Hide inbox" : "Show inbox"}
-          </TooltipContent>
-        </Tooltip>
+        <div className="flex items-center gap-2">
+          {/* <Button variant="outline" onClick={startReviewingTasks}>
+            Review tasks
+          </Button> */}
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={showInbox ? "outline" : "default"}
+                type="submit"
+                onClick={handleToggleTasks}
+                size="icon"
+              >
+                {showInbox ? (
+                  <Eye className="h-5 w-5" />
+                ) : (
+                  <EyeClosed className="h-5 w-5" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {showInbox ? "Hide inbox" : "Show inbox"}
+            </TooltipContent>
+          </Tooltip>
+        </div>
       }
     >
       <div>
         <div>
+          {/* {showReviewDialog && reviewingTask && projects?.length ? (
+            <TaskReviewDialog
+              task={reviewingTask}
+              isOpen={showReviewDialog}
+              onClose={() => {
+                setReviewingTask(null);
+                setShowReviewDialog(false);
+              }}
+              projects={projects}
+              onComplete={handleTaskReviewComplete}
+            />
+          ) : null} */}
+
           <div className="relative flex gap-4 mb-6">
             <Button
               className="absolute shadow-none top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
@@ -709,6 +905,7 @@ export function InboxPage() {
                                       <input
                                         type="text"
                                         value={item.title}
+                                        onChange={() => {}}
                                         className="w-full bg-transparent text-sm outline-none"
                                         onFocus={() => {
                                           setEditingTaskId(item.id as number);
@@ -737,7 +934,9 @@ export function InboxPage() {
                                           type="text"
                                           value={editingResourceTitle}
                                           onChange={(e) =>
-                                            setEditingResourceTitle(e.target.value)
+                                            setEditingResourceTitle(
+                                              e.target.value
+                                            )
                                           }
                                           onKeyDown={(e) =>
                                             handleResourceTitleKeyDown(
@@ -746,7 +945,9 @@ export function InboxPage() {
                                             )
                                           }
                                           onBlur={() =>
-                                            handleResourceTitleBlur(item.id as number)
+                                            handleResourceTitleBlur(
+                                              item.id as number
+                                            )
                                           }
                                           className="w-full rounded-md bg-transparent text-sm outline-none"
                                           autoFocus
@@ -755,7 +956,9 @@ export function InboxPage() {
                                         <span
                                           className="text-sm cursor-text"
                                           onClick={() => {
-                                            setEditingResourceId(item.id as number);
+                                            setEditingResourceId(
+                                              item.id as number
+                                            );
                                             setEditingResourceTitle(item.title);
                                           }}
                                         >
@@ -806,7 +1009,6 @@ export function InboxPage() {
                                 </TableCell>
                                 <TableCell className="text-right">
                                   <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
-                                    {/* If item is a resource then show a button to open the resource in a new tab */}
                                     {item.type === "resource" && (
                                       <Tooltip>
                                         <TooltipTrigger>
@@ -830,44 +1032,30 @@ export function InboxPage() {
                                     )}
 
                                     {item.type !== "thought" && (
-                                      <DropdownMenu>
-                                        <DropdownMenuTrigger>
-                                          <Tooltip>
-                                            <TooltipTrigger asChild>
-                                              <Button
-                                                variant="outline"
-                                                size="icon"
-                                              >
-                                                <MoveRight className="h-4 w-4" />
-                                              </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              Move {item.type} to a project
-                                            </TooltipContent>
-                                          </Tooltip>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                          {projects?.length ? (
-                                            projects?.map((project) => (
-                                              <DropdownMenuItem
-                                                key={project.id}
-                                                onClick={() =>
-                                                  handleMoveItem(
-                                                    item,
-                                                    project.id
-                                                  )
-                                                }
-                                              >
-                                                Move to {project.title}
-                                              </DropdownMenuItem>
-                                            ))
-                                          ) : (
-                                            <DropdownMenuItem className="text-muted-foreground">
-                                              No projects found
-                                            </DropdownMenuItem>
-                                          )}
-                                        </DropdownMenuContent>
-                                      </DropdownMenu>
+                                      <Combobox
+                                        button={(
+                                          <Button variant="outline" size="icon">
+                                            <MoveRight className="h-4 w-4" />
+                                          </Button>
+                                        )}
+                                        options={projects?.map((project) => ({
+                                          // The label is what's searchable.
+                                          label: project.title,
+                                          value: project.id.toString(),
+                                        })) || []}
+                                        onChange={async (projectId: string) => {
+                                          console.log("projectId", projectId);
+                                          try {
+                                            const projectIdInt = parseInt(projectId, 10)
+                                            await handleMoveItem(
+                                              item,
+                                              projectIdInt
+                                            )
+                                          } catch (error) {
+                                            toast.error("Failed to move item");
+                                          }
+                                        }}
+                                      />
                                     )}
 
                                     <Tooltip>
@@ -931,6 +1119,15 @@ export function InboxPage() {
           )}
         </div>
       </div>
+      {/* {reviewingTask && (
+        <TaskReviewDialog
+          task={reviewingTask}
+          isOpen={!!reviewingTask}
+          onClose={() => setReviewingTask(null)}
+          onComplete={handleTaskReviewComplete}
+          projects={projects || []}
+        />
+      )} */}
     </Layout>
   );
 }
