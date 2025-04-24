@@ -194,6 +194,7 @@ export function DocumentPage() {
         id: document.id,
         title: title,
         content: content || document.content,
+        isPublished: document.isPublished,
       });
       setIsEditing(false);
       setHasUnsavedChanges(false);
