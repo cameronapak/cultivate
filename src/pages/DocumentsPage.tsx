@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { deleteDocument, useQuery } from "wasp/client/operations";
-import { getDocuments } from "wasp/client/operations";
+import { createResource, deleteDocument, useQuery } from "wasp/client/operations";
+import { getDocuments, getProjects } from "wasp/client/operations";
 import { Document } from "wasp/entities";
 import { Layout } from "../components/Layout";
 import {
@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Button } from "../components/ui/button";
-import { BadgeCheck, Plus, File, MoreHorizontal, Trash2 } from "lucide-react";
+import { BadgeCheck, Plus, File, MoreHorizontal, Trash2, LinkIcon, ArrowRight } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import {
   Tooltip,
@@ -27,9 +27,11 @@ import {
   EmptyStateIcon,
 } from "../components/custom/EmptyStateView";
 import { toast } from "sonner";
+import { Combobox } from "../components/custom/ComboBox";
 
 export function DocumentsPage() {
   const navigate = useNavigate();
+  const { data: projects } = useQuery(getProjects);
   const { data: documents, isLoading, error } = useQuery(getDocuments);
 
   const handleDeleteDocument = async (documentId: string) => {
@@ -127,13 +129,43 @@ export function DocumentsPage() {
                 <TableCell className="text-sm text-muted-foreground">
                   {new Date(document.createdAt).toLocaleDateString()}
                 </TableCell>
-                <TableCell>
+                <TableCell className="flex items-center gap-2 group-hover:opacity-100 opacity-0 transition-opacity duration-150">
+                  {/* Add the url of doc as a Resource on a project */}
+                  <Combobox
+                    button={(
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        variant="outline"
+                        size="icon"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    )}
+                    options={projects?.map((project) => ({
+                      // The label is what's searchable.
+                      label: project.title,
+                      value: project.id.toString(),
+                    })) || []}
+                    onChange={async (projectTitle: string, projectId: string) => {
+                      try {
+                        await createResource({
+                          url: window.location.origin + "/documents/" + document.id,
+                          title: document.title,
+                          projectId: parseInt(projectId, 10)
+                        })
+                        toast.success(`Document added to ${projectTitle}`);
+                      } catch (error) {
+                        toast.error("Failed to move item");
+                      }
+                    }}
+                  />
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteDocument(document.id);
                     }}
-                    className="group-hover:opacity-100 opacity-0 transition-opacity duration-150"
                     variant="outline"
                     size="icon"
                   >
