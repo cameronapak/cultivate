@@ -25,7 +25,8 @@ import {
   Plus,
   Trash2,
   Settings2Icon,
-  CheckIcon,
+  Square,
+  Info,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -51,12 +52,10 @@ import {
 import {
   Tabs,
   TabsContent,
-  TabsList,
-  TabsTrigger,
 } from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
 import { Table, TableBody, TableCell, TableRow } from "../components/ui/table";
-import { getFaviconFromUrl, isUrl, getMetadataFromUrl } from "../lib/utils";
+import { getFaviconFromUrl, isUrl, getMetadataFromUrl, cn } from "../lib/utils";
 import {
   Popover,
   PopoverTrigger,
@@ -79,7 +78,7 @@ import { Switch } from "./ui/switch";
 import React from "react";
 import { Kbd } from "./custom/Kbd";
 import { useTabShortcuts } from "../hooks/useKeyboardShortcuts";
-import { useLayoutState } from "../hooks/useLayoutState";
+import { useLayoutState, type TabType } from "../hooks/useLayoutState";
 import { Project } from "../types";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 
@@ -889,7 +888,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } =
     useLayoutState();
 
-  const handleTabChange = (tab: "tasks" | "resources" | "about") => {
+  const handleTabChange = (tab: TabType) => {
     setTab(tab);
   };
 
@@ -934,38 +933,110 @@ export const ProjectView = ({ project }: { project: Project }) => {
 
   return (
     <main>
-      <h1 className="heading-1 pb-6">{project.title}</h1>
+      <h1 className="heading-1">{project.title}</h1>
+      <p className="paragraph text-muted-foreground !mt-0 line-clamp-2">{project.description}</p>
+      <div
+        className="flex items-center my-6 w-fit"
+        role="tablist"
+        aria-label="Filter inbox items"
+      >
+        {/* <Button
+          variant={currentTab === "all" ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() => handleTabChange("all")}
+          className={cn(
+            "relative px-3 rounded-full text-muted-foreground shadow-none",
+            currentTab === "all" && "text-primary"
+          )}
+          role="tab"
+          aria-selected={currentTab === "all"}
+          aria-controls="all-items-tab"
+          id="all-tab"
+        >
+          <List className="h-4 w-4" aria-hidden="true" />
+          <span>All</span>
+          {/ * <span className="sr-only">{getItemCount("all")} items</span> * /}
+        </Button> */}
+        <Button
+          variant={currentTab === "task" ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() => handleTabChange("task")}
+          className={cn(
+            "relative px-3 rounded-full text-muted-foreground shadow-none",
+            currentTab === "task" && "text-primary"
+          )}
+          role="tab"
+          aria-selected={currentTab === "task"}
+          aria-controls="tasks-tab"
+          id="tasks-tab"
+        >
+          <Square className="h-4 w-4" aria-hidden="true" />
+          <span>Tasks</span>
+          {/* <span className="sr-only">{getItemCount("task")} tasks</span> */}
+        </Button>
+        <Button
+          variant={currentTab === "resource" ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() => handleTabChange("resource")}
+          className={cn(
+            "relative px-3 rounded-full text-muted-foreground shadow-none",
+            currentTab === "resource" && "text-primary"
+          )}
+          role="tab"
+          aria-selected={currentTab === "resource"}
+          aria-controls="resources-tab"
+          id="resources-tab"
+        >
+          <Link2 className="h-4 w-4" aria-hidden="true" />
+          <span>Links</span>
+          {/* <span className="sr-only">
+            {getItemCount("resource")} links
+          </span> */}
+        </Button>
+        {/* <Button
+          variant={currentTab === "thought" ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() => handleTabChange("thought")}
+          className={cn(
+            "relative px-3 rounded-full text-muted-foreground shadow-none",
+            currentTab === "thought" && "text-primary"
+          )}
+          role="tab"
+          aria-selected={currentTab === "thought"}
+          aria-controls="thoughts-tab"
+          id="thoughts-tab"
+        >
+          <Minus className="h-4 w-4" aria-hidden="true" />
+          <span>Notes</span>
+          {/ * <span className="sr-only">
+            {getItemCount("thought")} notes
+          </span> * /}
+        </Button> */}
+        <Button
+          variant={currentTab === "about" ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() => handleTabChange("about")}
+          className={cn(
+            "relative px-3 rounded-full text-muted-foreground shadow-none",
+            currentTab === "about" && "text-primary"
+          )}
+          role="tab"
+          aria-selected={currentTab === "about"}
+          aria-controls="about-tab"
+          id="about-tab"
+        >
+          <Info className="h-4 w-4" aria-hidden="true" />
+          <span>About</span>
+          {/* <span className="sr-only">{getItemCount("task")} tasks</span> */}
+        </Button>
+      </div>
       <Tabs
         value={currentTab}
         onValueChange={(value) =>
-          handleTabChange(value as "tasks" | "resources" | "about")
+          handleTabChange(value as "about" | "task" | "resource" | "thought")
         }
       >
-        <TabsList className="group grid w-full grid-cols-3">
-          <TabsTrigger
-            value="tasks"
-            className="relative flex items-center gap-2"
-          >
-            Tasks
-            <Kbd>1</Kbd>
-          </TabsTrigger>
-          <TabsTrigger
-            value="resources"
-            className="relative flex items-center gap-2"
-          >
-            Resources
-            <Kbd>2</Kbd>
-          </TabsTrigger>
-          <TabsTrigger
-            value="about"
-            className="relative flex items-center gap-2"
-          >
-            About
-            <Kbd>3</Kbd>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="tasks">
+        <TabsContent value="task">
           <div className="mt-4 space-y-6">
             <Card>
               <CardHeader>
@@ -1025,13 +1096,13 @@ export const ProjectView = ({ project }: { project: Project }) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="resources">
+        <TabsContent value="resource">
           <div className="mt-4 space-y-6">
             <Card>
               <CardHeader>
                 <div className="grid grid-cols-[1fr_auto] gap-2">
                   <div className="flex flex-col gap-1">
-                    <CardTitle>Resources</CardTitle>
+                    <CardTitle>Links</CardTitle>
                     <CardDescription className="flex items-center gap-1">
                       <ExternalLink className="w-4 h-4" />
                       {project.resources?.length || 0} resource(s)
@@ -1061,6 +1132,22 @@ export const ProjectView = ({ project }: { project: Project }) => {
             </Card>
           </div>
         </TabsContent>
+
+        {/* <TabsContent value="thought">
+          <div className="mt-4 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notes</CardTitle>
+                <CardDescription>
+                  Update your project information
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Notes go here</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent> */}
 
         <TabsContent value="about">
           <div className="mt-4 space-y-6">
