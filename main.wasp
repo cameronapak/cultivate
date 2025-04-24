@@ -2,7 +2,7 @@ app shapeUp {
   wasp: {
     version: "^0.16.2"
   },
-  title: "Cultivate",
+  title: "Cultivate - A Calm PKM Tool",
   client: {
     setupFn: import { setupClient } from "@src/client/setup"
   },
@@ -17,12 +17,23 @@ app shapeUp {
     onAuthFailedRedirectTo: "/login"
   },
   head: [
+    "<meta name=\"description\" content=\"Imagine if Notion & Basecamp had a baby. Cultivate is a PKM tool where you can calmly brain dump, write, manage projects, and get things done.\" />",
     "<link rel=\"icon\" type=\"image/x-icon\" href=\"/favicon.ico\" />",
     "<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\" />",
     "<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\" />",
     "<link rel=\"apple-touch-icon\" href=\"/apple-touch-icon.png\" />",
     "<link rel=\"manifest\" href=\"/site.webmanifest\" />",
-    "<meta property=\"og:image\" content=\"/og-image.png\" />"
+    "<meta property=\"og:url\" content=\"https://cultivate.so\" />",
+    "<meta property=\"og:type\" content=\"website\" />",
+    "<meta property=\"og:title\" content=\"Cultivate\" />",
+    "<meta property=\"og:description\" content=\"\" />",
+    "<meta property=\"og:image\" content=\"/og-image.png\" />",
+    "<meta name=\"twitter:card\" content=\"summary_large_image\" />",
+    "<meta property=\"twitter:domain\" content=\"cultivate.so\" />",
+    "<meta property=\"twitter:url\" content=\"https://cultivate.so\" />",
+    "<meta name=\"twitter:title\" content=\"Cultivate\" />",
+    "<meta name=\"twitter:description\" content=\"\" />",
+    "<meta name=\"twitter:image\" content=\"/og-image.png\" />"
   ]
 }
 
