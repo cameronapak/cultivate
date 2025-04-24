@@ -1,5 +1,5 @@
 import { useState, useRef, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import type { Task, Resource, Pitch, Thought } from "wasp/entities";
 import {
   deleteTask,
@@ -52,12 +52,7 @@ import {
 } from "../components/ui/card";
 import { Tabs, TabsContent } from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "../components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "../components/ui/table";
 import { getFaviconFromUrl, isUrl, getMetadataFromUrl, cn } from "../lib/utils";
 import {
   Popover,
@@ -470,9 +465,14 @@ const ResourceItem = ({
 }) => {
   let faviconUrl: string | null = null;
   let url = resource.url;
+  const isSameOrigin = resource.url.includes(window.location.origin);
   try {
     const urlObj = new URL(resource.url);
-    faviconUrl = getFaviconFromUrl(urlObj.origin, 64);
+    if (isSameOrigin) {
+      faviconUrl = "/android-chrome-192x192.png";
+    } else {
+      faviconUrl = getFaviconFromUrl(urlObj.origin, 64);
+    }
     url = urlObj.hostname;
   } catch (err) {
     console.error(err);
@@ -484,33 +484,58 @@ const ResourceItem = ({
         <Link2 className="h-4 w-4 text-muted-foreground" />
       </TableCell>
       <TableCell className="flex justify-between w-full">
-        <a
-          href={resource.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2"
-        >
-          <div
-            className="grid items-center gap-2"
-            style={{ gridTemplateColumns: faviconUrl ? "16px 1fr" : "1fr" }}
-          >
-            {faviconUrl && (
-              <img
-                src={faviconUrl}
-                alt="Favicon"
-                className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
-              />
-            )}
-            <div className="flex flex-col">
-              <p className="text-sm hover:underline">{resource.title}</p>
-              {resource.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {resource.description}
-                </p>
+        {isSameOrigin ? (
+          <Link to={resource.url} className="flex items-center gap-2">
+            <div
+              className="grid items-center gap-2"
+              style={{ gridTemplateColumns: faviconUrl ? "16px 1fr" : "1fr" }}
+            >
+              {faviconUrl && (
+                <img
+                  src={faviconUrl}
+                  alt="Favicon"
+                  className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
+                />
               )}
+              <div className="flex flex-col">
+                <p className="text-sm hover:underline">{resource.title}</p>
+                {resource.description && (
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {resource.description}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        </a>
+          </Link>
+        ) : (
+          <a
+            href={resource.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2"
+          >
+            <div
+              className="grid items-center gap-2"
+              style={{ gridTemplateColumns: faviconUrl ? "16px 1fr" : "1fr" }}
+            >
+              {faviconUrl && (
+                <img
+                  src={faviconUrl}
+                  alt="Favicon"
+                  className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
+                />
+              )}
+              <div className="flex flex-col">
+                <p className="text-sm hover:underline">{resource.title}</p>
+                {resource.description && (
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {resource.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          </a>
+        )}
         <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
           <Button onClick={onEdit} variant="ghost" size="icon">
             <Pencil className="w-4 h-4" />
@@ -933,9 +958,9 @@ const NotesForm = ({
           )}
         />
 
-        <Button 
-          disabled={form.formState.isSubmitting || !form.formState.isDirty} 
-          size="icon" 
+        <Button
+          disabled={form.formState.isSubmitting || !form.formState.isDirty}
+          size="icon"
           type="submit"
           className="absolute right-0 top-0 rounded-l-none"
         >
@@ -1203,9 +1228,9 @@ export const ProjectView = ({ project }: { project: Project }) => {
             <Card>
               <CardHeader>
                 <CardTitle>Notes</CardTitle>
-                {!sortedThoughts?.length && <CardDescription>
-                  Add notes to your project
-                </CardDescription>}
+                {!sortedThoughts?.length && (
+                  <CardDescription>Add notes to your project</CardDescription>
+                )}
               </CardHeader>
               <CardContent>
                 <NotesForm
@@ -1241,9 +1266,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>
-                                Delete Note
-                              </TooltipContent>
+                              <TooltipContent>Delete Note</TooltipContent>
                             </Tooltip>
                           </div>
                         </TableCell>
