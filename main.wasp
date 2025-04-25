@@ -354,4 +354,11 @@ action claimInviteCode {
   fn: import { claimInviteCode } from "@src/queries",
   entities: [InviteCode, User] // Needs access to InviteCode and User entities
 }
+
+// Action to generate a new invite code for the logged-in user
+action generateInviteCode {
+  auth: true, // Requires user to be logged in
+  fn: import { generateInviteCode } from "@src/queries",
+  entities: [InviteCode, User] // Needs access to InviteCode and User entities
+}
 // #endregion
