@@ -12,6 +12,7 @@ import {
   deleteProject,
   updateTaskStatus,
   updateProjectTaskOrder,
+  updateProjectResourceOrder,
   createThought,
   deleteThought,
   useAction,
@@ -486,7 +487,12 @@ const ResourceItem = ({
   }
 
   return (
-    <TableRow className="grid grid-cols-[auto_1fr_auto] items-center group">
+    <TableRow className="grid grid-cols-[auto_auto_1fr_auto] items-center group">
+      <TableCell className="w-8">
+        <span className="drag-handle cursor-grab opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </span>
+      </TableCell>
       <TableCell className="w-8">
         <Link2 className="h-4 w-4 text-muted-foreground" />
       </TableCell>
@@ -795,6 +801,39 @@ const ResourcesSection = ({ project }: { project: Project }) => {
     null
   );
 
+  // Sort resources by the order in the project.resourceOrder array
+  const sortedResources = project.resources?.sort((a, b) => {
+    const indexA = project.resourceOrder?.indexOf(a.id) || 0;
+    const indexB = project.resourceOrder?.indexOf(b.id) || 0;
+    return indexA - indexB;
+  });
+
+  const [parentRef, values, setValues] = useDragAndDrop<HTMLTableSectionElement, Resource>(
+    sortedResources || [],
+    {
+      onSort: async (event) => {
+        const newResourceOrder = (event.values as Resource[]).map((resource) => resource.id);
+        try {
+          await updateProjectResourceOrder({
+            projectId: project.id,
+            resourceOrder: newResourceOrder,
+          });
+        } catch (error) {
+          console.error("Failed to update resource order:", error);
+          setValues(sortedResources || []);
+        }
+      },
+      draggingClass: "bg-muted",
+      dropZoneClass: "bg-muted opacity-30",
+      dragHandle: ".drag-handle",
+    }
+  );
+
+  // Update values when resources prop changes
+  React.useEffect(() => {
+    setValues(sortedResources || []);
+  }, [project.resources, project.resourceOrder, setValues]);
+
   const handleDeleteResource = async (resourceId: number) => {
     if (confirm("Are you sure you want to delete this resource?")) {
       try {
@@ -808,13 +847,13 @@ const ResourcesSection = ({ project }: { project: Project }) => {
 
   return (
     <div>
-      {project.resources && project.resources.length > 0 ? (
+      {values && values.length > 0 ? (
         <Table>
-          <TableBody>
-            {project.resources.map((resource: Resource) =>
+          <TableBody ref={parentRef}>
+            {values.map((resource: Resource) =>
               editingResourceId === resource.id ? (
                 <TableRow key={resource.id}>
-                  <TableCell colSpan={2} className="bg-background">
+                  <TableCell colSpan={4} className="bg-background">
                     <EditResourceForm
                       key={resource.id}
                       resource={resource}

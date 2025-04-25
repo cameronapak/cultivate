@@ -283,6 +283,11 @@ action updateProjectTaskOrder {
   entities: [Project]
 }
 
+action updateProjectResourceOrder {
+  fn: import { updateProjectResourceOrder } from "@src/queries",
+  entities: [Project]
+}
+
 //#region Thought Operations
 query getThoughts {
   fn: import { getThoughts } from "@src/queries",
