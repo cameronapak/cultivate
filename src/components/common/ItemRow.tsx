@@ -97,7 +97,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({
             <label
               htmlFor={item.id.toString()}
               className={cn(
-                "pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                "pointer-events-none text-sm leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
                 item.complete ? "line-through text-muted-foreground" : ""
               )}
             >
