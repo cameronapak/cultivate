@@ -5,7 +5,7 @@ import {
   useQuery,
   getInboxThoughts,
 } from "wasp/client/operations";
-import { type Project } from "wasp/entities";
+import type { Project, Task, Resource, Thought } from "wasp/entities";
 import {
   createTask,
   updateTaskStatus,
@@ -65,17 +65,8 @@ import {
 import { Textarea } from "../components/ui/textarea";
 import { Toggle } from "../components/ui/toggle";
 import { Combobox } from "../components/custom/ComboBox";
-
-// Add common shape type
-type InboxItem = {
-  id: number | string;
-  title: string;
-  content?: string;
-  type: "task" | "resource" | "thought";
-  createdAt: Date;
-  complete?: boolean;
-  url?: string;
-};
+import { ItemRow, DisplayItem } from "../components/common/ItemRow";
+import { EditTaskForm, EditResourceForm, EditThoughtForm } from "../components/ProjectView";
 
 // Create a type where the string is a date in the format "2025-04-20"
 type DateString =
@@ -122,7 +113,7 @@ const formatDate = (date: Date | DateString): string => {
 
 // Add this type for grouped items
 type GroupedInboxItems = {
-  [key: DateString]: InboxItem[];
+  [key: DateString]: DisplayItem[];
 };
 
 // Add this type for filter options
@@ -137,7 +128,7 @@ type TaskReviewState = {
 };
 
 type TaskReviewDialogProps = {
-  task: InboxItem;
+  task: DisplayItem;
   isOpen: boolean;
   onClose: () => void;
   onComplete: (
@@ -272,17 +263,7 @@ export function InboxPage() {
     return showTasksLocalStorage;
   });
   const [filter, setFilter] = useState<InboxFilter>("all");
-  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
-  const [editingTaskTitle, setEditingTaskTitle] = useState<string>("");
-  const [editingThoughtId, setEditingThoughtId] = useState<string | null>(null);
-  const [editingThoughtContent, setEditingThoughtContent] =
-    useState<string>("");
-  const [editingResourceId, setEditingResourceId] = useState<number | null>(
-    null
-  );
-  const [editingResourceTitle, setEditingResourceTitle] = useState<string>("");
-  const [reviewingTask, setReviewingTask] = useState<InboxItem | null>(null);
-  const [showReviewDialog, setShowReviewDialog] = useState<boolean>(false);
+  const [editingItemId, setEditingItemId] = useState<string | number | null>(null);
 
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
@@ -336,10 +317,10 @@ export function InboxPage() {
     }
   };
 
-  const handleToggleTask = async (taskId: number, currentStatus: boolean) => {
+  const handleToggleTask = async (item: Task, currentStatus: boolean) => {
     try {
       await updateTaskStatus({
-        id: taskId,
+        id: item.id,
         complete: !currentStatus,
       });
     } catch (error) {
@@ -347,40 +328,26 @@ export function InboxPage() {
     }
   };
 
-  const handleDeleteTask = async (taskId: number) => {
-    try {
-      if (confirm("Are you sure you want to delete this task?")) {
-        await deleteTask({ id: taskId });
-        toast.success("Task deleted");
+  const handleDeleteItem = async (item: DisplayItem) => {
+    const confirmMessage = `Are you sure you want to delete this ${item.type}?`;
+    if (confirm(confirmMessage)) {
+      try {
+        if (item.type === 'task') {
+          await deleteTask({ id: item.id as number });
+        } else if (item.type === 'resource') {
+          await deleteResource({ id: item.id as number });
+        } else if (item.type === 'thought') {
+          await deleteThought({ id: item.id as string });
+        }
+        toast.success(`${item.type.charAt(0).toUpperCase() + item.type.slice(1)} deleted`);
+      } catch (error) {
+        console.error(`Failed to delete ${item.type}:`, error);
+        toast.error(`Failed to delete ${item.type}`);
       }
-    } catch (error) {
-      console.error("Failed to delete task:", error);
     }
   };
 
-  const handleDeleteResource = async (resourceId: number) => {
-    try {
-      if (confirm("Are you sure you want to delete this resource?")) {
-        await deleteResource({ id: resourceId });
-        toast.success("Resource deleted");
-      }
-    } catch (error) {
-      console.error("Failed to delete resource:", error);
-    }
-  };
-
-  const handleDeleteThought = async (thoughtId: string) => {
-    try {
-      if (confirm("Are you sure you want to delete this thought?")) {
-        await deleteThought({ id: thoughtId });
-        toast.success("Thought deleted");
-      }
-    } catch (error) {
-      console.error("Failed to delete thought:", error);
-    }
-  };
-
-  const handleMoveItem = async (item: InboxItem, projectId: number) => {
+  const handleMoveItem = async (item: DisplayItem, projectId: number) => {
     try {
       if (item.type === "task") {
         await moveTask({
@@ -398,141 +365,60 @@ export function InboxPage() {
           projectId,
         });
       }
-      toast.success(`${item.type} moved to project`);
+      toast.success(`${item.type.charAt(0).toUpperCase() + item.type.slice(1)} moved to project`);
     } catch (error) {
       console.error(`Failed to move ${item.type}:`, error);
       toast.error(`Failed to move ${item.type}`);
     }
   };
 
-  const handleTaskTitleChange = async (taskId: number, newTitle: string) => {
-    // Find the original task
-    const originalTask = tasks?.find((t) => t.id === taskId);
-    if (!originalTask || originalTask.title === newTitle) {
-      return;
-    }
+  const handleEditItem = (item: DisplayItem) => {
+    setEditingItemId(item.id);
+  };
 
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+  };
+
+  const handleSaveItem = async (item: DisplayItem, values: any) => {
     try {
-      await updateTask({
-        id: taskId,
-        title: newTitle,
-      });
-      toast.success("Task updated");
+      if (item.type === 'task') {
+        await updateTask({ id: item.id as number, title: values.title, description: values.description });
+        toast.success("Task updated");
+      } else if (item.type === 'resource') {
+        // Assuming EditResourceForm provides title, url, description
+        await updateResource({ id: item.id as number, title: values.title, url: values.url, description: values.description });
+        toast.success("Resource updated");
+      } else if (item.type === 'thought') {
+        // Add thought update logic if an EditThoughtForm exists and is used
+         await updateThought({ id: item.id as string, content: values.content });
+         toast.success("Thought updated");
+      }
+      setEditingItemId(null); // Exit edit mode on success
     } catch (error) {
-      console.error("Failed to update task:", error);
-      toast.error("Failed to update task");
+      console.error(`Failed to update ${item.type}:`, error);
+      toast.error(`Failed to update ${item.type}`);
+      // Optionally keep editing mode open on error, or provide more specific feedback
     }
   };
-
-  const handleTaskTitleKeyDown = async (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    taskId: number
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      await handleTaskTitleChange(taskId, editingTaskTitle);
-      setEditingTaskId(null);
-    } else if (e.key === "Escape") {
-      setEditingTaskId(null);
+  
+  // Function to render the correct edit form based on item type
+  const renderItemEditForm = (item: DisplayItem, onSave: (values: any) => void, onCancel: () => void) => {
+    if (item.type === 'task') {
+      // Assuming EditTaskForm is imported and accepts Task
+      return <EditTaskForm task={item as Task} onSave={onSave} onCancel={onCancel} />;
+    } else if (item.type === 'resource') {
+      // Assuming EditResourceForm is imported and accepts Resource
+      return <EditResourceForm resource={item as Resource} onSave={onSave} onCancel={onCancel} />;
+    } else if (item.type === 'thought') {
+      // Need an EditThoughtForm component
+      return <EditThoughtForm thought={item as Thought} onSave={onSave} onCancel={onCancel} />;
     }
-  };
-
-  const handleTaskTitleBlur = async (taskId: number) => {
-    if (editingTaskTitle.trim()) {
-      await handleTaskTitleChange(taskId, editingTaskTitle);
-    }
-    setEditingTaskId(null);
-  };
-
-  const handleThoughtContentChange = async (
-    thoughtId: string,
-    newContent: string
-  ) => {
-    // Find the original thought content
-    const originalThought = thoughts?.find((t) => t.id === thoughtId);
-    if (!originalThought || originalThought.content === newContent) {
-      setEditingThoughtId(null);
-      return;
-    }
-
-    try {
-      await updateThought({
-        id: thoughtId,
-        content: newContent,
-      });
-      toast.success("Note updated");
-    } catch (error) {
-      console.error("Failed to update note:", error);
-      toast.error("Failed to update note");
-    }
-  };
-
-  const handleThoughtContentKeyDown = async (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    thoughtId: string
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      await handleThoughtContentChange(thoughtId, editingThoughtContent);
-      setEditingThoughtId(null);
-    } else if (e.key === "Escape") {
-      setEditingThoughtId(null);
-    }
-  };
-
-  const handleThoughtContentBlur = async (thoughtId: string) => {
-    if (editingThoughtContent.trim()) {
-      await handleThoughtContentChange(thoughtId, editingThoughtContent);
-    }
-    setEditingThoughtId(null);
-  };
-
-  const handleResourceTitleChange = async (
-    resourceId: number,
-    newTitle: string
-  ) => {
-    // Find the original resource title
-    const originalResource = resources?.find((r) => r.id === resourceId);
-    if (!originalResource || originalResource.title === newTitle) {
-      setEditingResourceId(null);
-      return;
-    }
-
-    try {
-      await updateResource({
-        id: resourceId,
-        title: newTitle,
-        url: originalResource.url,
-      });
-      toast.success("Resource updated");
-    } catch (error) {
-      console.error("Failed to update resource:", error);
-      toast.error("Failed to update resource");
-    }
-  };
-
-  const handleResourceTitleKeyDown = async (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    resourceId: number
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      await handleResourceTitleChange(resourceId, editingResourceTitle);
-      setEditingResourceId(null);
-    } else if (e.key === "Escape") {
-      setEditingResourceId(null);
-    }
-  };
-
-  const handleResourceTitleBlur = async (resourceId: number) => {
-    if (editingResourceTitle.trim()) {
-      await handleResourceTitleChange(resourceId, editingResourceTitle);
-    }
-    setEditingResourceId(null);
+    return null; // Or a placeholder/message for types without an edit form
   };
 
   // Group items by date
-  const groupItemsByDate = (items: InboxItem[]): GroupedInboxItems => {
+  const groupItemsByDate = (items: DisplayItem[]): GroupedInboxItems => {
     const grouped: GroupedInboxItems = {};
 
     items.forEach((item) => {
@@ -552,30 +438,23 @@ export function InboxPage() {
     return grouped;
   };
 
-  // Transform tasks, resources, and thoughts into a common shape
-  const inboxItems: InboxItem[] = useMemo(
+  // Transform tasks, resources, and thoughts into a common DisplayItem shape
+  const inboxItems: DisplayItem[] = useMemo(
     () =>
       [
         ...(tasks?.map((task) => ({
-          id: task.id,
-          title: task.title,
+          ...task,
           type: "task" as const,
           createdAt: new Date(task.createdAt), // Ensure it's a Date object
-          complete: task.complete,
         })) || []),
         ...(resources?.map((resource) => ({
-          id: resource.id,
-          title: resource.title,
+          ...resource,
           type: "resource" as const,
           createdAt: new Date(resource.createdAt), // Ensure it's a Date object
-          url: resource.url,
         })) || []),
         ...(thoughts?.map((thought) => ({
-          id: thought.id,
-          title:
-            thought.content.slice(0, 60) +
-            (thought.content.length > 60 ? "..." : ""),
-          content: thought.content,
+          ...thought,
+          title: thought.content.slice(0, 60) + (thought.content.length > 60 ? "..." : ""), 
           type: "thought" as const,
           createdAt: new Date(thought.createdAt), // Ensure it's a Date object
         })) || []),
@@ -620,22 +499,6 @@ export function InboxPage() {
     } catch (error) {
       console.error("Failed to process task:", error);
       toast.error("Failed to process task");
-    }
-  };
-
-  const startReviewingTasks = () => {
-    if (!reviewingTask && tasks && tasks.length > 0) {
-      const firstUncompletedTask = tasks.find((task) => !task.complete);
-      if (firstUncompletedTask) {
-        setReviewingTask({
-          id: firstUncompletedTask.id,
-          title: firstUncompletedTask.title,
-          content: firstUncompletedTask.description || "",
-          type: "task",
-          createdAt: firstUncompletedTask.createdAt,
-          complete: firstUncompletedTask.complete,
-        });
-      }
     }
   };
 
@@ -863,233 +726,20 @@ export function InboxPage() {
 
                             {/* Items for this date */}
                             {dateItems.map((item) => (
-                              <TableRow
-                                className="group grid grid-cols-[auto_1fr_auto] items-center"
+                              <ItemRow
                                 key={`${item.type}-${item.id}`}
-                              >
-                                <TableCell className="w-8">
-                                  {item.type === "task" ? (
-                                    <Checkbox
-                                      checked={item.complete}
-                                      onCheckedChange={() =>
-                                        handleToggleTask(
-                                          item.id as number,
-                                          item.complete || false
-                                        )
-                                      }
-                                    />
-                                  ) : item.type === "resource" ? (
-                                    <Link2 className="h-4 w-4 text-muted-foreground" />
-                                  ) : (
-                                    <Minus className="h-4 w-4 text-muted-foreground" />
-                                  )}
-                                </TableCell>
-                                <TableCell className="flex items-center gap-2">
-                                  {item.type === "task" ? (
-                                    editingTaskId === item.id ? (
-                                      <input
-                                        type="text"
-                                        value={editingTaskTitle}
-                                        onChange={(e) =>
-                                          setEditingTaskTitle(e.target.value)
-                                        }
-                                        onKeyDown={(e) =>
-                                          handleTaskTitleKeyDown(
-                                            e,
-                                            item.id as number
-                                          )
-                                        }
-                                        onBlur={() =>
-                                          handleTaskTitleBlur(item.id as number)
-                                        }
-                                        className="w-full bg-transparent text-sm outline-none"
-                                        autoFocus
-                                      />
-                                    ) : (
-                                      <input
-                                        type="text"
-                                        value={item.title}
-                                        onChange={() => {}}
-                                        className="w-full bg-transparent text-sm outline-none"
-                                        onFocus={() => {
-                                          setEditingTaskId(item.id as number);
-                                          setEditingTaskTitle(item.title);
-                                        }}
-                                      />
-                                    )
-                                  ) : item.type === "resource" ? (
-                                    <div
-                                      className="w-full grid items-center gap-2"
-                                      style={{
-                                        gridTemplateColumns: item.url
-                                          ? "16px 1fr"
-                                          : "1fr",
-                                      }}
-                                    >
-                                      {item.url ? (
-                                        <img
-                                          src={getFaviconFromUrl(item.url)}
-                                          alt="Favicon"
-                                          className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
-                                        />
-                                      ) : null}
-                                      {editingResourceId === item.id ? (
-                                        <input
-                                          type="text"
-                                          value={editingResourceTitle}
-                                          onChange={(e) =>
-                                            setEditingResourceTitle(
-                                              e.target.value
-                                            )
-                                          }
-                                          onKeyDown={(e) =>
-                                            handleResourceTitleKeyDown(
-                                              e,
-                                              item.id as number
-                                            )
-                                          }
-                                          onBlur={() =>
-                                            handleResourceTitleBlur(
-                                              item.id as number
-                                            )
-                                          }
-                                          className="w-full rounded-md bg-transparent text-sm outline-none"
-                                          autoFocus
-                                        />
-                                      ) : (
-                                        <span
-                                          className="text-sm cursor-text"
-                                          onClick={() => {
-                                            setEditingResourceId(
-                                              item.id as number
-                                            );
-                                            setEditingResourceTitle(item.title);
-                                          }}
-                                        >
-                                          {item.title}
-                                        </span>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <>
-                                      {editingThoughtId === item.id ? (
-                                        <input
-                                          value={editingThoughtContent}
-                                          onChange={(e) =>
-                                            setEditingThoughtContent(
-                                              e.target.value
-                                            )
-                                          }
-                                          onKeyDown={(e) =>
-                                            handleThoughtContentKeyDown(
-                                              e,
-                                              item.id as string
-                                            )
-                                          }
-                                          onBlur={() =>
-                                            handleThoughtContentBlur(
-                                              item.id as string
-                                            )
-                                          }
-                                          className="w-full rounded-md bg-transparent text-sm outline-none"
-                                        />
-                                      ) : (
-                                        <span
-                                          className="text-sm cursor-text"
-                                          onClick={() => {
-                                            setEditingThoughtId(
-                                              item.id as string
-                                            );
-                                            setEditingThoughtContent(
-                                              item.content || ""
-                                            );
-                                          }}
-                                        >
-                                          {item.content}
-                                        </span>
-                                      )}
-                                    </>
-                                  )}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                  <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
-                                    {item.type === "resource" && (
-                                      <Tooltip>
-                                        <TooltipTrigger>
-                                          <a
-                                            href={item.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                          >
-                                            <Button
-                                              variant="outline"
-                                              size="icon"
-                                            >
-                                              <ExternalLink className="h-4 w-4" />
-                                            </Button>
-                                          </a>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          Open in new tab
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    )}
-
-                                    <Combobox
-                                      button={(
-                                        <Button variant="outline" size="icon">
-                                          <MoveRight className="h-4 w-4" />
-                                        </Button>
-                                      )}
-                                      options={projects?.map((project) => ({
-                                        // The label is what's searchable.
-                                        label: project.title,
-                                        value: project.id.toString(),
-                                      })) || []}
-                                      onChange={async (_projectTitle: string, projectId: string) => {
-                                        console.log("projectId", projectId);
-                                        try {
-                                          const projectIdInt = parseInt(projectId, 10)
-                                          await handleMoveItem(
-                                            item,
-                                            projectIdInt
-                                          )
-                                        } catch (error) {
-                                          toast.error("Failed to move item");
-                                        }
-                                      }}
-                                    />
-
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          variant="outline"
-                                          size="icon"
-                                          onClick={() => {
-                                            if (item.type === "task")
-                                              handleDeleteTask(
-                                                item.id as number
-                                              );
-                                            else if (item.type === "resource")
-                                              handleDeleteResource(
-                                                item.id as number
-                                              );
-                                            else
-                                              handleDeleteThought(
-                                                item.id as string
-                                              );
-                                          }}
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        Delete {item.type}
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
+                                item={item}
+                                isEditing={editingItemId === item.id}
+                                projects={projects || []}
+                                onEdit={handleEditItem}
+                                onSave={handleSaveItem}
+                                onCancelEdit={handleCancelEdit}
+                                onDelete={handleDeleteItem}
+                                onStatusChange={item.type === 'task' ? (taskItem, complete) => handleToggleTask(taskItem as Task, complete) : undefined}
+                                onMove={handleMoveItem}
+                                renderEditForm={renderItemEditForm}
+                                hideDragHandle={true}
+                              />
                             ))}
                           </React.Fragment>
                         );
