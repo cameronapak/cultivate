@@ -14,6 +14,7 @@ import {
   updateProjectResourceOrder,
   createThought,
   deleteThought,
+  updateThought,
   useAction,
 } from "wasp/client/operations";
 import {
@@ -203,8 +204,23 @@ const TaskList = ({
         description: formValues.description,
       });
       toast.success("Task updated successfully");
+    } else if (item.type === 'resource') {
+      // This case should ideally not happen in TaskList
+      await updateResource({
+        id: item.id as number,
+        title: formValues.title,
+        url: formValues.url, // Assuming form provides URL
+        description: formValues.description,
+      });
+      toast.success("Resource updated successfully");
+    } else if (item.type === 'thought') {
+      // This case should ideally not happen in TaskList
+      await updateThought({ 
+        id: item.id as string, 
+        content: formValues.content 
+      }); 
+      toast.success("Thought updated successfully");
     }
-    // Add similar logic for other types if needed
   };
 
   const handleDelete = async (item: DisplayItem) => {
@@ -213,8 +229,19 @@ const TaskList = ({
         await deleteTask({ id: item.id as number });
         toast.success("Task deleted successfully");
       }
+    } else if (item.type === 'resource') {
+      // This case should ideally not happen in TaskList
+       if (confirm("Are you sure you want to delete this resource?")) {
+         await deleteResource({ id: item.id as number });
+         toast.success("Resource deleted successfully");
+       }
+    } else if (item.type === 'thought') {
+       // This case should ideally not happen in TaskList
+       if (confirm("Are you sure you want to delete this thought?")) {
+         await deleteThought({ id: item.id as string });
+         toast.success("Thought deleted successfully");
+       }
     }
-    // Add similar logic for other types if needed
   };
   
   const renderTaskEditForm = (
@@ -682,8 +709,22 @@ const ResourcesSection = ({ project }: { project: Project }) => {
          description: formValues.description,
        });
        toast.success("Resource updated successfully");
+    } else if (item.type === 'task') {
+      // This case should ideally not happen in ResourcesSection
+      await updateTask({
+        id: item.id as number,
+        title: formValues.title,
+        description: formValues.description,
+      });
+      toast.success("Task updated successfully");
+    } else if (item.type === 'thought') {
+      // This case should ideally not happen in ResourcesSection
+       await updateThought({ 
+        id: item.id as string, 
+        content: formValues.content 
+      }); 
+       toast.success("Thought updated successfully");
     }
-    // Add similar logic for other types if needed
   };
 
   const handleDelete = async (item: DisplayItem) => {
@@ -692,8 +733,19 @@ const ResourcesSection = ({ project }: { project: Project }) => {
          await deleteResource({ id: item.id as number });
          toast.success("Resource deleted successfully");
        }
+    } else if (item.type === 'task') {
+      // This case should ideally not happen in ResourcesSection
+      if (confirm("Are you sure you want to delete this task?")) {
+        await deleteTask({ id: item.id as number });
+        toast.success("Task deleted successfully");
+      }
+    } else if (item.type === 'thought') {
+      // This case should ideally not happen in ResourcesSection
+       if (confirm("Are you sure you want to delete this thought?")) {
+         await deleteThought({ id: item.id as string });
+         toast.success("Thought deleted successfully");
+       }
     }
-    // Add similar logic for other types if needed
   };
   
   const renderResourceEditForm = (
