@@ -1,5 +1,5 @@
 import { useState, useRef, FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { Task, Resource, Pitch, Thought } from "wasp/entities";
 import {
   deleteTask,
@@ -10,7 +10,6 @@ import {
   deleteResource,
   updateProject,
   deleteProject,
-  updateTaskStatus,
   updateProjectTaskOrder,
   updateProjectResourceOrder,
   createThought,
@@ -18,8 +17,6 @@ import {
   useAction,
 } from "wasp/client/operations";
 import {
-  Trash,
-  Pencil,
   ExternalLink,
   Link2,
   Plus,
@@ -29,9 +26,6 @@ import {
   Info,
   Minus,
   SendIcon,
-  PencilRuler,
-  BookOpen,
-  GripVertical,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -55,9 +49,8 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Tabs, TabsContent } from "../components/ui/tabs";
-import { Checkbox } from "../components/ui/checkbox";
-import { Table, TableBody, TableCell, TableRow } from "../components/ui/table";
-import { getFaviconFromUrl, isUrl, getMetadataFromUrl, cn } from "../lib/utils";
+import { Table, TableBody } from "../components/ui/table";
+import { isUrl, getMetadataFromUrl, cn } from "../lib/utils";
 import {
   Popover,
   PopoverTrigger,
@@ -82,17 +75,15 @@ import { useTabShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useLayoutState, type TabType } from "../hooks/useLayoutState";
 import { Project } from "../types";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
-import { TooltipContent } from "./ui/tooltip";
-import { TooltipTrigger } from "./ui/tooltip";
-import { Tooltip } from "./ui/tooltip";
+import { ItemRow, DisplayItem } from "../components/common/ItemRow";
 
-const EditTaskForm = ({
+export const EditTaskForm = ({
   task,
   onSave,
   onCancel,
 }: {
   task: Task;
-  onSave: () => void;
+  onSave: (values: { title: string; description?: string }) => void;
   onCancel: () => void;
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
@@ -107,27 +98,17 @@ const EditTaskForm = ({
       description: task.description || "",
     },
   });
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      await updateTask({
-        id: task.id,
-        title: form.getValues("title"),
-        description: form.getValues("description"),
-      });
-      toast.success("Task updated successfully");
-      onSave();
-    } catch (err: any) {
-      toast.error("Error updating task: " + err.message);
-    }
+
+  const processSubmit = (values: z.infer<typeof formSchema>) => {
+    onSave(values);
   };
 
   return (
     <Form {...form}>
       <form
         ref={formRef}
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-2"
+        onSubmit={form.handleSubmit(processSubmit)}
+        className="flex flex-col gap-2 p-2"
       >
         <FormField
           control={form.control}
@@ -172,104 +153,6 @@ const EditTaskForm = ({
   );
 };
 
-const TaskItem = ({ task }: { task: Task }) => {
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleStatusChange = async (complete: boolean) => {
-    try {
-      await updateTaskStatus({ id: task.id, complete });
-      toast.success(
-        `"${task.title}" ${complete ? "completed" : "marked as todo"}`
-      );
-    } catch (err: any) {
-      toast.error("Error updating task: " + err.message);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      if (confirm("Are you sure you want to delete this task?")) {
-        await deleteTask({ id: task.id });
-        toast.success("Task deleted successfully");
-      }
-    } catch (err: any) {
-      toast.error("Error deleting task: " + err.message);
-    }
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  if (isEditing) {
-    return (
-      <TableRow>
-        <TableCell colSpan={4} className="bg-background">
-          <EditTaskForm
-            task={task}
-            onSave={() => setIsEditing(false)}
-            onCancel={() => setIsEditing(false)}
-          />
-        </TableCell>
-      </TableRow>
-    );
-  }
-
-  return (
-    <TableRow className={`group ${task.complete ? "completed" : ""} grid grid-cols-[auto_auto_1fr_auto] items-center`}>
-      <TableCell className="w-8">
-        <span className="drag-handle cursor-grab">
-          <GripVertical className="h-4 w-4 text-muted-foreground opacity-50" />
-        </span>
-      </TableCell>
-      <TableCell className="p-2 pl-0">
-        <Checkbox
-          id={task.id.toString()}
-          checked={task.complete}
-          onCheckedChange={(checked) => handleStatusChange(checked === true)}
-        />
-      </TableCell>
-      <TableCell>
-        <div className="flex flex-col">
-          <label
-            htmlFor={task.id.toString()}
-            className={`pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
-              task.complete ? "line-through text-muted-foreground" : ""
-            }`}
-          >
-            {task.title}
-          </label>
-          {task.description && !task.complete && (
-            <p className="text-sm text-muted-foreground line-clamp-1">
-              {task.description}
-            </p>
-          )}
-          {task.complete && (
-            <p className="text-sm text-muted-foreground line-clamp-1">
-              Completed{" "}
-              {task.updatedAt.toLocaleDateString("en", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          )}
-        </div>
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
-          <Button onClick={handleEdit} variant="ghost" size="icon">
-            <Pencil className="w-4 h-4" />
-          </Button>
-          <Button onClick={handleDelete} variant="ghost" size="icon">
-            <Trash className="w-4 h-4" />
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-};
-
 const TaskList = ({
   tasks,
   projectId,
@@ -297,17 +180,74 @@ const TaskList = ({
       dragHandle: ".drag-handle",
     }
   );
+  const [editingItemId, setEditingItemId] = useState<number | string | null>(null);
 
   // Update values when tasks prop changes
   React.useEffect(() => {
     setValues(tasks);
   }, [tasks, setValues]);
 
+  const handleEdit = (item: DisplayItem) => {
+    setEditingItemId(item.id);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+  };
+
+  const handleSave = async (item: DisplayItem, formValues: any) => {
+    if (item.type === 'task') {
+      await updateTask({
+        id: item.id as number,
+        title: formValues.title,
+        description: formValues.description,
+      });
+      toast.success("Task updated successfully");
+    }
+    // Add similar logic for other types if needed
+  };
+
+  const handleDelete = async (item: DisplayItem) => {
+    if (item.type === 'task') {
+      if (confirm("Are you sure you want to delete this task?")) {
+        await deleteTask({ id: item.id as number });
+        toast.success("Task deleted successfully");
+      }
+    }
+    // Add similar logic for other types if needed
+  };
+  
+  const renderTaskEditForm = (
+    item: DisplayItem,
+    onSaveCallback: (values: any) => void,
+    onCancelCallback: () => void
+  ) => {
+    if (item.type === 'task') {
+      return (
+        <EditTaskForm
+          task={item as Task}
+          onSave={onSaveCallback}
+          onCancel={onCancelCallback}
+        />
+      );
+    }
+    return null;
+  };
+
   return (
     <Table>
       <TableBody ref={parentRef}>
         {values.map((task) => (
-          <TaskItem key={task.id} task={task} />
+          <ItemRow
+            key={task.id}
+            item={{ ...task, type: 'task' }}
+            isEditing={editingItemId === task.id}
+            onEdit={handleEdit}
+            onSave={handleSave}
+            onCancelEdit={handleCancelEdit}
+            onDelete={handleDelete}
+            renderEditForm={renderTaskEditForm}
+          />
         ))}
       </TableBody>
     </Table>
@@ -472,108 +412,6 @@ const EditProjectForm = ({
   );
 };
 
-const ResourceItem = ({
-  resource,
-  onEdit,
-  onDelete,
-}: {
-  resource: Resource;
-  onEdit: () => void;
-  onDelete: () => void;
-}) => {
-  let faviconUrl: string | null = null;
-  let url = resource.url;
-  const isSameOrigin = resource.url.includes(window.location.origin);
-  try {
-    const urlObj = new URL(resource.url);
-    if (isSameOrigin) {
-      faviconUrl = "/android-chrome-192x192.png";
-    } else {
-      faviconUrl = getFaviconFromUrl(urlObj.origin, 64);
-    }
-    url = urlObj.hostname;
-  } catch (err) {
-    console.error(err);
-  }
-
-  return (
-    <TableRow className="grid grid-cols-[auto_1fr_auto] items-center group">
-      <TableCell className="w-6">
-        <span className="drag-handle cursor-grab">
-          <GripVertical className="h-4 w-4 text-muted-foreground opacity-50" />
-        </span>
-      </TableCell>
-      <TableCell className="flex justify-between w-full">
-        {isSameOrigin ? (
-          <Link to={resource.url} className="flex items-center gap-2">
-            <div
-              className="grid items-center gap-2"
-              style={{ gridTemplateColumns: faviconUrl ? "16px 1fr" : "1fr" }}
-            >
-              {!isSameOrigin && faviconUrl && (
-                <img
-                  src={faviconUrl}
-                  alt="Favicon"
-                  className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
-                />
-              )}
-              {isSameOrigin && resource.url.includes("canvas") ? (
-                <PencilRuler className="h-4 w-4 text-muted-foreground" />
-              ) : isSameOrigin && resource.url.includes("document") ? (
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
-              ) : null}
-              <div className="flex flex-col">
-                <p className="text-sm hover:underline">{resource.title}</p>
-                {resource.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {resource.description}
-                  </p>
-                )}
-              </div>
-            </div>
-          </Link>
-        ) : (
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2"
-          >
-            <div
-              className="grid items-center gap-2"
-              style={{ gridTemplateColumns: faviconUrl ? "16px 1fr" : "1fr" }}
-            >
-              {faviconUrl && (
-                <img
-                  src={faviconUrl}
-                  alt="Favicon"
-                  className="mt-0.5 w-4 h-4 bg-secondary rounded-sm"
-                />
-              )}
-              <div className="flex flex-col">
-                <p className="text-sm hover:underline">{resource.title}</p>
-                {resource.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {resource.description}
-                  </p>
-                )}
-              </div>
-            </div>
-          </a>
-        )}
-        <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
-          <Button onClick={onEdit} variant="ghost" size="icon">
-            <Pencil className="w-4 h-4" />
-          </Button>
-          <Button onClick={onDelete} variant="ghost" size="icon">
-            <Trash className="w-4 h-4" />
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-};
-
 const NewResourceForm = ({ projectId }: { projectId: number }) => {
   const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
   const formSchema = z.object({
@@ -702,13 +540,13 @@ const NewResourceForm = ({ projectId }: { projectId: number }) => {
   );
 };
 
-const EditResourceForm = ({
+export const EditResourceForm = ({
   resource,
   onSave,
   onCancel,
 }: {
   resource: Resource;
-  onSave: () => void;
+  onSave: (values: { title: string; url: string; description?: string }) => void;
   onCancel: () => void;
 }) => {
   const formSchema = z.object({
@@ -726,24 +564,13 @@ const EditResourceForm = ({
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      await updateResource({
-        id: resource.id,
-        title: values.title,
-        url: values.url,
-        description: values.description,
-      });
-      toast.success("Resource updated successfully");
-      onSave();
-    } catch (err: any) {
-      toast.error("Error updating resource: " + err.message);
-    }
-  }
+  const processSubmit = (values: z.infer<typeof formSchema>) => {
+    onSave(values);
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-2">
+      <form onSubmit={form.handleSubmit(processSubmit)} className="space-y-4 p-2">
         <FormField
           control={form.control}
           name="title"
@@ -804,10 +631,6 @@ const EditResourceForm = ({
 };
 
 const ResourcesSection = ({ project }: { project: Project }) => {
-  const [editingResourceId, setEditingResourceId] = useState<number | null>(
-    null
-  );
-
   // Sort resources by the order in the project.resourceOrder array
   const sortedResources = project.resources?.sort((a, b) => {
     const indexA = project.resourceOrder?.indexOf(a.id) || 0;
@@ -835,21 +658,59 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       dragHandle: ".drag-handle",
     }
   );
+  const [editingItemId, setEditingItemId] = useState<number | string | null>(null);
 
   // Update values when resources prop changes
   React.useEffect(() => {
     setValues(sortedResources || []);
   }, [project.resources, project.resourceOrder, setValues]);
 
-  const handleDeleteResource = async (resourceId: number) => {
-    if (confirm("Are you sure you want to delete this resource?")) {
-      try {
-        await deleteResource({ id: resourceId });
-        toast.success("Resource deleted successfully");
-      } catch (err: any) {
-        toast.error("Error deleting resource: " + err.message);
-      }
+  const handleEdit = (item: DisplayItem) => {
+    setEditingItemId(item.id);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+  };
+
+  const handleSave = async (item: DisplayItem, formValues: any) => {
+    if (item.type === 'resource') {
+       await updateResource({
+         id: item.id as number,
+         title: formValues.title,
+         url: formValues.url,
+         description: formValues.description,
+       });
+       toast.success("Resource updated successfully");
     }
+    // Add similar logic for other types if needed
+  };
+
+  const handleDelete = async (item: DisplayItem) => {
+    if (item.type === 'resource') {
+       if (confirm("Are you sure you want to delete this resource?")) {
+         await deleteResource({ id: item.id as number });
+         toast.success("Resource deleted successfully");
+       }
+    }
+    // Add similar logic for other types if needed
+  };
+  
+  const renderResourceEditForm = (
+    item: DisplayItem,
+    onSaveCallback: (values: any) => void,
+    onCancelCallback: () => void
+  ) => {
+    if (item.type === 'resource') {
+      return (
+        <EditResourceForm
+          resource={item as Resource}
+          onSave={onSaveCallback}
+          onCancel={onCancelCallback}
+        />
+      );
+    }
+    return null;
   };
 
   return (
@@ -857,27 +718,18 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       {values && values.length > 0 ? (
         <Table>
           <TableBody ref={parentRef}>
-            {values.map((resource: Resource) =>
-              editingResourceId === resource.id ? (
-                <TableRow key={resource.id}>
-                  <TableCell colSpan={4} className="bg-background">
-                    <EditResourceForm
-                      key={resource.id}
-                      resource={resource}
-                      onSave={() => setEditingResourceId(null)}
-                      onCancel={() => setEditingResourceId(null)}
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                <ResourceItem
+            {values.map((resource: Resource) => (
+                <ItemRow
                   key={resource.id}
-                  resource={resource}
-                  onEdit={() => setEditingResourceId(resource.id)}
-                  onDelete={() => handleDeleteResource(resource.id)}
+                  item={{ ...resource, type: 'resource' }}
+                  isEditing={editingItemId === resource.id}
+                  onEdit={handleEdit}
+                  onSave={handleSave}
+                  onCancelEdit={handleCancelEdit}
+                  onDelete={handleDelete}
+                  renderEditForm={renderResourceEditForm}
                 />
-              )
-            )}
+            ))}
           </TableBody>
         </Table>
       ) : (
@@ -1298,42 +1150,23 @@ export const ProjectView = ({ project }: { project: Project }) => {
                 <Table className="mt-4">
                   <TableBody>
                     {sortedThoughts?.map((thought: Thought) => (
-                      <TableRow className="group grid grid-cols-[auto_1fr_auto] items-center">
-                        <TableCell className="w-8">
-                          <Minus className="h-4 w-4 text-muted-foreground" />
-                        </TableCell>
-                        <TableCell className="grid grid-cols-[1fr_auto] gap-2">
-                          <p className="text-sm cursor-text">
-                            {thought.content}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(thought.createdAt).toLocaleDateString()}
-                          </p>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 flex items-center justify-end gap-2">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  onClick={async () => {
-                                    if (confirm("Are you sure you want to delete this note?")) {
-                                      await deleteThought({
-                                        id: thought.id as string,
-                                      });
-                                      toast.success("Note deleted successfully");
-                                    }
-                                  }}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Delete Note</TooltipContent>
-                            </Tooltip>
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                       <ItemRow
+                          key={thought.id}
+                          item={{ ...thought, type: 'thought' }}
+                          isEditing={false}
+                          onEdit={() => {}}
+                          onSave={async () => {}}
+                          onCancelEdit={() => {}}
+                          onDelete={async (item) => {
+                             if (item.type === 'thought') {
+                                if (confirm("Are you sure you want to delete this note?")) {
+                                   await deleteThought({ id: item.id as string });
+                                   toast.success("Note deleted successfully");
+                                }
+                             }
+                          }}
+                          renderEditForm={() => null} 
+                       />
                     ))}
                   </TableBody>
                 </Table>
