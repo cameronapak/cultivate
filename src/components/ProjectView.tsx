@@ -203,52 +203,60 @@ const TaskItem = ({ task }: { task: Task }) => {
 
   if (isEditing) {
     return (
-      <EditTaskForm
-        task={task}
-        onSave={() => setIsEditing(false)}
-        onCancel={() => setIsEditing(false)}
-      />
+      <TableRow>
+        <TableCell colSpan={4} className="bg-background">
+          <EditTaskForm
+            task={task}
+            onSave={() => setIsEditing(false)}
+            onCancel={() => setIsEditing(false)}
+          />
+        </TableCell>
+      </TableRow>
     );
   }
 
   return (
-    <div className={`group task-item ${task.complete ? "completed" : ""}`}>
-      <div className="flex items-center space-x-2 justify-between p-2 border-b border-[hsl(var(--input))]">
-        <div className="flex items-start space-x-2">
-          <span className="drag-handle cursor-grab opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
-            <GripVertical className="w-4 h-4 text-muted-foreground" />
-          </span>
-          <Checkbox
-            id={task.id.toString()}
-            checked={task.complete}
-            onCheckedChange={(checked) => handleStatusChange(checked === true)}
-          />
-          <div className="flex flex-col">
-            <label
-              htmlFor={task.id.toString()}
-              className={`pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
-                task.complete ? "line-through text-muted-foreground" : ""
-              }`}
-            >
-              {task.title}
-            </label>
-            {task.description && !task.complete && (
-              <p className="text-sm text-muted-foreground line-clamp-1">
-                {task.description}
-              </p>
-            )}
-            {task.complete && (
-              <p className="text-sm text-muted-foreground line-clamp-1">
-                Completed{" "}
-                {task.updatedAt.toLocaleDateString("en", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            )}
-          </div>
+    <TableRow className={`group ${task.complete ? "completed" : ""} grid grid-cols-[auto_auto_1fr_auto] items-center`}>
+      <TableCell className="w-8">
+        <span className="drag-handle cursor-grab">
+          <GripVertical className="h-4 w-4 text-muted-foreground opacity-50" />
+        </span>
+      </TableCell>
+      <TableCell className="p-2 pl-0">
+        <Checkbox
+          id={task.id.toString()}
+          checked={task.complete}
+          onCheckedChange={(checked) => handleStatusChange(checked === true)}
+        />
+      </TableCell>
+      <TableCell>
+        <div className="flex flex-col">
+          <label
+            htmlFor={task.id.toString()}
+            className={`pointer-events-none text-sm font-medium leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+              task.complete ? "line-through text-muted-foreground" : ""
+            }`}
+          >
+            {task.title}
+          </label>
+          {task.description && !task.complete && (
+            <p className="text-sm text-muted-foreground line-clamp-1">
+              {task.description}
+            </p>
+          )}
+          {task.complete && (
+            <p className="text-sm text-muted-foreground line-clamp-1">
+              Completed{" "}
+              {task.updatedAt.toLocaleDateString("en", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          )}
         </div>
+      </TableCell>
+      <TableCell className="text-right">
         <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
           <Button onClick={handleEdit} variant="ghost" size="icon">
             <Pencil className="w-4 h-4" />
@@ -257,8 +265,8 @@ const TaskItem = ({ task }: { task: Task }) => {
             <Trash className="w-4 h-4" />
           </Button>
         </div>
-      </div>
-    </div>
+      </TableCell>
+    </TableRow>
   );
 };
 
@@ -269,7 +277,7 @@ const TaskList = ({
   tasks: Task[];
   projectId: number;
 }) => {
-  const [parentRef, values, setValues] = useDragAndDrop<HTMLDivElement, Task>(
+  const [parentRef, values, setValues] = useDragAndDrop<HTMLTableSectionElement, Task>(
     tasks,
     {
       onSort: async (event) => {
@@ -296,11 +304,13 @@ const TaskList = ({
   }, [tasks, setValues]);
 
   return (
-    <div ref={parentRef} className="space-y-2">
-      {values.map((task) => (
-        <TaskItem key={task.id} task={task} />
-      ))}
-    </div>
+    <Table>
+      <TableBody ref={parentRef}>
+        {values.map((task) => (
+          <TaskItem key={task.id} task={task} />
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 
@@ -487,14 +497,11 @@ const ResourceItem = ({
   }
 
   return (
-    <TableRow className="grid grid-cols-[auto_auto_1fr_auto] items-center group">
+    <TableRow className="grid grid-cols-[auto_1fr_auto] items-center group">
       <TableCell className="w-6">
-        <span className="drag-handle cursor-grab opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
-          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        <span className="drag-handle cursor-grab">
+          <GripVertical className="h-4 w-4 text-muted-foreground opacity-50" />
         </span>
-      </TableCell>
-      <TableCell className="w-8">
-        <Link2 className="h-4 w-4 text-muted-foreground" />
       </TableCell>
       <TableCell className="flex justify-between w-full">
         {isSameOrigin ? (
