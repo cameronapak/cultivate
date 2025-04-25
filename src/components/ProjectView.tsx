@@ -1272,10 +1272,12 @@ export const ProjectView = ({ project }: { project: Project }) => {
                                   variant="outline"
                                   size="icon"
                                   onClick={async () => {
-                                    await deleteThought({
-                                      id: thought.id as string,
-                                    });
-                                    toast.success("Note deleted successfully");
+                                    if (confirm("Are you sure you want to delete this note?")) {
+                                      await deleteThought({
+                                        id: thought.id as string,
+                                      });
+                                      toast.success("Note deleted successfully");
+                                    }
                                   }}
                                 >
                                   <Trash2 className="h-4 w-4" />
