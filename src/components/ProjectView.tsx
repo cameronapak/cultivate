@@ -1017,9 +1017,33 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const navigate = useNavigate();
   const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } =
     useLayoutState();
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
   const handleTabChange = (tab: TabType) => {
     setTab(tab);
+  };
+
+  // Handlers for editing notes (Thoughts)
+  const handleEditNote = (item: DisplayItem) => {
+    if (item.type === 'thought') {
+      setEditingItemId({ id: item.id, type: 'thought' });
+    }
+  };
+
+  const handleCancelEditNote = () => {
+    setEditingItemId(null);
+  };
+
+  const handleSaveNote = async (item: DisplayItem, values: any) => {
+    if (item.type === 'thought') {
+      try {
+        await updateThought({ id: item.id as string, content: values.content });
+        toast.success("Note updated successfully");
+        setEditingItemId(null); // Exit edit mode on success
+      } catch (err: any) {
+        toast.error("Error updating note: " + err.message);
+      }
+    }
   };
 
   const handleCreateThought = useAction(createThought);
@@ -1282,10 +1306,10 @@ export const ProjectView = ({ project }: { project: Project }) => {
                             type: 'thought', 
                             title: thought.content.slice(0, 60) + (thought.content.length > 60 ? "..." : "") 
                           }} 
-                          isEditing={false}
-                          onEdit={() => {}}
-                          onSave={async () => {}}
-                          onCancelEdit={() => {}}
+                          isEditing={editingItemId?.id === thought.id && editingItemId?.type === 'thought'}
+                          onEdit={handleEditNote}
+                          onSave={handleSaveNote}
+                          onCancelEdit={handleCancelEditNote}
                           onDelete={async (item) => {
                              if (item.type === 'thought') {
                                 if (confirm("Are you sure you want to delete this note?")) {
@@ -1294,7 +1318,15 @@ export const ProjectView = ({ project }: { project: Project }) => {
                                 }
                              }
                           }}
-                          renderEditForm={() => null} 
+                          renderEditForm={(item, onSave, onCancel) => 
+                            item.type === 'thought' ? (
+                              <EditThoughtForm 
+                                thought={item as Thought} 
+                                onSave={onSave} 
+                                onCancel={onCancel} 
+                              />
+                            ) : null
+                          } 
                        />
                     ))}
                   </TableBody>
