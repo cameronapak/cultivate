@@ -6,6 +6,13 @@ app shapeUp {
   client: {
     setupFn: import { setupClient } from "@src/client/setup"
   },
+  db: {
+    // system: PostgreSQL, // Assuming PostgreSQL is default or set elsewhere
+    // Add the seed function to the list
+    seeds: [
+      import { seedDevInviteCode } from "@src/server/scripts/seedDevData.js"
+    ]
+  },
   auth: {
     // Tells Wasp which entity to use for storing users.
     userEntity: User,
