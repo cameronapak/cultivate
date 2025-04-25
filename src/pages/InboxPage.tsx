@@ -739,6 +739,7 @@ export function InboxPage() {
                                 onStatusChange={item.type === 'task' ? (taskItem, complete) => handleToggleTask(taskItem as Task, complete) : undefined}
                                 onMove={handleMoveItem}
                                 renderEditForm={renderItemEditForm}
+                                hideDragHandle={true}
                               />
                             ))}
                           </React.Fragment>

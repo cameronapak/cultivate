@@ -44,6 +44,7 @@ interface ItemRowProps {
     onSave: (values: any) => void,
     onCancel: () => void
   ) => React.ReactNode; // Function to render the specific edit form
+  hideDragHandle?: boolean; // New optional prop
 }
 
 export const ItemRow: React.FC<ItemRowProps> = ({
@@ -57,6 +58,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({
   onStatusChange,
   onMove,
   renderEditForm,
+  hideDragHandle = false, // Default to false
 }) => {
   const handleSave = async (values: any) => {
     try {
@@ -79,7 +81,11 @@ export const ItemRow: React.FC<ItemRowProps> = ({
   }
 
   const commonRowClasses = cn(
-    "group grid grid-cols-[auto_auto_1fr_auto] items-center",
+    "group items-center",
+    // Adjust grid columns based on hideDragHandle
+    hideDragHandle
+      ? "grid grid-cols-[auto_1fr_auto]"
+      : "grid grid-cols-[auto_auto_1fr_auto]",
     item.type === "task" && (item as Task).complete ? "completed" : ""
   );
 
@@ -204,15 +210,18 @@ export const ItemRow: React.FC<ItemRowProps> = ({
 
   return (
     <TableRow className={commonRowClasses}>
-      {/* Drag Handle */}
-      <TableCell className="w-8">
-        <span className="drag-handle cursor-grab">
-          <GripVertical className="h-4 w-4 text-muted-foreground opacity-50" />
-        </span>
-      </TableCell>
+      {/* Drag Handle - Conditionally Rendered */}
+      {!hideDragHandle && (
+        <TableCell className="w-8 pr-0">
+          <span className="drag-handle cursor-grab">
+            <GripVertical className="h-4 w-4 text-muted-foreground opacity-50" />
+          </span>
+        </TableCell>
+      )}
 
       {/* Item Type Icon/Checkbox */}
-      <TableCell className="w-6 p-2 pl-0">{renderItemIcon()}</TableCell>
+      {/* Adjust padding if drag handle is hidden */}
+      <TableCell className={cn("w-8 p-2", hideDragHandle ? "pl-2" : "pl-0")} >{renderItemIcon()}</TableCell>
 
       {/* Item Content */}
       <TableCell className="py-2">{renderItemContent()}</TableCell>
