@@ -488,7 +488,7 @@ const ResourceItem = ({
 
   return (
     <TableRow className="grid grid-cols-[auto_auto_1fr_auto] items-center group">
-      <TableCell className="w-8">
+      <TableCell className="w-6">
         <span className="drag-handle cursor-grab opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
           <GripVertical className="h-4 w-4 text-muted-foreground" />
         </span>
