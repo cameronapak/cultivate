@@ -103,15 +103,17 @@ export const ItemRow: React.FC<ItemRowProps> = ({
             >
               {item.title}
             </label>
+            {/* Only show description if NOT complete */}
             {item.description && !item.complete && (
               <p className="text-sm text-muted-foreground line-clamp-1">
                 {item.description}
               </p>
             )}
+            {/* Show completion date if complete */}
             {item.complete && (
               <p className="text-sm text-muted-foreground line-clamp-1">
                 Completed{" "}
-                {new Date(item.updatedAt).toLocaleDateString("en", {
+                {new Date((item as Task).updatedAt).toLocaleDateString("en", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",

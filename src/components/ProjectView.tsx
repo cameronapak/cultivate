@@ -15,6 +15,7 @@ import {
   createThought,
   deleteThought,
   updateThought,
+  updateTaskStatus,
   useAction,
 } from "wasp/client/operations";
 import {
@@ -183,6 +184,18 @@ const TaskList = ({
   );
   const [editingItemId, setEditingItemId] = useState<number | string | null>(null);
 
+  // Add handler for status change
+  const handleStatusChange = async (task: Task, complete: boolean) => {
+    try {
+      await updateTaskStatus({ id: task.id, complete });
+      // Optionally add a success toast here if desired
+      toast.success(`Task "${task.title}" marked as ${complete ? 'complete' : 'incomplete'}`);
+      // Wasp query cache should update automatically
+    } catch (err) {
+      toast.error("Failed to update task status");
+    }
+  };
+
   // Update values when tasks prop changes
   React.useEffect(() => {
     setValues(tasks);
@@ -273,6 +286,7 @@ const TaskList = ({
             onSave={handleSave}
             onCancelEdit={handleCancelEdit}
             onDelete={handleDelete}
+            onStatusChange={(item, complete) => handleStatusChange(item as Task, complete)}
             renderEditForm={renderTaskEditForm}
           />
         ))}

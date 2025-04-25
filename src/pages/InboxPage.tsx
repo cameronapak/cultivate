@@ -502,6 +502,18 @@ export function InboxPage() {
     }
   };
 
+  // Add handler for status change
+  const handleStatusChange = async (task: Task, complete: boolean) => {
+    try {
+      await updateTaskStatus({ id: task.id, complete });
+      // Optionally add a success toast here if desired
+      toast.success(`Task "${task.title}" marked as ${complete ? 'complete' : 'incomplete'}`);
+      // Wasp query cache should update automatically
+    } catch (err) {
+      toast.error("Failed to update task status");
+    }
+  };
+
   if (tasksError || resourcesError || thoughtsError) {
     return (
       <div>
@@ -735,7 +747,7 @@ export function InboxPage() {
                                 onSave={handleSaveItem}
                                 onCancelEdit={handleCancelEdit}
                                 onDelete={handleDeleteItem}
-                                onStatusChange={item.type === 'task' ? (taskItem, complete) => handleToggleTask(taskItem as Task, complete) : undefined}
+                                onStatusChange={item.type === 'task' ? (taskItem, complete) => handleStatusChange(taskItem as Task, complete) : undefined}
                                 onMove={handleMoveItem}
                                 renderEditForm={renderItemEditForm}
                                 hideDragHandle={true}
