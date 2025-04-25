@@ -1,4 +1,4 @@
-import { Project, Task, Pitch, Resource, Thought } from 'wasp/entities'
+import { Project, Task, Pitch, Resource, Thought, User, InviteCode } from 'wasp/entities'
 import { HttpError } from 'wasp/server'
 import { 
   type GetProjects, 
@@ -29,12 +29,17 @@ import {
   type UpdateThought,
   type DeleteThought,
   type MoveThought,
+  type CheckInviteCode,
+  type ClaimInviteCode
 } from 'wasp/server/operations'
 
-// Define our own GetProject type since we need to include related entities
-type GetProject<Input, Output> = (args: Input, context: any) => Output | Promise<Output>
+// Wasp operation context type (adjust if a more specific type is available)
+type WaspContext = any;
 
-export const getProjects: GetProjects<void, Project[]> = async (args, context) => {
+// Define our own GetProject type since we need to include related entities
+type GetProject<Input, Output> = (args: Input, context: WaspContext) => Output | Promise<Output>
+
+export const getProjects: GetProjects<void, Project[]> = async (_args: void, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -55,11 +60,11 @@ type GetProjectInput = {
   projectId: number
 }
 
-export const getProject: GetProject<GetProjectInput, Project> = async (args, context) => {
+export const getProject: GetProject<GetProjectInput, Project> = async (args: GetProjectInput, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
-  return context.entities.Project.findUnique({
+  const project = await context.entities.Project.findUnique({
     where: { id: args.projectId, userId: context.user.id },
     include: { 
       tasks: true,
@@ -68,13 +73,17 @@ export const getProject: GetProject<GetProjectInput, Project> = async (args, con
       thoughts: true
     }
   })
+  if (!project) {
+    throw new HttpError(404, `Project with id ${args.projectId} not found`);
+  }
+  return project;
 }
 
 type GetProjectTasksInput = {
   projectId: number
 }
 
-export const getProjectTasks: GetProjectTasks<GetProjectTasksInput, Task[]> = async (args, context) => {
+export const getProjectTasks: GetProjectTasks<GetProjectTasksInput, Task[]> = async (args: GetProjectTasksInput, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -91,7 +100,7 @@ type GetProjectPitchesInput = {
   projectId: number
 }
 
-export const getProjectPitches: GetProjectPitches<GetProjectPitchesInput, Pitch[]> = async (args, context) => {
+export const getProjectPitches: GetProjectPitches<GetProjectPitchesInput, Pitch[]> = async (args: GetProjectPitchesInput, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -107,8 +116,8 @@ type CreateProjectPayload = {
 }
 
 export const createProject: CreateProject<CreateProjectPayload, Project> = async (
-  args,
-  context
+  args: CreateProjectPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -132,8 +141,8 @@ type UpdateProjectPayload = {
 }
 
 export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async (
-  args,
-  context
+  args: UpdateProjectPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -155,8 +164,8 @@ type DeleteProjectPayload = {
 }
 
 export const deleteProject: DeleteProject<DeleteProjectPayload, Project> = async (
-  args,
-  context
+  args: DeleteProjectPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -183,8 +192,8 @@ type CreatePitchPayload = {
 }
 
 export const createPitch: CreatePitch<CreatePitchPayload, Pitch> = async (
-  args,
-  context
+  args: CreatePitchPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -223,8 +232,8 @@ type DeletePitchPayload = {
 }
 
 export const deletePitch: DeletePitch<DeletePitchPayload, Pitch> = async (
-  args,
-  context
+  args: DeletePitchPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -234,7 +243,7 @@ export const deletePitch: DeletePitch<DeletePitchPayload, Pitch> = async (
   })
 }
 
-export const getInboxTasks: GetInboxTasks<void, Task[]> = async (_args, context) => {
+export const getInboxTasks: GetInboxTasks<void, Task[]> = async (_args: void, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -254,8 +263,8 @@ type CreateTaskPayload = {
 }
 
 export const createTask: CreateTask<CreateTaskPayload, Task> = async (
-  args,
-  context
+  args: CreateTaskPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -300,8 +309,8 @@ type UpdateTaskStatusPayload = {
 }
 
 export const updateTaskStatus: UpdateTaskStatus<UpdateTaskStatusPayload, Task> = async (
-  args,
-  context
+  args: UpdateTaskStatusPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -326,8 +335,8 @@ type UpdateTaskPayload = {
 }
 
 export const updateTask: UpdateTask<UpdateTaskPayload, Task> = async (
-  args,
-  context
+  args: UpdateTaskPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -350,8 +359,8 @@ type DeleteTaskPayload = {
 }
 
 export const deleteTask: DeleteTask<DeleteTaskPayload, Task> = async (
-  args,
-  context
+  args: DeleteTaskPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -379,8 +388,8 @@ type UpdatePitchPayload = {
 }
 
 export const updatePitch: UpdatePitch<UpdatePitchPayload, Pitch> = async (
-  args,
-  context
+  args: UpdatePitchPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -405,7 +414,7 @@ type GetProjectResourcesInput = {
   projectId: number
 }
 
-export const getProjectResources: GetProjectResources<GetProjectResourcesInput, Resource[]> = async (args, context) => {
+export const getProjectResources: GetProjectResources<GetProjectResourcesInput, Resource[]> = async (args: GetProjectResourcesInput, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -426,8 +435,8 @@ type CreateResourcePayload = {
 }
 
 export const createResource: CreateResource<CreateResourcePayload, Resource> = async (
-  args,
-  context
+  args: CreateResourcePayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -474,8 +483,8 @@ type UpdateResourcePayload = {
 }
 
 export const updateResource: UpdateResource<UpdateResourcePayload, Resource> = async (
-  args,
-  context
+  args: UpdateResourcePayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -499,8 +508,8 @@ type DeleteResourcePayload = {
 }
 
 export const deleteResource: DeleteResource<DeleteResourcePayload, Resource> = async (
-  args,
-  context
+  args: DeleteResourcePayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -525,7 +534,7 @@ type MoveTaskArgs = {
   projectId: number | null
 }
 
-export const moveTask: MoveTask<MoveTaskArgs, Task> = async (args, context) => {
+export const moveTask: MoveTask<MoveTaskArgs, Task> = async (args: MoveTaskArgs, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -541,20 +550,24 @@ export const moveTask: MoveTask<MoveTaskArgs, Task> = async (args, context) => {
   return task
 }
 
-export const getDocument = async (args: { documentId: string }, context: any) => {
+export const getDocument = async (args: { documentId: string }, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
-  return context.entities.Document.findUnique({
+  const doc = await context.entities.Document.findUnique({
     where: { 
       id: args.documentId,
       userId: context.user.id 
     }
   })
+  if (!doc) {
+    throw new HttpError(404, `Document with id ${args.documentId} not found`);
+  }
+  return doc;
 }
 
 // Add a function to get a public document without auth
-export const getPublicDocument = async (args: { documentId: string }, context: any) => {
+export const getPublicDocument = async (args: { documentId: string }, context: WaspContext) => {
   // Find document by ID and check if it's published
   const document = await context.entities.Document.findFirst({
     where: {
@@ -577,7 +590,7 @@ export const getPublicDocument = async (args: { documentId: string }, context: a
   return document;
 }
 
-export const getDocuments = async (args: {}, context: any) => {
+export const getDocuments = async (args: {}, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -588,7 +601,7 @@ export const getDocuments = async (args: {}, context: any) => {
   })
 }
 
-export const createDocument = async (args: { title: string; content: string, isPublished?: boolean }, context: any) => {
+export const createDocument = async (args: { title: string; content: string, isPublished?: boolean }, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -606,12 +619,12 @@ export const createDocument = async (args: { title: string; content: string, isP
   })
 }
 
-export const updateDocument = async (args: { id: string; title: string; content: string, isPublished?: boolean }, context: any) => {
+export const updateDocument = async (args: { id: string; title: string; content: string, isPublished?: boolean }, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
   return context.entities.Document.update({
-    where: { id: args.id },
+    where: { id: args.id, userId: context.user.id }, // Ensure user owns the document
     data: {
       title: args.title,
       content: args.content,
@@ -620,12 +633,12 @@ export const updateDocument = async (args: { id: string; title: string; content:
   })
 }
 
-export const deleteDocument = async (args: { id: string }, context: any) => {
+export const deleteDocument = async (args: { id: string }, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
   return context.entities.Document.delete({
-    where: { id: args.id }
+    where: { id: args.id, userId: context.user.id } // Ensure user owns the document
   })
 }
 
@@ -635,7 +648,7 @@ type SaveCanvasPayload = {
   id: string
 }
 
-export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
+export const saveCanvas = async (args: SaveCanvasPayload, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -646,12 +659,13 @@ export const saveCanvas = async (args: SaveCanvasPayload, context: any) => {
 
   try {
     await context.entities.Canvas.upsert({
-      where: { id: args.id },
+      where: { id: args.id, userId: context.user.id }, // Check ownership
       update: { 
         snapshot: JSON.stringify(args.snapshot),
         updatedAt: new Date()
       },
       create: { 
+        id: args.id, // Use provided ID for creation
         snapshot: JSON.stringify(args.snapshot),
         user: { connect: { id: context.user.id } }
       }
@@ -668,7 +682,7 @@ type LoadCanvasPayload = {
   id: string
 }
 
-export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
+export const loadCanvas = async (args: LoadCanvasPayload, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -684,17 +698,17 @@ export const loadCanvas = async (args: LoadCanvasPayload, context: any) => {
 
   try {
     const canvas = await context.entities.Canvas.findUnique({
-      where: { id: args.id }
+      where: { id: args.id, userId: context.user.id } // Check ownership
     });
-
-    return canvas;
+    // Don't throw if not found, return null or let the client handle it
+    return canvas; 
   } catch (error) {
     console.error('Failed to load canvas:', error);
     throw new HttpError(500, 'Failed to load canvas');
   }
 };
 
-export const getCanvases = async (_args: {}, context: any) => {
+export const getCanvases = async (_args: {}, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -710,7 +724,7 @@ export const getCanvases = async (_args: {}, context: any) => {
   }
 };
 
-export const createCanvas = async (args: { title: string, description: string, snapshot: any }, context: any) => {
+export const createCanvas = async (args: { title: string, description: string, snapshot: any }, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -732,14 +746,14 @@ export const createCanvas = async (args: { title: string, description: string, s
   }
 };
 
-export const deleteCanvas = async (args: { id: string }, context: any) => {
+export const deleteCanvas = async (args: { id: string }, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
 
   try {
     await context.entities.Canvas.delete({
-      where: { id: args.id }
+      where: { id: args.id, userId: context.user.id } // Check ownership
     });
     return { success: true };
   } catch (error) {
@@ -749,7 +763,7 @@ export const deleteCanvas = async (args: { id: string }, context: any) => {
 };
 //#endregion
 
-export const getInboxResources: GetInboxResources<void, Resource[]> = async (_args, context) => {
+export const getInboxResources: GetInboxResources<void, Resource[]> = async (_args: void, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -768,7 +782,7 @@ type MoveResourceArgs = {
   projectId: number | null
 }
 
-export const moveResource: MoveResource<MoveResourceArgs, Resource> = async (args, context) => {
+export const moveResource: MoveResource<MoveResourceArgs, Resource> = async (args: MoveResourceArgs, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -789,7 +803,7 @@ type UpdateProjectTaskOrderPayload = {
   taskOrder: number[]
 }
 
-export const updateProjectTaskOrder = async (args: UpdateProjectTaskOrderPayload, context: any) => {
+export const updateProjectTaskOrder = async (args: UpdateProjectTaskOrderPayload, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -820,7 +834,7 @@ type UpdateProjectResourceOrderPayload = {
   resourceOrder: number[]
 }
 
-export const updateProjectResourceOrder = async (args: UpdateProjectResourceOrderPayload, context: any) => {
+export const updateProjectResourceOrder = async (args: UpdateProjectResourceOrderPayload, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -847,7 +861,7 @@ export const updateProjectResourceOrder = async (args: UpdateProjectResourceOrde
 }
 
 //#region Thoughts
-export const getThoughts: GetThoughts<void, Thought[]> = async (_args, context) => {
+export const getThoughts: GetThoughts<void, Thought[]> = async (_args: void, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -863,7 +877,7 @@ type GetThoughtInput = {
   id: string
 }
 
-export const getThought: GetThought<GetThoughtInput, Thought> = async (args, context) => {
+export const getThought: GetThought<GetThoughtInput, Thought> = async (args: GetThoughtInput, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -887,8 +901,8 @@ type CreateThoughtPayload = {
 }
 
 export const createThought: CreateThought<CreateThoughtPayload, Thought> = async (
-  args,
-  context
+  args: CreateThoughtPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -910,8 +924,8 @@ type UpdateThoughtPayload = {
 }
 
 export const updateThought: UpdateThought<UpdateThoughtPayload, Thought> = async (
-  args,
-  context
+  args: UpdateThoughtPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -942,8 +956,8 @@ type DeleteThoughtPayload = {
 }
 
 export const deleteThought: DeleteThought<DeleteThoughtPayload, Thought> = async (
-  args,
-  context
+  args: DeleteThoughtPayload,
+  context: WaspContext
 ) => {
   if (!context.user) {
     throw new HttpError(401)
@@ -970,7 +984,7 @@ type MoveThoughtArgs = {
   projectId: number | null
 }
 
-export const moveThought: MoveThought<MoveThoughtArgs, Thought> = async (args: MoveThoughtArgs, context: any) => {
+export const moveThought: MoveThought<MoveThoughtArgs, Thought> = async (args: MoveThoughtArgs, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -994,7 +1008,7 @@ export const moveThought: MoveThought<MoveThoughtArgs, Thought> = async (args: M
   })
 }
 
-export const getInboxThoughts: GetInboxThoughts<void, Thought[]> = async (_args, context) => {
+export const getInboxThoughts: GetInboxThoughts<void, Thought[]> = async (_args: void, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
@@ -1006,5 +1020,75 @@ export const getInboxThoughts: GetInboxThoughts<void, Thought[]> = async (_args,
     orderBy: { createdAt: 'desc' }
   })
 }
+
+//#endregion
+
+//#region Invite Codes
+
+type CheckInviteCodeArgs = {
+  code: string;
+};
+
+export const checkInviteCode: CheckInviteCode<CheckInviteCodeArgs, InviteCode> = async (args: CheckInviteCodeArgs, context: WaspContext) => {
+  const { code } = args;
+
+  if (!code) {
+    throw new HttpError(400, 'Invite code is required.');
+  }
+
+  const codeEntry = await context.entities.InviteCode.findUnique({
+    where: { code },
+  });
+
+  if (!codeEntry) {
+    throw new HttpError(404, 'Invalid invite code.');
+  }
+
+  if (codeEntry.isClaimed) {
+    throw new HttpError(400, 'This invite code has already been claimed.');
+  }
+
+  // Code is valid and unclaimed
+  return codeEntry;
+};
+
+type ClaimInviteCodeArgs = {
+  code: string;
+};
+
+export const claimInviteCode: ClaimInviteCode<ClaimInviteCodeArgs, InviteCode> = async (args: ClaimInviteCodeArgs, context: WaspContext) => {
+  if (!context.user) {
+    // This action requires authentication because it runs after signup
+    throw new HttpError(401, 'User must be logged in to claim an invite code.');
+  }
+  
+  const { code } = args;
+
+  const codeEntry = await context.entities.InviteCode.findUnique({
+    where: { code },
+  });
+
+  // Basic validation again, though checkInviteCode should have caught most issues
+  if (!codeEntry) {
+    throw new HttpError(404, 'Invite code not found during claim process.'); 
+  }
+
+  if (codeEntry.isClaimed) {
+    // Should ideally not happen if checkInviteCode was called just before signup,
+    // but handle race conditions just in case.
+    throw new HttpError(400, 'This invite code was already claimed.');
+  }
+
+  // Mark the code as claimed and link it to the newly signed-up user
+  const updatedCode = await context.entities.InviteCode.update({
+    where: { id: codeEntry.id },
+    data: {
+      isClaimed: true,
+      claimedByUserId: context.user.id,
+    },
+  });
+
+  return updatedCode;
+};
 
 //#endregion
