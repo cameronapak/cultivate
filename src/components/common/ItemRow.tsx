@@ -244,20 +244,18 @@ export const ItemRow: React.FC<ItemRowProps> = ({
           )}
 
           {/* Edit Button */}
-          {item.type !== "thought" && ( // Thoughts might be edited differently or not at all via button
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={() => onEdit(item)}
-                  variant="ghost"
-                  size="icon"
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Edit {item.type}</TooltipContent>
-            </Tooltip>
-          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => onEdit(item)}
+                variant="ghost"
+                size="icon"
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Edit {item.type}</TooltipContent>
+          </Tooltip>
 
           {/* Move Button (Optional) */}
           {onMove && projects && projects.length > 0 && (

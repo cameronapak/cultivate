@@ -657,6 +657,63 @@ export const EditResourceForm = ({
   );
 };
 
+export const EditThoughtForm = ({
+  thought,
+  onSave,
+  onCancel,
+}: {
+  thought: Thought;
+  onSave: (values: { content: string }) => void;
+  onCancel: () => void;
+}) => {
+  const formSchema = z.object({
+    content: z.string().min(1, { message: "Note content cannot be empty" }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      content: thought.content || "",
+    },
+  });
+
+  const processSubmit = (values: z.infer<typeof formSchema>) => {
+    onSave(values);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(processSubmit)} className="space-y-2 p-2">
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea
+                  placeholder="Edit your note..."
+                  className="min-h-[60px]" // Smaller height for inline editing
+                  autoFocus
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex gap-2 items-center">
+          <Button size="sm" type="submit" variant="default">
+            Save Note
+          </Button>
+          <Button size="sm" type="button" onClick={onCancel} variant="outline">
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
+
 const ResourcesSection = ({ project }: { project: Project }) => {
   // Sort resources by the order in the project.resourceOrder array
   const sortedResources = project.resources?.sort((a, b) => {

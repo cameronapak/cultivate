@@ -5,7 +5,7 @@ import {
   useQuery,
   getInboxThoughts,
 } from "wasp/client/operations";
-import type { Project, Task, Resource } from "wasp/entities";
+import type { Project, Task, Resource, Thought } from "wasp/entities";
 import {
   createTask,
   updateTaskStatus,
@@ -66,7 +66,7 @@ import { Textarea } from "../components/ui/textarea";
 import { Toggle } from "../components/ui/toggle";
 import { Combobox } from "../components/custom/ComboBox";
 import { ItemRow, DisplayItem } from "../components/common/ItemRow";
-import { EditTaskForm, EditResourceForm } from "../components/ProjectView";
+import { EditTaskForm, EditResourceForm, EditThoughtForm } from "../components/ProjectView";
 
 // Create a type where the string is a date in the format "2025-04-20"
 type DateString =
@@ -410,11 +410,10 @@ export function InboxPage() {
     } else if (item.type === 'resource') {
       // Assuming EditResourceForm is imported and accepts Resource
       return <EditResourceForm resource={item as Resource} onSave={onSave} onCancel={onCancel} />;
-    } 
-    // else if (item.type === 'thought') {
-    //   // Need an EditThoughtForm component
-    //   // return <EditThoughtForm thought={item as Thought} onSave={onSave} onCancel={onCancel} />;
-    // }
+    } else if (item.type === 'thought') {
+      // Need an EditThoughtForm component
+      return <EditThoughtForm thought={item as Thought} onSave={onSave} onCancel={onCancel} />;
+    }
     return null; // Or a placeholder/message for types without an edit form
   };
 
