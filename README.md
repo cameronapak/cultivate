@@ -18,8 +18,8 @@ Cultivate is a PKM tool where you can calmly brain dump, write, manage projects,
 ## How to Run
 
 1. [Download the Wasp Compiler](https://wasp.sh/docs/quick-start)
-2. Download Docker or [Orbstack](https://orbstack.dev/) _(skip if you already have Docker)_
-3. Run `wasp db migrate-dev` to get the DB set up
+2. Install Docker or [Orbstack](https://orbstack.dev/) (recommended for macOS). Wasp uses this to standup the database.
+3. Run `wasp db migrate-dev` to set up the database schema. This command also automatically runs the seed script (`src/server/scripts/seedDevData.ts`) which creates a default user (`dev_user` / `password`) if no users exist, and ensures the initial invite code (`JESUS-SAVES`) is available.
 4. Run `wasp start` to get the app running locally at `localhost:3000`
 
 ## Contributing
