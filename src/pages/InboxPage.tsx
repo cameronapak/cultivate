@@ -263,7 +263,7 @@ export function InboxPage() {
     return showTasksLocalStorage;
   });
   const [filter, setFilter] = useState<InboxFilter>("all");
-  const [editingItemId, setEditingItemId] = useState<string | number | null>(null);
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
@@ -373,7 +373,10 @@ export function InboxPage() {
   };
 
   const handleEditItem = (item: DisplayItem) => {
-    setEditingItemId(item.id);
+    setEditingItemId({
+      id: item.id,
+      type: item.type
+    });
   };
 
   const handleCancelEdit = () => {
@@ -741,7 +744,7 @@ export function InboxPage() {
                               <ItemRow
                                 key={`${item.type}-${item.id}`}
                                 item={item}
-                                isEditing={editingItemId === item.id}
+                                isEditing={editingItemId?.id === item.id && editingItemId?.type === item.type}
                                 projects={projects || []}
                                 onEdit={handleEditItem}
                                 onSave={handleSaveItem}

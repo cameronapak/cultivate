@@ -182,7 +182,7 @@ const TaskList = ({
       dragHandle: ".drag-handle",
     }
   );
-  const [editingItemId, setEditingItemId] = useState<number | string | null>(null);
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
   // Add handler for status change
   const handleStatusChange = async (task: Task, complete: boolean) => {
@@ -202,7 +202,7 @@ const TaskList = ({
   }, [tasks, setValues]);
 
   const handleEdit = (item: DisplayItem) => {
-    setEditingItemId(item.id);
+    setEditingItemId({ id: item.id, type: item.type });
   };
 
   const handleCancelEdit = () => {
@@ -234,6 +234,7 @@ const TaskList = ({
       }); 
       toast.success("Thought updated successfully");
     }
+    setEditingItemId(null);
   };
 
   const handleDelete = async (item: DisplayItem) => {
@@ -281,7 +282,7 @@ const TaskList = ({
           <ItemRow
             key={task.id}
             item={{ ...task, type: 'task' }}
-            isEditing={editingItemId === task.id}
+            isEditing={editingItemId?.id === task.id && editingItemId?.type === 'task'}
             onEdit={handleEdit}
             onSave={handleSave}
             onCancelEdit={handleCancelEdit}
@@ -756,7 +757,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       dragHandle: ".drag-handle",
     }
   );
-  const [editingItemId, setEditingItemId] = useState<number | string | null>(null);
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
   // Update values when resources prop changes
   React.useEffect(() => {
@@ -764,7 +765,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   }, [project.resources, project.resourceOrder, setValues]);
 
   const handleEdit = (item: DisplayItem) => {
-    setEditingItemId(item.id);
+    setEditingItemId({ id: item.id, type: item.type });
   };
 
   const handleCancelEdit = () => {
@@ -796,6 +797,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       }); 
        toast.success("Thought updated successfully");
     }
+    setEditingItemId(null);
   };
 
   const handleDelete = async (item: DisplayItem) => {
@@ -845,7 +847,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
                 <ItemRow
                   key={resource.id}
                   item={{ ...resource, type: 'resource' }}
-                  isEditing={editingItemId === resource.id}
+                  isEditing={editingItemId?.id === resource.id && editingItemId?.type === 'resource'}
                   onEdit={handleEdit}
                   onSave={handleSave}
                   onCancelEdit={handleCancelEdit}
