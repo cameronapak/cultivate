@@ -15,6 +15,7 @@ import {
   createThought,
   deleteThought,
   updateThought,
+  updateTaskStatus,
   useAction,
 } from "wasp/client/operations";
 import {
@@ -181,7 +182,19 @@ const TaskList = ({
       dragHandle: ".drag-handle",
     }
   );
-  const [editingItemId, setEditingItemId] = useState<number | string | null>(null);
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
+
+  // Add handler for status change
+  const handleStatusChange = async (task: Task, complete: boolean) => {
+    try {
+      await updateTaskStatus({ id: task.id, complete });
+      // Optionally add a success toast here if desired
+      toast.success(`Task "${task.title}" marked as ${complete ? 'complete' : 'incomplete'}`);
+      // Wasp query cache should update automatically
+    } catch (err) {
+      toast.error("Failed to update task status");
+    }
+  };
 
   // Update values when tasks prop changes
   React.useEffect(() => {
@@ -189,7 +202,7 @@ const TaskList = ({
   }, [tasks, setValues]);
 
   const handleEdit = (item: DisplayItem) => {
-    setEditingItemId(item.id);
+    setEditingItemId({ id: item.id, type: item.type });
   };
 
   const handleCancelEdit = () => {
@@ -221,6 +234,7 @@ const TaskList = ({
       }); 
       toast.success("Thought updated successfully");
     }
+    setEditingItemId(null);
   };
 
   const handleDelete = async (item: DisplayItem) => {
@@ -268,11 +282,12 @@ const TaskList = ({
           <ItemRow
             key={task.id}
             item={{ ...task, type: 'task' }}
-            isEditing={editingItemId === task.id}
+            isEditing={editingItemId?.id === task.id && editingItemId?.type === 'task'}
             onEdit={handleEdit}
             onSave={handleSave}
             onCancelEdit={handleCancelEdit}
             onDelete={handleDelete}
+            onStatusChange={(item, complete) => handleStatusChange(item as Task, complete)}
             renderEditForm={renderTaskEditForm}
           />
         ))}
@@ -742,7 +757,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       dragHandle: ".drag-handle",
     }
   );
-  const [editingItemId, setEditingItemId] = useState<number | string | null>(null);
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
   // Update values when resources prop changes
   React.useEffect(() => {
@@ -750,7 +765,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
   }, [project.resources, project.resourceOrder, setValues]);
 
   const handleEdit = (item: DisplayItem) => {
-    setEditingItemId(item.id);
+    setEditingItemId({ id: item.id, type: item.type });
   };
 
   const handleCancelEdit = () => {
@@ -782,6 +797,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
       }); 
        toast.success("Thought updated successfully");
     }
+    setEditingItemId(null);
   };
 
   const handleDelete = async (item: DisplayItem) => {
@@ -831,7 +847,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
                 <ItemRow
                   key={resource.id}
                   item={{ ...resource, type: 'resource' }}
-                  isEditing={editingItemId === resource.id}
+                  isEditing={editingItemId?.id === resource.id && editingItemId?.type === 'resource'}
                   onEdit={handleEdit}
                   onSave={handleSave}
                   onCancelEdit={handleCancelEdit}
@@ -1001,9 +1017,33 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const navigate = useNavigate();
   const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } =
     useLayoutState();
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
   const handleTabChange = (tab: TabType) => {
     setTab(tab);
+  };
+
+  // Handlers for editing notes (Thoughts)
+  const handleEditNote = (item: DisplayItem) => {
+    if (item.type === 'thought') {
+      setEditingItemId({ id: item.id, type: 'thought' });
+    }
+  };
+
+  const handleCancelEditNote = () => {
+    setEditingItemId(null);
+  };
+
+  const handleSaveNote = async (item: DisplayItem, values: any) => {
+    if (item.type === 'thought') {
+      try {
+        await updateThought({ id: item.id as string, content: values.content });
+        toast.success("Note updated successfully");
+        setEditingItemId(null); // Exit edit mode on success
+      } catch (err: any) {
+        toast.error("Error updating note: " + err.message);
+      }
+    }
   };
 
   const handleCreateThought = useAction(createThought);
@@ -1266,10 +1306,10 @@ export const ProjectView = ({ project }: { project: Project }) => {
                             type: 'thought', 
                             title: thought.content.slice(0, 60) + (thought.content.length > 60 ? "..." : "") 
                           }} 
-                          isEditing={false}
-                          onEdit={() => {}}
-                          onSave={async () => {}}
-                          onCancelEdit={() => {}}
+                          isEditing={editingItemId?.id === thought.id && editingItemId?.type === 'thought'}
+                          onEdit={handleEditNote}
+                          onSave={handleSaveNote}
+                          onCancelEdit={handleCancelEditNote}
                           onDelete={async (item) => {
                              if (item.type === 'thought') {
                                 if (confirm("Are you sure you want to delete this note?")) {
@@ -1278,7 +1318,15 @@ export const ProjectView = ({ project }: { project: Project }) => {
                                 }
                              }
                           }}
-                          renderEditForm={() => null} 
+                          renderEditForm={(item, onSave, onCancel) => 
+                            item.type === 'thought' ? (
+                              <EditThoughtForm 
+                                thought={item as Thought} 
+                                onSave={onSave} 
+                                onCancel={onCancel} 
+                              />
+                            ) : null
+                          } 
                        />
                     ))}
                   </TableBody>

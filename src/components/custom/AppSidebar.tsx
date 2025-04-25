@@ -1,4 +1,4 @@
-import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail } from "lucide-react";
+import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail, MailPlus, Loader2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +14,11 @@ import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "../ui/button";
 import Logo from "./Logo";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import {
+  generateInviteCode
+} from "wasp/client/operations";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -25,8 +30,24 @@ export type SidebarItem = {
 export function AppSidebar({ items }: { items: SidebarItem[] }) {
   // Get the current path
   const currentPath = window.location.pathname;
-  // const { data: projects } = useQuery(getProjects);
-  // const pinnedProjects = projects?.filter((project) => project.pinned) || [];
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+
+  const handleGenerateCode = async () => {
+    setIsGeneratingCode(true);
+    try {
+      const newCode = await generateInviteCode();
+      toast.success(
+        <div className="flex flex-col gap-2">
+          <p>Invite code generated:</p>
+          <p className="font-bold select-all font-mono w-fit max-w-full bg-muted p-2 rounded-md">{newCode.code}</p>
+        </div>
+      );
+    } catch (error: any) {
+      toast.error(error?.data?.message || error?.message || "Failed to generate invite code.");
+    } finally {
+      setIsGeneratingCode(false);
+    }
+  };
 
   return (
     <Sidebar>
@@ -129,6 +150,10 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
               <Github className="w-4 h-4 text-muted-foreground" />
             </Button>
           </a>
+          <Button onClick={handleGenerateCode} disabled={isGeneratingCode} variant="ghost" size="icon" className="p-0 text-muted-foreground">
+            {isGeneratingCode ? <Loader2 className="h-5 w-5 animate-spin" /> : <MailPlus className="h-5 w-5" />}
+            <span className="sr-only">{isGeneratingCode ? "Generating..." : "Generate Invite Code"}</span>
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>

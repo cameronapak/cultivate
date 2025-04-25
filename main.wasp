@@ -6,6 +6,13 @@ app shapeUp {
   client: {
     setupFn: import { setupClient } from "@src/client/setup"
   },
+  db: {
+    // system: PostgreSQL, // Assuming PostgreSQL is default or set elsewhere
+    // Add the seed function to the list
+    seeds: [
+      import { seedDevInviteCode } from "@src/server/scripts/seedDevData.js"
+    ]
+  },
   auth: {
     // Tells Wasp which entity to use for storing users.
     userEntity: User,
@@ -332,3 +339,26 @@ apiNamespace urlMetadata {
   middlewareConfigFn: import { urlMetadataNamespaceMiddlewareFn } from "@src/server/apis/urlMetadata",
   path: "/api"
 }
+
+// #region Invite Code Operations
+// Action to check if an invite code is valid and unclaimed
+action checkInviteCode {
+  auth: false, // Doesn't require auth to check a code
+  fn: import { checkInviteCode } from "@src/queries",
+  entities: [InviteCode] // Needs access to InviteCode entity
+}
+
+// Action to mark an invite code as claimed after successful signup
+action claimInviteCode {
+  auth: true, // Requires auth because user just signed up and is logged in
+  fn: import { claimInviteCode } from "@src/queries",
+  entities: [InviteCode, User] // Needs access to InviteCode and User entities
+}
+
+// Action to generate a new invite code for the logged-in user
+action generateInviteCode {
+  auth: true, // Requires user to be logged in
+  fn: import { generateInviteCode } from "@src/queries",
+  entities: [InviteCode, User] // Needs access to InviteCode and User entities
+}
+// #endregion

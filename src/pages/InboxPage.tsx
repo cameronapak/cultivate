@@ -263,7 +263,7 @@ export function InboxPage() {
     return showTasksLocalStorage;
   });
   const [filter, setFilter] = useState<InboxFilter>("all");
-  const [editingItemId, setEditingItemId] = useState<string | number | null>(null);
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
@@ -373,7 +373,10 @@ export function InboxPage() {
   };
 
   const handleEditItem = (item: DisplayItem) => {
-    setEditingItemId(item.id);
+    setEditingItemId({
+      id: item.id,
+      type: item.type
+    });
   };
 
   const handleCancelEdit = () => {
@@ -499,6 +502,18 @@ export function InboxPage() {
     } catch (error) {
       console.error("Failed to process task:", error);
       toast.error("Failed to process task");
+    }
+  };
+
+  // Add handler for status change
+  const handleStatusChange = async (task: Task, complete: boolean) => {
+    try {
+      await updateTaskStatus({ id: task.id, complete });
+      // Optionally add a success toast here if desired
+      toast.success(`Task "${task.title}" marked as ${complete ? 'complete' : 'incomplete'}`);
+      // Wasp query cache should update automatically
+    } catch (err) {
+      toast.error("Failed to update task status");
     }
   };
 
@@ -729,13 +744,13 @@ export function InboxPage() {
                               <ItemRow
                                 key={`${item.type}-${item.id}`}
                                 item={item}
-                                isEditing={editingItemId === item.id}
+                                isEditing={editingItemId?.id === item.id && editingItemId?.type === item.type}
                                 projects={projects || []}
                                 onEdit={handleEditItem}
                                 onSave={handleSaveItem}
                                 onCancelEdit={handleCancelEdit}
                                 onDelete={handleDeleteItem}
-                                onStatusChange={item.type === 'task' ? (taskItem, complete) => handleToggleTask(taskItem as Task, complete) : undefined}
+                                onStatusChange={item.type === 'task' ? (taskItem, complete) => handleStatusChange(taskItem as Task, complete) : undefined}
                                 onMove={handleMoveItem}
                                 renderEditForm={renderItemEditForm}
                                 hideDragHandle={true}
