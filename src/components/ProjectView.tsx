@@ -1152,7 +1152,11 @@ export const ProjectView = ({ project }: { project: Project }) => {
                     {sortedThoughts?.map((thought: Thought) => (
                        <ItemRow
                           key={thought.id}
-                          item={{ ...thought, type: 'thought' }}
+                          item={{ 
+                            ...thought, 
+                            type: 'thought', 
+                            title: thought.content.slice(0, 60) + (thought.content.length > 60 ? "..." : "") 
+                          }} 
                           isEditing={false}
                           onEdit={() => {}}
                           onSave={async () => {}}
