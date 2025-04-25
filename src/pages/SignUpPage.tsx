@@ -49,8 +49,8 @@ export function SignUpPage({
     } catch (error: HttpError | any) {
       setIsValidated(false);
       toast.error(
-        error?.data?.message ||
-          error?.message ||
+        error?.data?.message ??
+          error?.message ??
           "Invalid or claimed invite code."
       );
     } finally {
@@ -60,29 +60,39 @@ export function SignUpPage({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!isValidated) {
-      toast.error("Please validate your invite code first.");
-      return;
-    }
     setIsLoadingSignup(true);
     try {
+      try {
+        await checkInviteCode({ code: inviteCode });
+      } catch (validationError: HttpError | any) {
+        setIsValidated(false);
+        toast.error(
+          validationError?.data?.message ??
+            validationError?.message ??
+            "Invite code became invalid or was claimed. Please try again."
+        );
+        setIsLoadingSignup(false);
+        return;
+      }
+
       await signup({ username, password });
 
       try {
         await claimInviteCode({ code: inviteCode });
+        toast.success("Signup successful and invite code claimed!");
       } catch (claimError: any) {
         console.error("Failed to claim invite code after signup:", claimError);
-        toast.warning("Signup successful, but failed to claim invite code. Please contact support.");
+        toast.warning("Signup successful, but failed to claim invite code. This might happen if someone claimed it just now. Please contact support if needed.");
       }
 
       navigate("/");
       
     } catch (error: HttpError | any) {
       toast.error(
-        error?.data?.data?.message ||
-          error?.data?.message ||
-          error?.message ||
-          "Signup failed. Please check your details."
+        error?.data?.data?.message ??
+          error?.data?.message ??
+          error?.message ??
+          "Signup failed. Please check your details or try again."
       );
     } finally {
       setIsLoadingSignup(false);
