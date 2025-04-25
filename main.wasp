@@ -278,10 +278,17 @@ action deleteCanvas {
 }
 //#endregion
 
+//#region Project Operations
 action updateProjectTaskOrder {
   fn: import { updateProjectTaskOrder } from "@src/queries",
   entities: [Project]
 }
+
+action updateProjectResourceOrder {
+  fn: import { updateProjectResourceOrder } from "@src/queries",
+  entities: [Project]
+}
+//#endregion
 
 //#region Thought Operations
 query getThoughts {
