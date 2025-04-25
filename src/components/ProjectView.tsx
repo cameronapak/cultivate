@@ -30,6 +30,7 @@ import {
   SendIcon,
   PencilRuler,
   BookOpen,
+  GripVertical,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -211,8 +212,11 @@ const TaskItem = ({ task }: { task: Task }) => {
 
   return (
     <div className={`group task-item ${task.complete ? "completed" : ""}`}>
-      <div className="hover:cursor-grab flex items-center space-x-2 justify-between p-2 border-b border-[hsl(var(--input))]">
+      <div className="flex items-center space-x-2 justify-between p-2 border-b border-[hsl(var(--input))]">
         <div className="flex items-start space-x-2">
+          <span className="drag-handle cursor-grab opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto">
+            <GripVertical className="w-4 h-4 text-muted-foreground" />
+          </span>
           <Checkbox
             id={task.id.toString()}
             checked={task.complete}
@@ -281,6 +285,7 @@ const TaskList = ({
       },
       draggingClass: "bg-muted",
       dropZoneClass: "bg-muted opacity-30",
+      dragHandle: ".drag-handle",
     }
   );
 
