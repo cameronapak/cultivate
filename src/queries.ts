@@ -431,15 +431,37 @@ export const createResource: CreateResource<CreateResourcePayload, Resource> = a
     throw new HttpError(401)
   }
 
-  return context.entities.Resource.create({
+  // Create the resource
+  const resource = await context.entities.Resource.create({
     data: {
       url: args.url,
       title: args.title,
       description: args.description,
-      project: args.projectId ? { connect: { id: args.projectId } } : undefined,
+      // Only connect to project if projectId is provided
+      ...(args.projectId && {
+        project: { connect: { id: args.projectId } }
+      }),
       user: { connect: { id: context.user.id } }
     }
   })
+
+  // If the resource is associated with a project, update the project's resourceOrder
+  if (args.projectId) {
+    const project = await context.entities.Project.findUnique({
+      where: { id: args.projectId },
+      select: { resourceOrder: true }
+    })
+
+    // Append the new resource's ID to the resourceOrder array
+    const updatedResourceOrder = [...(project?.resourceOrder || []), resource.id]
+    
+    await context.entities.Project.update({
+      where: { id: args.projectId },
+      data: { resourceOrder: updatedResourceOrder }
+    })
+  }
+
+  return resource
 }
 
 type UpdateResourcePayload = {
@@ -787,6 +809,37 @@ export const updateProjectTaskOrder = async (args: UpdateProjectTaskOrderPayload
     where: { id: args.projectId },
     data: {
       taskOrder: args.taskOrder
+    }
+  })
+}
+
+type UpdateProjectResourceOrderPayload = {
+  projectId: number
+  resourceOrder: number[]
+}
+
+export const updateProjectResourceOrder = async (args: UpdateProjectResourceOrderPayload, context: any) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+
+  // Verify the project belongs to the user
+  const project = await context.entities.Project.findUnique({
+    where: { 
+      id: args.projectId,
+      userId: context.user.id 
+    }
+  })
+
+  if (!project) {
+    throw new HttpError(404, 'Project not found')
+  }
+
+  // Update the resourceOrder
+  return context.entities.Project.update({
+    where: { id: args.projectId },
+    data: {
+      resourceOrder: args.resourceOrder
     }
   })
 }
