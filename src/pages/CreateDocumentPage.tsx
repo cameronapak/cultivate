@@ -20,13 +20,8 @@ export const CreateDocumentPage = () => {
     
     setIsSubmitting(true);
     try {
-      if (!title.trim()) {
-        toast.error("Please enter a title");
-        return;
-      }
-      
       const newDocument = await createDocument({ 
-        title: title.trim(), 
+        title: title.trim() || "untitled document", 
         content: content || "" 
       });
       navigate(`/documents/${newDocument.id}`);
