@@ -107,8 +107,13 @@ export const ItemRow: React.FC<ItemRowProps> = ({
                 href={part}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:underline"
+                className="text-muted-foreground hover:underline inline-flex items-center gap-1"
               >
+                <img 
+                  src={getFaviconFromUrl(part)} 
+                  alt="Favicon" 
+                  className="grayscale w-3 h-3 rounded-xs bg-muted group-hover:grayscale-0 transition-all duration-300" 
+                />
                 {url.hostname}
               </a>
             );
