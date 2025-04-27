@@ -7,6 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function isUrl(str: string): boolean {
+  // validate the URL has no spaces in it
+  if (str.includes(' ')) {
+    return false;
+  }
+
   try {
     new URL(str);
     return true;
