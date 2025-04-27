@@ -174,7 +174,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({
           >
             <div className="flex flex-col">
               <div className="flex items-center gap-1">
-                <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="bg-muted w-4 h-4 rounded-sm" />
+                <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="grayscale bg-muted w-4 h-4 rounded-sm group-hover:grayscale-0 transition-all duration-300" />
                 <p className="text-sm text-muted-foreground line-clamp-1">{linkAsUrl.host}</p>
               </div>
               <p className="text-sm hover:underline">{item.title}</p>
