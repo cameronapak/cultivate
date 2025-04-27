@@ -18,7 +18,7 @@ import { ThemeProvider } from "./custom/ThemeProvider";
 import { EllipsisVertical, Folder } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { useQuery } from "wasp/client/operations";
-import { Link, useRouter } from "wasp/client/router";
+import { Link } from "wasp/client/router";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
