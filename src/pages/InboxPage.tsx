@@ -807,7 +807,7 @@ export function InboxPage() {
                       top: 0,
                       left: 0,
                       opacity: 0.2,
-                      filter: "blur(8px)"
+                      filter: "blur(4px)"
                     }}
                     animate={{ 
                       x: 0,
@@ -894,7 +894,7 @@ export function InboxPage() {
             </div>
           ) : (
             <motion.div
-              initial={{ filter: "blur(8px)", opacity: 0, scale: 0.95 }}
+              initial={{ filter: "blur(4px)", opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
