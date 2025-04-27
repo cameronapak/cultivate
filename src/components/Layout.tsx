@@ -1,4 +1,5 @@
-import { Fragment, ReactNode, useState } from "react";
+import { Fragment, ReactNode, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar, type SidebarItem } from "./custom/AppSidebar";
 import { CommandMenu } from "./custom/CommandMenu";
@@ -17,7 +18,7 @@ import { ThemeProvider } from "./custom/ThemeProvider";
 import { EllipsisVertical, Folder } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { useQuery } from "wasp/client/operations";
-import { Link } from "wasp/client/router";
+import { Link, useRouter } from "wasp/client/router";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -55,12 +56,27 @@ export function Layout({
   menuItems = [],
   ctaButton,
 }: LayoutProps) {
+  const navigate = useNavigate();
   const isSidebarHidden = JSON.parse(
     localStorage.getItem("isSidebarHidden") || "false"
   );
   const [open, setOpen] = useState(Boolean(isSidebarHidden));
   const { data: projects, isLoading: areProjectsLoading } =
     useQuery(getProjects);
+
+  // Add keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for CMD+I (Mac) or CTRL+I (Windows)
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
+        e.preventDefault();
+        navigate('/inbox');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
 
   const toggleSidebar = () => {
     setOpen((open) => {
