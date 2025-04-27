@@ -18,6 +18,7 @@ model Project {
   id            Int        @id @default(autoincrement())
   title         String
   description   String?
+  emoji         String?    // Optional emoji field
   tasks         Task[]
   taskOrder     Int[]      @default([]) // Array of task IDs in sorted order
   resourceOrder Int[]      @default([]) // Array of resource IDs in sorted order
