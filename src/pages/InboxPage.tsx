@@ -807,13 +807,13 @@ export function InboxPage() {
                       top: 0,
                       left: 0,
                       opacity: 0.2,
-                      filter: "blur(0.2)"
+                      filter: "blur(8px)"
                     }}
                     animate={{ 
                       x: 0,
                       opacity: 1,
                       position: "relative",
-                      filter: "blur(0.2)",
+                      filter: "blur(0px)",
                     }}
                     exit={{ 
                       x: tabs.findIndex(t => t.id === filter) > tabs.findIndex(t => t.id === previousFilter) ? "0" : "0",
