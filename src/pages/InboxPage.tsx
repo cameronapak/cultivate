@@ -282,6 +282,7 @@ export function InboxPage() {
   const [filter, setFilter] = useState<InboxFilter>("all");
   const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
   const [previousFilter, setPreviousFilter] = useState<InboxFilter>(filter);
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
   // Add optimistic updates for tasks
   const createTaskOptimistically = useAction(createTask, {
@@ -645,6 +646,7 @@ export function InboxPage() {
   const handleFilterChange = (newFilter: InboxFilter) => {
     setPreviousFilter(filter);
     setFilter(newFilter);
+    setIsInitialRender(false);
   };
 
   if (tasksError || resourcesError || thoughtsError) {
@@ -801,7 +803,7 @@ export function InboxPage() {
                   <motion.div
                     key={filter}
                     initial={{ 
-                      x: tabs.findIndex(t => t.id === filter) > tabs.findIndex(t => t.id === previousFilter) ? "10%" : "-10%",
+                      x: isInitialRender ? 0 : (tabs.findIndex(t => t.id === filter) > tabs.findIndex(t => t.id === previousFilter) ? "10%" : "-10%"),
                       position: "absolute",
                       width: "100%",
                       top: 0,
