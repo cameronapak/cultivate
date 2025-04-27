@@ -6,40 +6,48 @@ import { Button } from "../components/ui/button";
 import { BlockNoteEditor } from "../components/custom/BlockNoteEditor";
 import { toast } from "sonner";
 
-// Add Trix editor declaration
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      "trix-editor": React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & {
-          input?: string;
-          placeholder?: string;
-          value?: string;
-          onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-        },
-        HTMLElement
-      >;
-    }
-  }
-}
-
 export const CreateDocumentPage = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
     try {
-      const newDocument = await createDocument({ title, content });
+      if (!title.trim()) {
+        toast.error("Please enter a title");
+        return;
+      }
+      
+      const newDocument = await createDocument({ 
+        title: title.trim(), 
+        content: content || "" 
+      });
       navigate(`/documents/${newDocument.id}`);
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to create document");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Layout breadcrumbItems={[{ title: "Docs", url: "/documents" }, { title: "New" }]}>
+    <Layout
+      breadcrumbItems={[{ title: "Docs", url: "/documents" }, { title: "New" }]}
+      ctaButton={
+        <Button 
+          type="submit" 
+          form="createDocumentForm"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Saving..." : "Save"}
+        </Button>
+      }
+    >
       <div>
         <form
           onSubmit={handleSubmit}
@@ -54,13 +62,16 @@ export const CreateDocumentPage = () => {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
               className="w-full bg-background text-2xl font-medium outline-none"
+              required
             />
-            <Button type="submit" form="createDocumentForm">
-              Save
-            </Button>
           </div>
 
-          <BlockNoteEditor onChange={setContent} value={content} id="content" name="content" />
+          <BlockNoteEditor
+            onChange={setContent}
+            value={content}
+            id="content"
+            name="content"
+          />
         </form>
       </div>
     </Layout>
