@@ -893,12 +893,18 @@ export function InboxPage() {
               </div>
             </div>
           ) : (
-            <div className="opacity-50 flex justify-center items-center h-full">
-              <EmptyStateView
-                Icon={<EyeClosed className="h-10 w-10" />}
-                title="Inbox is safely hidden"
-              />
-            </div>
+            <motion.div
+              initial={{ filter: "blur(8px)", opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="opacity-50 flex justify-center items-center h-full">
+                <EmptyStateView
+                  Icon={<EyeClosed className="h-10 w-10" />}
+                  title="Inbox is safely hidden"
+                />
+              </div>
+            </motion.div>
           )}
         </div>
       </div>
