@@ -1139,6 +1139,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
 
   return (
     <main>
+      {/* @TODO - add emoji to project for customization and easier identification — db already supports it */}
       <h1 className="heading-1">{project.title}</h1>
       <p className="paragraph text-muted-foreground !mt-0 line-clamp-2">
         {project.description}
