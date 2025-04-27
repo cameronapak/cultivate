@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   getInboxTasks,
   getInboxResources,
@@ -238,6 +239,21 @@ const TaskReviewDialog = ({
   );
 };
 
+// Add this type for tab data
+type TabData = {
+  id: InboxFilter;
+  label: string;
+  icon: React.ReactNode;
+};
+
+// Add this constant for tab data
+const tabs: TabData[] = [
+  { id: "all", label: "All", icon: <List className="h-4 w-4" /> },
+  { id: "task", label: "Tasks", icon: <Square className="h-4 w-4" /> },
+  { id: "resource", label: "Links", icon: <Link2 className="h-4 w-4" /> },
+  { id: "thought", label: "Notes", icon: <Minus className="h-4 w-4" /> },
+];
+
 export function InboxPage() {
   const {
     data: tasks,
@@ -265,6 +281,7 @@ export function InboxPage() {
   });
   const [filter, setFilter] = useState<InboxFilter>("all");
   const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
+  const [previousFilter, setPreviousFilter] = useState<InboxFilter>(filter);
 
   // Add optimistic updates for tasks
   const createTaskOptimistically = useAction(createTask, {
@@ -624,6 +641,12 @@ export function InboxPage() {
     }
   };
 
+  // Add this function to handle filter changes
+  const handleFilterChange = (newFilter: InboxFilter) => {
+    setPreviousFilter(filter);
+    setFilter(newFilter);
+  };
+
   if (tasksError || resourcesError || thoughtsError) {
     return (
       <div>
@@ -740,78 +763,31 @@ export function InboxPage() {
                 role="tablist"
                 aria-label="Filter inbox items"
               >
-                <Button
-                  variant={filter === "all" ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setFilter("all")}
-                  className={cn(
-                    "relative px-3 rounded-full text-muted-foreground shadow-none",
-                    filter === "all" && "text-primary"
-                  )}
-                  role="tab"
-                  aria-selected={filter === "all"}
-                  aria-controls="all-items-tab"
-                  id="all-tab"
-                >
-                  <List className="h-4 w-4" aria-hidden="true" />
-                  <span>All</span>
-                  <span className="sr-only">{getItemCount("all")} items</span>
-                </Button>
-                <Button
-                  variant={filter === "task" ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setFilter("task")}
-                  className={cn(
-                    "relative px-3 rounded-full text-muted-foreground shadow-none",
-                    filter === "task" && "text-primary"
-                  )}
-                  role="tab"
-                  aria-selected={filter === "task"}
-                  aria-controls="tasks-tab"
-                  id="tasks-tab"
-                >
-                  <Square className="h-4 w-4" aria-hidden="true" />
-                  <span>Tasks</span>
-                  <span className="sr-only">{getItemCount("task")} tasks</span>
-                </Button>
-                <Button
-                  variant={filter === "resource" ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setFilter("resource")}
-                  className={cn(
-                    "relative px-3 rounded-full text-muted-foreground shadow-none",
-                    filter === "resource" && "text-primary"
-                  )}
-                  role="tab"
-                  aria-selected={filter === "resource"}
-                  aria-controls="resources-tab"
-                  id="resources-tab"
-                >
-                  <Link2 className="h-4 w-4" aria-hidden="true" />
-                  <span>Links</span>
-                  <span className="sr-only">
-                    {getItemCount("resource")} links
-                  </span>
-                </Button>
-                <Button
-                  variant={filter === "thought" ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setFilter("thought")}
-                  className={cn(
-                    "relative px-3 rounded-full text-muted-foreground shadow-none",
-                    filter === "thought" && "text-primary"
-                  )}
-                  role="tab"
-                  aria-selected={filter === "thought"}
-                  aria-controls="thoughts-tab"
-                  id="thoughts-tab"
-                >
-                  <Minus className="h-4 w-4" aria-hidden="true" />
-                  <span>Notes</span>
-                  <span className="sr-only">
-                    {getItemCount("thought")} notes
-                  </span>
-                </Button>
+                {tabs.map((tab) => (
+                  <motion.div
+                    key={tab.id}
+                    initial={false}
+                    className="relative"
+                  >
+                    <Button
+                      variant={filter === tab.id ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => handleFilterChange(tab.id)}
+                      className={cn(
+                        "relative px-3 rounded-full text-muted-foreground shadow-none",
+                        filter === tab.id && "text-primary"
+                      )}
+                      role="tab"
+                      aria-selected={filter === tab.id}
+                      aria-controls={`${tab.id}-items-tab`}
+                      id={`${tab.id}-tab`}
+                    >
+                      {tab.icon}
+                      <span>{tab.label}</span>
+                      <span className="sr-only">{getItemCount(tab.id)} items</span>
+                    </Button>
+                  </motion.div>
+                ))}
               </div>
 
               <div
@@ -819,68 +795,101 @@ export function InboxPage() {
                 id={`${filter}-items-tab`}
                 aria-labelledby={`${filter}-tab`}
                 tabIndex={0}
+                className="relative overflow-hidden"
               >
-                <Table>
-                  <TableBody>
-                    {sortedDates.length > 0 ? (
-                      sortedDates.map((dateKey) => {
-                        // Filter items for this date based on the current filter
-                        const dateItems = groupedItems[dateKey].filter(
-                          (item) => {
-                            if (filter === "all") return true;
-                            return item.type === filter;
-                          }
-                        );
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={filter}
+                    initial={{ 
+                      x: tabs.findIndex(t => t.id === filter) > tabs.findIndex(t => t.id === previousFilter) ? "10%" : "-10%",
+                      position: "absolute",
+                      width: "100%",
+                      top: 0,
+                      left: 0,
+                      opacity: 0.2,
+                      filter: "blur(0.2)"
+                    }}
+                    animate={{ 
+                      x: 0,
+                      opacity: 1,
+                      position: "relative",
+                      filter: "blur(0.2)",
+                    }}
+                    exit={{ 
+                      x: tabs.findIndex(t => t.id === filter) > tabs.findIndex(t => t.id === previousFilter) ? "0" : "0",
+                      position: "absolute",
+                      width: "100%",
+                      top: 0,
+                      left: 0,
+                    }}
+                    transition={{ 
+                      duration: 0.25,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <Table>
+                      <TableBody>
+                        {sortedDates.length > 0 ? (
+                          sortedDates.map((dateKey) => {
+                            // Filter items for this date based on the current filter
+                            const dateItems = groupedItems[dateKey].filter(
+                              (item) => {
+                                if (filter === "all") return true;
+                                return item.type === filter;
+                              }
+                            );
 
-                        if (dateItems.length === 0) return null;
+                            if (dateItems.length === 0) return null;
 
-                        return (
-                          <React.Fragment key={dateKey}>
-                            {/* Date header row */}
-                            <TableRow>
-                              <TableCell
-                                colSpan={3}
-                                className="bg-muted/30 py-1 px-4 text-xs font-semibold text-muted-foreground"
-                              >
-                                {formatDate(dateKey)}
-                              </TableCell>
-                            </TableRow>
+                            return (
+                              <React.Fragment key={dateKey}>
+                                {/* Date header row */}
+                                <TableRow>
+                                  <TableCell
+                                    colSpan={3}
+                                    className="bg-muted/30 py-1 px-4 text-xs font-semibold text-muted-foreground"
+                                  >
+                                    {formatDate(dateKey)}
+                                  </TableCell>
+                                </TableRow>
 
-                            {/* Items for this date */}
-                            {dateItems.map((item) => (
-                              <ItemRow
-                                key={`${item.type}-${item.id}`}
-                                item={item}
-                                isEditing={editingItemId?.id === item.id && editingItemId?.type === item.type}
-                                projects={projects || []}
-                                onEdit={handleEditItem}
-                                onSave={handleSaveItem}
-                                onCancelEdit={handleCancelEdit}
-                                onDelete={handleDeleteItem}
-                                onStatusChange={item.type === 'task' ? (taskItem, complete) => handleStatusChange(taskItem as Task, complete) : undefined}
-                                onMove={handleMoveItem}
-                                renderEditForm={renderItemEditForm}
-                                hideDragHandle={true}
+                                {/* Items for this date */}
+                                {dateItems.map((item) => (
+                                  <ItemRow
+                                    key={`${item.type}-${item.id}`}
+                                    item={item}
+                                    isEditing={editingItemId?.id === item.id && editingItemId?.type === item.type}
+                                    projects={projects || []}
+                                    onEdit={handleEditItem}
+                                    onSave={handleSaveItem}
+                                    onCancelEdit={handleCancelEdit}
+                                    onDelete={handleDeleteItem}
+                                    onStatusChange={item.type === 'task' ? (taskItem, complete) => handleStatusChange(taskItem as Task, complete) : undefined}
+                                    onMove={handleMoveItem}
+                                    renderEditForm={renderItemEditForm}
+                                    hideDragHandle={true}
+                                  />
+                                ))}
+                              </React.Fragment>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={3}
+                              className="text-center flex flex-col items-center justify-center text-muted-foreground"
+                            >
+                              <EmptyStateView
+                                Icon={<Coffee className="h-10 w-10" />}
+                                title="Inbox Zero"
                               />
-                            ))}
-                          </React.Fragment>
-                        );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={3}
-                          className="text-center flex flex-col items-center justify-center text-muted-foreground"
-                        >
-                          <EmptyStateView
-                            Icon={<Coffee className="h-10 w-10" />}
-                            title="Inbox Zero"
-                          />
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
           ) : (
