@@ -242,6 +242,24 @@ export function CanvasPage() {
     }
   }, [store, canvas, isLoadingCanvas]);
 
+  // Add touch event handler to prevent browser navigation
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      // Only prevent if we're in the canvas area
+      const target = e.target as HTMLElement;
+      if (target.closest('.tldraw__editor')) {
+        e.preventDefault();
+      }
+    };
+
+    // Add passive: false to ensure preventDefault works
+    document.addEventListener('touchstart', handleTouchStart, { passive: false });
+    
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+    };
+  }, []);
+
   if (loadingState.status === "error") {
     return (
       <Layout mainContentClasses="w-full max-w-full !p-0 h-full">
@@ -329,7 +347,10 @@ export function CanvasPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="tldraw__editor h-full">
+      <div 
+        className="tldraw__editor h-full"
+        onTouchStart={(e) => e.preventDefault()} // Additional prevention for React
+      >
         <Tldraw
           className="h-full"
           components={components}
