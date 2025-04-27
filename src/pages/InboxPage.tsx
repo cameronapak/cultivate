@@ -379,15 +379,23 @@ export function InboxPage() {
     try {
       // Always check for URL first, regardless of mode
       if (isUrl(newItemText.trim())) {
-        const metadata = await getMetadataFromUrl(newItemText.trim());
-        // Create a resource
-        await createResourceOptimistically({
-          title: metadata.title || "Untitled Resource",
+        const resource = await createResourceOptimistically({
+          title: newItemText.trim(),
           url: newItemText.trim(),
-          description: metadata.description,
+          description: "",
           // No projectId means it goes to inbox
         });
-        toast.success(`Resource created: "${metadata.title || newItemText}"`);
+        if (resource) {
+          toast.success('Resource created!');
+          // Now, let's update the resource
+          const metadata = await getMetadataFromUrl(newItemText.trim());
+          await updateResourceOptimistically({
+            id: resource.id,
+            title: metadata.title,
+            url: newItemText.trim(),
+            description: metadata.description,
+          })
+        }
       } else if (isThought) {
         // Create a thought
         await createThought({
