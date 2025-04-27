@@ -70,7 +70,10 @@ export function Layout({
       // Check for CMD+I (Mac) or CTRL+I (Windows)
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
         e.preventDefault();
-        navigate('/inbox');
+        // if I'm on the inbox page, toggle the inbox
+        if (window.location.pathname !== '/inbox') {
+          navigate('/inbox');
+        }
       }
     };
 

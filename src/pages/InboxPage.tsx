@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   getInboxTasks,
@@ -283,6 +283,24 @@ export function InboxPage() {
   const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
   const [previousFilter, setPreviousFilter] = useState<InboxFilter>(filter);
   const [isInitialRender, setIsInitialRender] = useState(true);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Add keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for CMD+I (Mac) or CTRL+I (Windows)
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
+        e.preventDefault();
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Add optimistic updates for tasks
   const createTaskOptimistically = useAction(createTask, {
@@ -754,6 +772,7 @@ export function InboxPage() {
             </Button>
 
             <Input
+              ref={inputRef}
               autoFocus={true}
               type="text"
               placeholder={
