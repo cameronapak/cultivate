@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { toast } from "sonner";
-import { getFaviconFromUrl } from "../../lib/utils";
+import { getFaviconFromUrl, isUrl } from "../../lib/utils";
 import { Link } from "react-router-dom";
 import { Combobox } from "../custom/ComboBox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -123,16 +123,25 @@ export const ItemRow: React.FC<ItemRowProps> = ({
           </div>
         );
       case "resource":
-        const isSameOrigin = item.url.includes(window.location.origin);
+        if (!isUrl(item.url)) {
+          return null;
+        }
+
+        const linkAsUrl = new URL(item.url);
+        const isSameOrigin = linkAsUrl.origin === window.location.origin;
 
         const content = (
           <div
             className="grid grid-cols-1 items-center gap-2"
           >
             <div className="flex flex-col">
+              <div className="flex items-center gap-1">
+                <img src={getFaviconFromUrl(item.url)} alt="Favicon" className="bg-muted w-4 h-4 rounded-sm" />
+                <p className="text-sm text-muted-foreground line-clamp-1">{linkAsUrl.host}</p>
+              </div>
               <p className="text-sm hover:underline">{item.title}</p>
               {item.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-1">
                   {item.description}
                 </p>
               )}
@@ -223,7 +232,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({
 
       {/* Item Type Icon/Checkbox */}
       {/* Adjust padding if drag handle is hidden */}
-      <TableCell className={cn("w-8 p-2", hideDragHandle ? "pl-2" : "pl-0")} >{renderItemIcon()}</TableCell>
+      <TableCell className={cn("w-6 p-2 pl-0")} >{renderItemIcon()}</TableCell>
 
       {/* Item Content */}
       <TableCell className="py-2">{renderItemContent()}</TableCell>
