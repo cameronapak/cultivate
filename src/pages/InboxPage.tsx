@@ -381,6 +381,26 @@ export function InboxPage() {
     ],
   });
 
+  const createThoughtOptimistically = useAction(createThought, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getInboxThoughts],
+        updateQuery: (payload, oldData) => {
+          const newThought = {
+            id: Date.now().toString(), // Temporary ID
+            content: payload.content,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            projectId: null,
+            type: "thought" as const,
+            title: payload.content.slice(0, 60) + (payload.content.length > 60 ? "..." : ""),
+          };
+          return [...(oldData || []), newThought];
+        },
+      },
+    ],
+  });
+
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
       localStorage.setItem("shouldShowTasks", (!prev).toString());
@@ -407,8 +427,8 @@ export function InboxPage() {
           description: "",
           // No projectId means it goes to inbox
         });
+        toast.success('Resource created!');
         if (resource) {
-          toast.success('Resource created!');
           // Now, let's update the resource
           const metadata = await getMetadataFromUrl(newItemText.trim());
           await updateResourceOptimistically({
@@ -420,7 +440,7 @@ export function InboxPage() {
         }
       } else if (isThought) {
         // Create a thought
-        await createThought({
+        await createThoughtOptimistically({
           content: newItemText,
         });
         toast.success(`Thought captured!`);
