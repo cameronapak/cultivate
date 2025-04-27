@@ -114,6 +114,7 @@ export const getProjectPitches: GetProjectPitches<GetProjectPitchesInput, Pitch[
 type CreateProjectPayload = {
   title: string
   description?: string
+  emoji?: string
 }
 
 export const createProject: CreateProject<CreateProjectPayload, Project> = async (
@@ -127,6 +128,7 @@ export const createProject: CreateProject<CreateProjectPayload, Project> = async
     data: {
       title: args.title,
       description: args.description,
+      emoji: args.emoji,
       user: { connect: { id: context.user.id } }
     },
   })
@@ -136,6 +138,7 @@ type UpdateProjectPayload = {
   id: number
   title?: string
   description?: string
+  emoji?: string | null
   taskOrder?: number[]
   resourceOrder?: number[]
   pinned?: boolean
@@ -153,6 +156,7 @@ export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async
     data: {
       ...(args.title && { title: args.title }),
       ...(args.description && { description: args.description }),
+      ...(args.emoji !== undefined && { emoji: args.emoji }),
       ...(args.taskOrder && { taskOrder: args.taskOrder }),
       ...(args.resourceOrder && { resourceOrder: args.resourceOrder }),
       ...(typeof args.pinned === 'boolean' && { pinned: args.pinned })
