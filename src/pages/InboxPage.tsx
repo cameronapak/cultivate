@@ -375,13 +375,17 @@ export function InboxPage() {
   };
 
   const handleCreateItem = async () => {
-    if (!newItemText.trim()) return;
+    if (!newItemText.trim()) {
+      return;
+    }
+
     try {
       // Always check for URL first, regardless of mode
       if (isUrl(newItemText.trim())) {
+        const url = newItemText.trim();
         const resource = await createResourceOptimistically({
-          title: newItemText.trim(),
-          url: newItemText.trim(),
+          title: url,
+          url: url,
           description: "",
           // No projectId means it goes to inbox
         });
@@ -391,9 +395,9 @@ export function InboxPage() {
           const metadata = await getMetadataFromUrl(newItemText.trim());
           await updateResourceOptimistically({
             id: resource.id,
-            title: metadata.title,
-            url: newItemText.trim(),
-            description: metadata.description,
+            title: metadata.title || url,
+            url: url,
+            description: metadata.description || '',
           })
         }
       } else if (isThought) {
