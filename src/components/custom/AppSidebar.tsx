@@ -19,6 +19,7 @@ import {
 } from "wasp/client/operations";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Kbd } from "./Kbd";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -67,10 +68,11 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
         <SidebarGroup>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={currentPath === "/inbox"}>
+              <SidebarMenuButton className="group" asChild isActive={currentPath === "/inbox"}>
                 <Link to={"/inbox"}>
                   <InboxIcon className="h-5 w-5" />
                   <span>Inbox</span>
+                  <Kbd>⌘ + i</Kbd>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
