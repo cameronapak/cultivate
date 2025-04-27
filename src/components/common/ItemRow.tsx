@@ -90,23 +90,56 @@ export const ItemRow: React.FC<ItemRowProps> = ({
   );
 
   const renderItemContent = () => {
+    // Function to detect and format URLs in text
+    const formatTextWithUrls = (text: string) => {
+      if (!text) return null;
+      
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const parts = text.split(urlRegex);
+      
+      return parts.map((part, index) => {
+        if (part.match(urlRegex)) {
+          try {
+            const url = new URL(part);
+            return (
+              <a
+                key={index}
+                href={part}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:underline"
+              >
+                {url.hostname}
+              </a>
+            );
+          } catch (e) {
+            return part;
+          }
+        }
+        return part;
+      });
+    };
+
     switch (item.type) {
       case "task":
+        const taskContent = item.title;
+        const taskDescription = item.description;
+        
         return (
           <div className="flex flex-col">
             <label
               htmlFor={item.id.toString()}
               className={cn(
-                "pointer-events-none text-sm leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                "text-sm leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
                 item.complete ? "line-through text-muted-foreground" : ""
               )}
             >
-              {item.title}
+              {formatTextWithUrls(taskContent)}
             </label>
             {/* Only show description if NOT complete */}
-            {item.description && !item.complete && (
+            {taskDescription && !item.complete && (
               <p className="text-sm text-muted-foreground line-clamp-1">
-                {item.description}
+                {formatTextWithUrls(taskDescription)}
               </p>
             )}
             {/* Show completion date if complete */}
@@ -164,7 +197,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({
           </a>
         );
       case "thought":
-        return <p className="text-sm cursor-text">{item.content}</p>;
+        const thoughtContent = item.content;
+        return <p className="text-sm cursor-text">{formatTextWithUrls(thoughtContent)}</p>;
       default:
         return null;
     }
