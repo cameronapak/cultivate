@@ -292,7 +292,16 @@ export function CanvasPage() {
             if (!canvasId) {
               return;
             }
-            saveCanvasStable(canvasId, getSnapshot(store));
+
+            try {
+              if (canvasId === "new" || !canvasId) {
+                setIsNameDialogOpen(true);
+              } else {
+                saveCanvasStable(canvasId, getSnapshot(store));
+              }
+            } catch (error: any) {
+              toast.error(error?.message || "Error saving canvas");
+            }
           }}
         >
           <SaveIcon className="w-4 h-4" />
