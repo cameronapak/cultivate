@@ -180,6 +180,22 @@ export function DocumentPage() {
     }
   }, [content, title, document, isEditing]);
 
+  // Add keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for CMD+S (Mac) or CTRL+S (Windows)
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault(); // Prevent browser's default save behavior
+        if (isEditing) {
+          handleSave();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEditing, title, content, document]); // Add dependencies to ensure latest state is used
+
   if (error) {
     return <div className="text-red-500">Error: {error.message}</div>;
   }
@@ -198,7 +214,7 @@ export function DocumentPage() {
       });
       setIsEditing(false);
       setHasUnsavedChanges(false);
-      toast.success("Document updated successfully");
+      toast.success("Saved!");
     } catch (error) {
       console.error("Failed to update document:", error);
       toast.error("Failed to update document");
