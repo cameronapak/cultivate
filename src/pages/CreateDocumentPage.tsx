@@ -12,8 +12,10 @@ export const CreateDocumentPage = () => {
   const [content, setContent] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (isSubmitting) return;
     
     setIsSubmitting(true);
@@ -34,6 +36,20 @@ export const CreateDocumentPage = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Add keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for CMD+S (Mac) or CTRL+S (Windows)
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault(); // Prevent browser's default save behavior
+        handleSubmit();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [title, content, isSubmitting]); // Add dependencies to ensure latest state is used
 
   return (
     <Layout
