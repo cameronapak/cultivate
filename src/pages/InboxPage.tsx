@@ -4,6 +4,7 @@ import {
   getInboxResources,
   useQuery,
   getInboxThoughts,
+  useAction,
 } from "wasp/client/operations";
 import type { Project, Task, Resource, Thought } from "wasp/entities";
 import {
@@ -265,6 +266,103 @@ export function InboxPage() {
   const [filter, setFilter] = useState<InboxFilter>("all");
   const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
+  // Add optimistic updates for tasks
+  const createTaskOptimistically = useAction(createTask, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getInboxTasks],
+        updateQuery: (payload, oldData) => {
+          const newTask = {
+            id: Date.now(), // Temporary ID
+            title: payload.title,
+            description: payload.description,
+            complete: false,
+            status: "TODO",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            projectId: null,
+            type: "task" as const,
+          };
+          return [...(oldData || []), newTask];
+        },
+      },
+    ],
+  });
+
+  const updateTaskOptimistically = useAction(updateTask, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getInboxTasks],
+        updateQuery: (payload, oldData) => {
+          return (oldData || []).map((task: Task & { type: "task" }) =>
+            task.id === payload.id
+              ? { ...task, ...payload, updatedAt: new Date() }
+              : task
+          );
+        },
+      },
+    ],
+  });
+
+  const deleteTaskOptimistically = useAction(deleteTask, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getInboxTasks],
+        updateQuery: (payload, oldData) => {
+          return (oldData || []).filter((task: Task & { type: "task" }) => task.id !== payload.id);
+        },
+      },
+    ],
+  });
+
+  // Add optimistic updates for resources
+  const createResourceOptimistically = useAction(createResource, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getInboxResources],
+        updateQuery: (payload, oldData) => {
+          const newResource = {
+            id: Date.now(), // Temporary ID
+            title: payload.title,
+            url: payload.url,
+            description: payload.description,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            projectId: null,
+            type: "resource" as const,
+          };
+          return [...(oldData || []), newResource];
+        },
+      },
+    ],
+  });
+
+  const updateResourceOptimistically = useAction(updateResource, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getInboxResources],
+        updateQuery: (payload, oldData) => {
+          return (oldData || []).map((resource: Resource & { type: "resource" }) =>
+            resource.id === payload.id
+              ? { ...resource, ...payload, updatedAt: new Date() }
+              : resource
+          );
+        },
+      },
+    ],
+  });
+
+  const deleteResourceOptimistically = useAction(deleteResource, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getInboxResources],
+        updateQuery: (payload, oldData) => {
+          return (oldData || []).filter((resource: Resource & { type: "resource" }) => resource.id !== payload.id);
+        },
+      },
+    ],
+  });
+
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
       localStorage.setItem("shouldShowTasks", (!prev).toString());
@@ -283,7 +381,7 @@ export function InboxPage() {
       if (isUrl(newItemText.trim())) {
         const metadata = await getMetadataFromUrl(newItemText.trim());
         // Create a resource
-        await createResource({
+        await createResourceOptimistically({
           title: metadata.title || "Untitled Resource",
           url: newItemText.trim(),
           description: metadata.description,
@@ -298,7 +396,7 @@ export function InboxPage() {
         toast.success(`Thought captured!`);
       } else {
         // Create a regular task
-        await createTask({
+        await createTaskOptimistically({
           title: newItemText,
           // No projectId means it goes to inbox
         });
@@ -333,9 +431,9 @@ export function InboxPage() {
     if (confirm(confirmMessage)) {
       try {
         if (item.type === 'task') {
-          await deleteTask({ id: item.id as number });
+          await deleteTaskOptimistically({ id: item.id as number });
         } else if (item.type === 'resource') {
-          await deleteResource({ id: item.id as number });
+          await deleteResourceOptimistically({ id: item.id as number });
         } else if (item.type === 'thought') {
           await deleteThought({ id: item.id as string });
         }
@@ -386,22 +484,19 @@ export function InboxPage() {
   const handleSaveItem = async (item: DisplayItem, values: any) => {
     try {
       if (item.type === 'task') {
-        await updateTask({ id: item.id as number, title: values.title, description: values.description });
+        await updateTaskOptimistically({ id: item.id as number, title: values.title, description: values.description });
         toast.success("Task updated");
       } else if (item.type === 'resource') {
-        // Assuming EditResourceForm provides title, url, description
-        await updateResource({ id: item.id as number, title: values.title, url: values.url, description: values.description });
+        await updateResourceOptimistically({ id: item.id as number, title: values.title, url: values.url, description: values.description });
         toast.success("Resource updated");
       } else if (item.type === 'thought') {
-        // Add thought update logic if an EditThoughtForm exists and is used
-         await updateThought({ id: item.id as string, content: values.content });
-         toast.success("Thought updated");
+        await updateThought({ id: item.id as string, content: values.content });
+        toast.success("Thought updated");
       }
-      setEditingItemId(null); // Exit edit mode on success
+      setEditingItemId(null);
     } catch (error) {
       console.error(`Failed to update ${item.type}:`, error);
       toast.error(`Failed to update ${item.type}`);
-      // Optionally keep editing mode open on error, or provide more specific feedback
     }
   };
   
@@ -489,7 +584,7 @@ export function InboxPage() {
   ) => {
     try {
       if (decision === "discard") {
-        await deleteTask({ id: taskId as number });
+        await deleteTaskOptimistically({ id: taskId as number });
         toast.success("Task discarded");
       } else if (decision === "defer") {
         // You might want to implement defer logic here

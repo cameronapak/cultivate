@@ -17,6 +17,7 @@ import {
   updateThought,
   updateTaskStatus,
   useAction,
+  getThoughts,
 } from "wasp/client/operations";
 import {
   ExternalLink,
@@ -209,6 +210,21 @@ const TaskList = ({
     setEditingItemId(null);
   };
 
+  const updateThoughtOptimistically = useAction(updateThought, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getThoughts],
+        updateQuery: (payload, oldData) => {
+          return (oldData || []).map((thought: Thought & { type: "thought" }) =>
+            thought.id === payload.id
+              ? { ...thought, ...payload, updatedAt: new Date() }
+              : thought
+          );
+        },
+      },
+    ],
+  });
+
   const handleSave = async (item: DisplayItem, formValues: any) => {
     if (item.type === 'task') {
       await updateTask({
@@ -228,7 +244,7 @@ const TaskList = ({
       toast.success("Resource updated successfully");
     } else if (item.type === 'thought') {
       // This case should ideally not happen in TaskList
-      await updateThought({ 
+      await updateThoughtOptimistically({ 
         id: item.id as string, 
         content: formValues.content 
       }); 
@@ -1046,7 +1062,36 @@ export const ProjectView = ({ project }: { project: Project }) => {
     }
   };
 
-  const handleCreateThought = useAction(createThought);
+  const handleCreateThought = useAction(createThought, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getThoughts],
+        updateQuery: (payload, oldData) => {
+          const newThought = {
+            id: Date.now().toString(), // Temporary ID
+            content: payload.content,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            projectId: payload.projectId,
+            type: "thought" as const,
+            title: payload.content.slice(0, 50) + "...", // Generate a title from content
+          };
+          return [...(oldData || []), newThought];
+        },
+      },
+    ],
+  });
+
+  const deleteThoughtOptimistically = useAction(deleteThought, {
+    optimisticUpdates: [
+      {
+        getQuerySpecifier: () => [getThoughts],
+        updateQuery: (payload, oldData) => {
+          return (oldData || []).filter((thought: Thought & { type: "thought" }) => thought.id !== payload.id);
+        },
+      },
+    ],
+  });
 
   // Use the new hook for tab shortcuts
   useTabShortcuts(handleTabChange);
@@ -1313,7 +1358,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                           onDelete={async (item) => {
                              if (item.type === 'thought') {
                                 if (confirm("Are you sure you want to delete this note?")) {
-                                   await deleteThought({ id: item.id as string });
+                                   await deleteThoughtOptimistically({ id: item.id as string });
                                    toast.success("Note deleted successfully");
                                 }
                              }
