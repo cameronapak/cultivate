@@ -105,21 +105,21 @@ export function CommandMenu() {
     switch (result.type) {
       case 'task':
         if (result.projectId) {
-          navigate(`/projects/${result.projectId}?taskId=${result.id}`);
+          navigate(`/projects/${result.projectId}?taskId=${result.id}&tab=task`);
         } else {
           navigate('/inbox');
         }
         break;
       case 'resource':
         if (result.projectId) {
-          navigate(`/projects/${result.projectId}?resourceId=${result.id}`);
+          navigate(`/projects/${result.projectId}?resourceId=${result.id}&tab=resource`);
         } else {
           navigate('/inbox');
         }
         break;
       case 'thought':
         if (result.projectId) {
-          navigate(`/projects/${result.projectId}?thoughtId=${result.id}`);
+          navigate(`/projects/${result.projectId}?thoughtId=${result.id}&tab=notes`);
         } else {
           navigate('/inbox');
         }
