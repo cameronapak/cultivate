@@ -163,7 +163,7 @@ export function CommandMenu() {
             `/projects/${result.projectId}?taskId=${result.id}&tab=task`
           );
         } else {
-          navigate("/inbox");
+          navigate(`/inbox?resource=${result.id}`);
         }
         break;
       case "resource":
@@ -175,7 +175,7 @@ export function CommandMenu() {
               `/projects/${result.projectId}?resourceId=${result.id}&tab=resource`
             );
           } else {
-            navigate("/inbox");
+            navigate(`/inbox?resource=${result.id}`);
           }
         }
         break;
@@ -185,7 +185,7 @@ export function CommandMenu() {
             `/projects/${result.projectId}?thoughtId=${result.id}&tab=notes`
           );
         } else {
-          navigate("/inbox");
+          navigate(`/inbox?resource=${result.id}`);
         }
         break;
     }
