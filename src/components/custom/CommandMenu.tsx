@@ -148,7 +148,7 @@ export function CommandMenu() {
 
   type SearchResult = {
     id: string;
-    type: 'task' | 'resource' | 'thought';
+    type: "task" | "resource" | "thought";
     projectId?: string;
     title?: string;
     content?: string;
@@ -227,55 +227,56 @@ export function CommandMenu() {
       <AnimatePresence>
         <CommandList>
           {searchResults && searchResults?.length > 0 && (
-            <CommandGroup heading="Search Results">
-              {searchResults.map((result: any, index: number) => (
-                <MotionAnimateHeight key={`${result.id}-${result.type}`}>
-                  <CommandItem
-                    onSelect={() =>
-                      runCommand(() => handleSearchResultClick(result))
-                    }
-                  >
-                    {getIconForType(result.type)}
-                    <div className="flex flex-col">
-                      <span>
-                        {result.title || result.content || "Untitled"}
-                        {result.type === "resource" && result.url && (
-                          <span className="text-xs text-muted-foreground ml-2">
-                            ({result.url})
+            <>
+              <CommandGroup heading="Search Results">
+                {searchResults.map((result: any, index: number) => (
+                  <MotionAnimateHeight key={`${result.id}-${result.type}`}>
+                    <CommandItem
+                      onSelect={() =>
+                        runCommand(() => handleSearchResultClick(result))
+                      }
+                    >
+                      {getIconForType(result.type)}
+                      <div className="flex flex-col">
+                        <span>
+                          {result.title || result.content || "Untitled"}
+                          {result.type === "resource" && result.url && (
+                            <span className="text-xs text-muted-foreground ml-2">
+                              ({result.url})
+                            </span>
+                          )}
+                        </span>
+                        {result.description && (
+                          <span className="text-xs text-muted-foreground line-clamp-2">
+                            {result.description}
                           </span>
                         )}
-                      </span>
-                      {result.description && (
-                        <span className="text-xs text-muted-foreground line-clamp-2">
-                          {result.description}
-                        </span>
-                      )}
-                    </div>
-                  </CommandItem>
-                </MotionAnimateHeight>
-              ))}
-            </CommandGroup>
-          )}
-
-          {filteredProjects.length > 0 && (
-            <CommandGroup heading="Projects">
-              {filteredProjects.map((project: Project) => (
-                <MotionAnimateHeight key={project.id}>
-                  <CommandItem
-                    onSelect={() =>
-                      runCommand(() =>
-                        navigate(
-                          `/projects/${project.id}${window.location.search}`
-                        )
-                      )
-                    }
-                  >
-                    <Folder className="mr-2 h-4 w-4" />
-                    Open "{project.title}"
-                  </CommandItem>
-                </MotionAnimateHeight>
-              ))}
-            </CommandGroup>
+                      </div>
+                    </CommandItem>
+                  </MotionAnimateHeight>
+                ))}
+              </CommandGroup>
+              {filteredProjects.length > 0 && (
+                <CommandGroup heading="Projects">
+                  {filteredProjects.map((project: Project) => (
+                    <MotionAnimateHeight key={project.id}>
+                      <CommandItem
+                        onSelect={() =>
+                          runCommand(() =>
+                            navigate(
+                              `/projects/${project.id}${window.location.search}`
+                            )
+                          )
+                        }
+                      >
+                        <Folder className="mr-2 h-4 w-4" />
+                        Open "{project.title}"
+                      </CommandItem>
+                    </MotionAnimateHeight>
+                  ))}
+                </CommandGroup>
+              )}
+            </>
           )}
 
           {(showHideCompletedAction || showSidebarAction) && (
