@@ -274,8 +274,6 @@ export function InboxPage() {
   const { data: projects } = useQuery(getProjects);
   const [searchParams] = useSearchParams();
   const activeItemId = searchParams.get("resource");
-  const activeItemType = searchParams.get("type");
-  const activeItemRef = useRef<HTMLTableRowElement>(null);
   const [newItemText, setNewItemText] = useState("");
   const [isThought, setIsThought] = useState(false);
   const [showInbox, setShowInbox] = useState(() => {
@@ -635,26 +633,6 @@ export function InboxPage() {
     [tasks, resources, thoughts, filter]
   );
 
-  // Add effect to scroll to active item
-  useEffect(() => {
-    if (activeItemId && activeItemType && activeItemRef.current) {
-      if (inboxItems.length === 0) {
-        return;
-      }
-
-      // Small delay to ensure the item is rendered
-      setTimeout(() => {
-        activeItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        // now remove the URL param
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.delete("resource");
-        newUrl.searchParams.delete("type");
-        window.history.replaceState({}, "", newUrl.toString());
-      }, 250);
-    }
-  }, [activeItemId, activeItemType, inboxItems]);
-
   // Group items by date
   const groupedItems = groupItemsByDate(inboxItems);
 
@@ -929,13 +907,6 @@ export function InboxPage() {
                                       (item.type === 'resource' && item.id.toString() === activeItemId) ||
                                       (item.type === 'task' && item.id.toString() === activeItemId) ||
                                       (item.type === 'thought' && item.id.toString() === activeItemId)
-                                    }
-                                    ref={
-                                      (item.type === 'resource' && item.id.toString() === activeItemId) ||
-                                      (item.type === 'task' && item.id.toString() === activeItemId) ||
-                                      (item.type === 'thought' && item.id.toString() === activeItemId)
-                                        ? activeItemRef
-                                        : null
                                     }
                                     projects={projects || []}
                                     onEdit={handleEditItem}

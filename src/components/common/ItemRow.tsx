@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Task, Resource, Thought } from "wasp/entities";
 import { TableRow, TableCell } from "../ui/table";
 import { Button } from "../ui/button";
@@ -70,6 +70,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(({
       console.error("Save failed from ItemRow", err);
     }
   };
+  const rowRef = useRef<HTMLTableCellElement>(null);
 
   if (isEditing) {
     return (
@@ -80,6 +81,18 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(({
       </TableRow>
     );
   }
+
+  React.useEffect(() => {
+    if (isActive && rowRef.current) {
+      setTimeout(() => {
+        rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete("resource");
+        newUrl.searchParams.delete("type");
+        window.history.replaceState({}, "", newUrl.toString());
+      }, 250);
+    }
+  }, [isActive]);
 
   const commonRowClasses = cn(
     "group items-center",
@@ -260,7 +273,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(({
   };
 
   return (
-    <TableRow 
+    <TableRow
       ref={ref}
       className={commonRowClasses}
       data-active={isActive}
@@ -276,7 +289,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(({
 
       {/* Item Type Icon/Checkbox */}
       {/* Adjust padding if drag handle is hidden */}
-      <TableCell className={cn("w-6 p-2 pl-0")} >{renderItemIcon()}</TableCell>
+      <TableCell className={cn("w-6 p-2 pl-0")} ref={rowRef}>{renderItemIcon()}</TableCell>
 
       {/* Item Content */}
       <TableCell className="py-2">{renderItemContent()}</TableCell>
