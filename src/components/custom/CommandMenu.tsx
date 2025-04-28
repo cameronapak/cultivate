@@ -163,7 +163,7 @@ export function CommandMenu() {
             `/projects/${result.projectId}?taskId=${result.id}&tab=task`
           );
         } else {
-          navigate(`/inbox?resource=${result.id}`);
+          navigate(`/inbox?resource=${result.id}&type=task`);
         }
         break;
       case "resource":
@@ -172,10 +172,10 @@ export function CommandMenu() {
         } else {
           if (result.projectId) {
             navigate(
-              `/projects/${result.projectId}?resourceId=${result.id}&tab=resource`
+              `/projects/${result.projectId}?resource=${result.id}&tab=resource`
             );
           } else {
-            navigate(`/inbox?resource=${result.id}`);
+            navigate(`/inbox?resource=${result.id}&type=resource`);
           }
         }
         break;
@@ -185,7 +185,7 @@ export function CommandMenu() {
             `/projects/${result.projectId}?thoughtId=${result.id}&tab=notes`
           );
         } else {
-          navigate(`/inbox?resource=${result.id}`);
+          navigate(`/inbox?resource=${result.id}&type=thought`);
         }
         break;
     }
