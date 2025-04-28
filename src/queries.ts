@@ -1271,9 +1271,5 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
     return b.createdAt.getTime() - a.createdAt.getTime();
   });
 
-  console.log({
-    combinedResults
-  })
-
   return combinedResults;
 };

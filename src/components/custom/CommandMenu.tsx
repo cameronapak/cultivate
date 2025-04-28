@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, getProjects, globalSearch } from "wasp/client/operations";
+import { debounce } from "../../lib/utils";
 import {
   CommandDialog,
   CommandEmpty,
@@ -36,17 +37,29 @@ type NavigationCommand = {
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
+  const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [search, setSearch] = React.useState("");
   const navigate = useNavigate();
   const { data: projects } = useQuery(getProjects);
-  const { data: searchResults, isLoading: isLoadingQuery } = useQuery(globalSearch, { query: search }, {
-    enabled: search.length > 0,
+  const { data: searchResults, isLoading: isLoadingQuery } = useQuery(globalSearch, { query: debouncedSearch }, {
+    enabled: debouncedSearch.length > 0,
   });
   const {
     hideCompletedTasks,
     toggleHideCompleted,
   } = useLayoutState();
   const { open: isSidebarOpen, toggleSidebar } = useSidebar();
+
+  // Create debounced search handler
+  const debouncedSetSearch = React.useMemo(
+    () => debounce((value: string) => setDebouncedSearch(value), 250),
+    []
+  );
+
+  // Update debounced value when search changes
+  React.useEffect(() => {
+    debouncedSetSearch(search);
+  }, [search]);
 
   // Navigation commands
   const navigationCommands: NavigationCommand[] = React.useMemo(() => [
@@ -236,7 +249,9 @@ export function CommandMenu() {
         )}
 
         <CommandSeparator />
-        <CommandEmpty>No results found.</CommandEmpty>
+        {searchResults && searchResults?.length === 0 && (
+          <CommandEmpty>No results found.</CommandEmpty>
+        )}
       </CommandList>
     </CommandDialog>
   );
