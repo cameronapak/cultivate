@@ -1,5 +1,5 @@
 import { useState, useRef, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { Task, Resource, Pitch, Thought } from "wasp/entities";
 import {
   deleteTask,
@@ -184,6 +184,8 @@ const TaskList = ({
     }
   );
   const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
+  const [searchParams] = useSearchParams();
+  const activeResourceId = searchParams.get("resource");
 
   // Add handler for status change
   const handleStatusChange = async (task: Task, complete: boolean) => {
@@ -296,6 +298,7 @@ const TaskList = ({
       <TableBody ref={parentRef}>
         {values.map((task) => (
           <ItemRow
+            isActive={`${activeResourceId}` === `${task.id}`}
             key={task.id}
             item={{ ...task, type: 'task' }}
             isEditing={editingItemId?.id === task.id && editingItemId?.type === 'task'}
@@ -752,6 +755,8 @@ const ResourcesSection = ({ project }: { project: Project }) => {
     const indexB = project.resourceOrder?.indexOf(b.id) || 0;
     return indexA - indexB;
   });
+  const [searchParams] = useSearchParams();
+  const activeResourceId = searchParams.get("resource");
 
   const [parentRef, values, setValues] = useDragAndDrop<HTMLTableSectionElement, Resource>(
     sortedResources || [],
@@ -861,6 +866,7 @@ const ResourcesSection = ({ project }: { project: Project }) => {
           <TableBody ref={parentRef}>
             {values.map((resource: Resource) => (
                 <ItemRow
+                  isActive={`${activeResourceId}` === `${resource.id}`}
                   key={resource.id}
                   item={{ ...resource, type: 'resource' }}
                   isEditing={editingItemId?.id === resource.id && editingItemId?.type === 'resource'}
@@ -1034,6 +1040,8 @@ export const ProjectView = ({ project }: { project: Project }) => {
   const { currentTab, setTab, hideCompletedTasks, toggleHideCompleted } =
     useLayoutState();
   const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
+  const [searchParams] = useSearchParams();
+  const activeResourceId = searchParams.get("resource");
 
   const handleTabChange = (tab: TabType) => {
     setTab(tab);
@@ -1346,6 +1354,7 @@ export const ProjectView = ({ project }: { project: Project }) => {
                   <TableBody>
                     {sortedThoughts?.map((thought: Thought) => (
                        <ItemRow
+                          isActive={`${activeResourceId}` === `${thought.id}`}
                           key={thought.id}
                           item={{ 
                             ...thought, 

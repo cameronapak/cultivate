@@ -1161,3 +1161,122 @@ export const generateInviteCode: GenerateInviteCode<GenerateInviteCodeArgs, Invi
 };
 
 //#endregion
+type GlobalSearchInput = {
+  query: string;
+}
+
+type SearchResult = {
+  type: 'task' | 'resource' | 'thought';
+  id: string;
+  title: string;
+  description: string | null;
+  projectId: number | null;
+  createdAt: Date;
+  rank: number;
+  url?: string;
+}
+
+// Calculate relevance scores based on match positions and number of matches
+const calculateRelevance = (text: string | null, searchTerm: string): number => {
+  if (!text) return 0;
+  const lowerText = text.toLowerCase();
+  const lowerTerm = searchTerm.toLowerCase();
+  const matches = lowerText.split(lowerTerm).length - 1;
+  const position = lowerText.indexOf(lowerTerm);
+  return matches * 10 + (position === 0 ? 5 : 0);
+};
+
+export const globalSearch = async (args: GlobalSearchInput, context: WaspContext): Promise<SearchResult[]> => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+
+  const { query } = args;
+  if (!query || query.trim().length === 0) {
+    return [];
+  }
+
+  // Search tasks
+  const tasks = await context.entities.Task.findMany({
+    where: {
+      userId: context.user.id,
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } }
+      ]
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5
+  });
+
+  // Search resources
+  const resources = await context.entities.Resource.findMany({
+    where: {
+      userId: context.user.id,
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+        { url: { contains: query, mode: 'insensitive' } }
+      ]
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5
+  });
+
+  // Search thoughts
+  const thoughts = await context.entities.Thought.findMany({
+    where: {
+      userId: context.user.id,
+      content: { contains: query, mode: 'insensitive' }
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5
+  });
+
+  // Format and rank results
+  const formattedTasks: SearchResult[] = tasks.map((task: Task) => ({
+    id: task.id.toString(),
+    title: task.title,
+    description: task.description,
+    type: 'task',
+    projectId: task.projectId,
+    createdAt: task.createdAt,
+    rank: calculateRelevance(task.title, query) + calculateRelevance(task.description, query),
+    url: null
+  }));
+
+  const formattedResources: SearchResult[] = resources.map((resource: Resource) => ({
+    id: resource.id.toString(),
+    title: resource.title,
+    description: resource.description,
+    type: 'resource',
+    projectId: resource.projectId,
+    createdAt: resource.createdAt,
+    rank: calculateRelevance(resource.title, query) + 
+          calculateRelevance(resource.description, query) + 
+          calculateRelevance(resource.url, query),
+    url: resource.url
+  }));
+
+  const formattedThoughts: SearchResult[] = thoughts.map((thought: Thought) => ({
+    id: thought.id,
+    title: thought.content,
+    description: null,
+    type: 'thought',
+    projectId: thought.projectId,
+    createdAt: thought.createdAt,
+    rank: calculateRelevance(thought.content, query),
+    url: null
+  }));
+
+  // Combine all results and sort by rank (higher rank first) and then by date
+  const combinedResults = [...formattedTasks, ...formattedResources, ...formattedThoughts];
+  combinedResults.sort((a, b) => {
+    if (b.rank !== a.rank) {
+      return b.rank - a.rank;
+    }
+    return b.createdAt.getTime() - a.createdAt.getTime();
+  });
+
+  return combinedResults;
+};

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Task, Resource, Thought } from "wasp/entities";
 import { TableRow, TableCell } from "../ui/table";
 import { Button } from "../ui/button";
@@ -32,24 +32,26 @@ export type DisplayItem =
 interface ItemRowProps {
   item: DisplayItem;
   isEditing: boolean;
-  projects?: Project[]; // Make projects optional, needed for move action
+  isActive?: boolean;
+  projects?: Project[];
   onEdit: (item: DisplayItem) => void;
-  onSave: (item: DisplayItem, values: any) => Promise<void>; // Callback to save edits
+  onSave: (item: DisplayItem, values: any) => Promise<void>;
   onCancelEdit: () => void;
   onDelete: (item: DisplayItem) => void;
-  onStatusChange?: (item: Task, complete: boolean) => void; // Only for tasks
-  onMove?: (item: DisplayItem, projectId: number) => void; // Optional move action
+  onStatusChange?: (item: Task, complete: boolean) => void;
+  onMove?: (item: DisplayItem, projectId: number) => void;
   renderEditForm: (
     item: DisplayItem,
     onSave: (values: any) => void,
     onCancel: () => void
-  ) => React.ReactNode; // Function to render the specific edit form
-  hideDragHandle?: boolean; // New optional prop
+  ) => React.ReactNode;
+  hideDragHandle?: boolean;
 }
 
-export const ItemRow: React.FC<ItemRowProps> = ({
+export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(({
   item,
   isEditing,
+  isActive = false,
   projects,
   onEdit,
   onSave,
@@ -58,17 +60,17 @@ export const ItemRow: React.FC<ItemRowProps> = ({
   onStatusChange,
   onMove,
   renderEditForm,
-  hideDragHandle = false, // Default to false
-}) => {
+  hideDragHandle = false,
+}, ref) => {
   const handleSave = async (values: any) => {
     try {
       await onSave(item, values);
-      onCancelEdit(); // Exit editing mode on successful save
+      onCancelEdit();
     } catch (err) {
-      // Error handling is likely done in the parent, but we could add local feedback too
       console.error("Save failed from ItemRow", err);
     }
   };
+  const rowRef = useRef<HTMLTableCellElement>(null);
 
   if (isEditing) {
     return (
@@ -80,13 +82,25 @@ export const ItemRow: React.FC<ItemRowProps> = ({
     );
   }
 
+  React.useEffect(() => {
+    if (isActive && rowRef.current) {
+      setTimeout(() => {
+        rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete("resource");
+        newUrl.searchParams.delete("type");
+        window.history.replaceState({}, "", newUrl.toString());
+      }, 250);
+    }
+  }, [isActive]);
+
   const commonRowClasses = cn(
     "group items-center",
-    // Adjust grid columns based on hideDragHandle
     hideDragHandle
       ? "grid grid-cols-[auto_1fr_auto]"
       : "grid grid-cols-[auto_auto_1fr_auto]",
-    item.type === "task" && (item as Task).complete ? "completed" : ""
+    item.type === "task" && (item as Task).complete ? "completed" : "",
+    isActive && "bg-muted/80 hover:bg-muted"
   );
 
   const renderItemContent = () => {
@@ -259,7 +273,11 @@ export const ItemRow: React.FC<ItemRowProps> = ({
   };
 
   return (
-    <TableRow className={commonRowClasses}>
+    <TableRow
+      ref={ref}
+      className={commonRowClasses}
+      data-active={isActive}
+    >
       {/* Drag Handle - Conditionally Rendered */}
       {!hideDragHandle && (
         <TableCell className="w-8 pr-0">
@@ -271,7 +289,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({
 
       {/* Item Type Icon/Checkbox */}
       {/* Adjust padding if drag handle is hidden */}
-      <TableCell className={cn("w-6 p-2 pl-0")} >{renderItemIcon()}</TableCell>
+      <TableCell className={cn("w-6 p-2 pl-0")} ref={rowRef}>{renderItemIcon()}</TableCell>
 
       {/* Item Content */}
       <TableCell className="py-2">{renderItemContent()}</TableCell>
@@ -360,4 +378,6 @@ export const ItemRow: React.FC<ItemRowProps> = ({
       </TableCell>
     </TableRow>
   );
-};
+});
+
+ItemRow.displayName = "ItemRow";

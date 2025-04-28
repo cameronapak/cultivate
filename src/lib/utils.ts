@@ -73,18 +73,20 @@ export const throttle = <T extends (...args: any[]) => any>(
 };
 
 // Custom debounce function implementation
-export const debounce = <T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
-): ((...args: Parameters<T>) => void) => {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null;
 
-  return (...args: Parameters<T>) => {
+  return function executedFunction(...args: Parameters<T>) {
     if (timeout) {
       clearTimeout(timeout);
     }
+
     timeout = setTimeout(() => {
       func(...args);
+      timeout = null;
     }, wait);
   };
-};
+}
