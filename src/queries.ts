@@ -1173,6 +1173,7 @@ type SearchResult = {
   projectId: number | null;
   createdAt: Date;
   rank: number;
+  url?: string;
 }
 
 // Calculate relevance scores based on match positions and number of matches
@@ -1237,7 +1238,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
     type: 'task',
     projectId: task.projectId,
     createdAt: task.createdAt,
-    rank: calculateRelevance(task.title, query) + calculateRelevance(task.description, query)
+    rank: calculateRelevance(task.title, query) + calculateRelevance(task.description, query),
+    url: null
   }));
 
   const formattedResources: SearchResult[] = resources.map((resource: Resource) => ({
@@ -1249,7 +1251,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
     createdAt: resource.createdAt,
     rank: calculateRelevance(resource.title, query) + 
           calculateRelevance(resource.description, query) + 
-          calculateRelevance(resource.url, query)
+          calculateRelevance(resource.url, query),
+    url: resource.url
   }));
 
   const formattedThoughts: SearchResult[] = thoughts.map((thought: Thought) => ({
@@ -1259,7 +1262,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
     type: 'thought',
     projectId: thought.projectId,
     createdAt: thought.createdAt,
-    rank: calculateRelevance(thought.content, query)
+    rank: calculateRelevance(thought.content, query),
+    url: null
   }));
 
   // Combine all results and sort by rank (higher rank first) and then by date

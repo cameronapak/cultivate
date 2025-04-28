@@ -23,8 +23,8 @@ import {
   InboxIcon,
   PencilRuler,
   FileText,
-  Link as LinkIcon,
-  CheckSquare,
+  Link2,
+  Square,
 } from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
 import { useSidebar } from "../ui/sidebar";
@@ -91,11 +91,11 @@ export function CommandMenu() {
   const getIconForType = (type: string) => {
     switch (type) {
       case 'task':
-        return <CheckSquare className="mr-2 h-4 w-4" />;
+        return <Square className="mr-2 h-2 w-2 text-muted-foreground" />;
       case 'resource':
-        return <LinkIcon className="mr-2 h-4 w-4" />;
+        return <Link2 className="mr-2 h-2 w-2 text-muted-foreground" />;
       case 'thought':
-        return <FileText className="mr-2 h-4 w-4" />;
+        return <FileText className="mr-2 h-2 w-2 text-muted-foreground" />;
       default:
         return null;
     }
@@ -111,10 +111,14 @@ export function CommandMenu() {
         }
         break;
       case 'resource':
-        if (result.projectId) {
-          navigate(`/projects/${result.projectId}?resourceId=${result.id}&tab=resource`);
+        if (result.url) {
+          window.open(result.url, '_blank');
         } else {
-          navigate('/inbox');
+          if (result.projectId) {
+            navigate(`/projects/${result.projectId}?resourceId=${result.id}&tab=resource`);
+          } else {
+            navigate('/inbox');
+          }
         }
         break;
       case 'thought':
@@ -176,7 +180,7 @@ export function CommandMenu() {
                     )}
                   </span>
                   {result.description && (
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground line-clamp-2">
                       {result.description}
                     </span>
                   )}
