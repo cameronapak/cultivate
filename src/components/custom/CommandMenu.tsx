@@ -25,6 +25,7 @@ import {
   FileText,
   Link2,
   Square,
+  Minus,
 } from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
 import { useSidebar } from "../ui/sidebar";
@@ -139,7 +140,7 @@ export function CommandMenu() {
       case "resource":
         return <Link2 className="mr-2 h-2 w-2 text-muted-foreground" />;
       case "thought":
-        return <FileText className="mr-2 h-2 w-2 text-muted-foreground" />;
+        return <Minus className="mr-2 h-2 w-2 text-muted-foreground" />;
       default:
         return null;
     }
