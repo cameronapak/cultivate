@@ -43,10 +43,10 @@ function MotionAnimateHeight({
 }: { children: React.ReactNode } & MotionProps) {
   return (
     <motion.div
-      initial={{ height: 0, opacity: 0 }}
+      initial={{ height: 0, opacity: 0, filter: "blur(8px)" }}
       // https://developer.chrome.com/docs/css-ui/animate-to-height-auto
-      animate={{ height: "calc-size(min-content, size)", opacity: 1 }}
-      exit={{ height: 0, opacity: 0 }}
+      animate={{ height: "calc-size(min-content, size)", opacity: 1, filter: "blur(0px)" }}
+      exit={{ height: 0, opacity: 0, filter: "blur(8px)" }}
       transition={{ type: "spring", bounce: 0.1, duration: 0.25 }}
       {...props}
     >
