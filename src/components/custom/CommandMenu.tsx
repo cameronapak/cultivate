@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
 import { useSidebar } from "../ui/sidebar";
+import { AnimatePresence, motion, MotionProps } from "motion/react";
 
 type NavigationCommand = {
   title: string;
@@ -35,19 +36,40 @@ type NavigationCommand = {
   path: string;
 };
 
+function MotionAnimateHeight({
+  children,
+  ...props
+}: { children: React.ReactNode } & MotionProps) {
+  return (
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      // https://developer.chrome.com/docs/css-ui/animate-to-height-auto
+      animate={{ height: "calc-size(min-content, size)", opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ type: "spring", bounce: 0.1, duration: 0.25 }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [search, setSearch] = React.useState("");
   const navigate = useNavigate();
-  const { data: projects } = useQuery(getProjects);
-  const { data: searchResults, isLoading: isLoadingQuery } = useQuery(globalSearch, { query: debouncedSearch }, {
+  const { data: projects } = useQuery(getProjects, null, {
     enabled: debouncedSearch.length > 0,
   });
-  const {
-    hideCompletedTasks,
-    toggleHideCompleted,
-  } = useLayoutState();
+  const { data: searchResults, isLoading: isLoadingQuery } = useQuery(
+    globalSearch,
+    { query: debouncedSearch },
+    {
+      enabled: debouncedSearch.length > 0,
+    }
+  );
+  const { hideCompletedTasks, toggleHideCompleted } = useLayoutState();
   const { open: isSidebarOpen, toggleSidebar } = useSidebar();
 
   // Create debounced search handler
@@ -62,12 +84,31 @@ export function CommandMenu() {
   }, [search]);
 
   // Navigation commands
-  const navigationCommands: NavigationCommand[] = React.useMemo(() => [
-    { title: "Open Inbox", icon: <InboxIcon className="mr-2 h-4 w-4" />, path: "/inbox" },
-    { title: "Open Docs", icon: <BookOpen className="mr-2 h-4 w-4" />, path: "/documents" },
-    { title: "Open Projects", icon: <Folder className="mr-2 h-4 w-4" />, path: "/" },
-    { title: "Open Canvases", icon: <PencilRuler className="mr-2 h-4 w-4" />, path: "/canvases" },
-  ], []);
+  const navigationCommands: NavigationCommand[] = React.useMemo(
+    () => [
+      {
+        title: "Open Inbox",
+        icon: <InboxIcon className="mr-2 h-4 w-4" />,
+        path: "/inbox",
+      },
+      {
+        title: "Open Docs",
+        icon: <BookOpen className="mr-2 h-4 w-4" />,
+        path: "/documents",
+      },
+      {
+        title: "Open Projects",
+        icon: <Folder className="mr-2 h-4 w-4" />,
+        path: "/",
+      },
+      {
+        title: "Open Canvases",
+        icon: <PencilRuler className="mr-2 h-4 w-4" />,
+        path: "/canvases",
+      },
+    ],
+    []
+  );
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -90,11 +131,11 @@ export function CommandMenu() {
 
   const getIconForType = (type: string) => {
     switch (type) {
-      case 'task':
+      case "task":
         return <Square className="mr-2 h-2 w-2 text-muted-foreground" />;
-      case 'resource':
+      case "resource":
         return <Link2 className="mr-2 h-2 w-2 text-muted-foreground" />;
-      case 'thought':
+      case "thought":
         return <FileText className="mr-2 h-2 w-2 text-muted-foreground" />;
       default:
         return null;
@@ -103,29 +144,35 @@ export function CommandMenu() {
 
   const handleSearchResultClick = (result: any) => {
     switch (result.type) {
-      case 'task':
+      case "task":
         if (result.projectId) {
-          navigate(`/projects/${result.projectId}?taskId=${result.id}&tab=task`);
+          navigate(
+            `/projects/${result.projectId}?taskId=${result.id}&tab=task`
+          );
         } else {
-          navigate('/inbox');
+          navigate("/inbox");
         }
         break;
-      case 'resource':
+      case "resource":
         if (result.url) {
-          window.open(result.url, '_blank');
+          window.open(result.url, "_blank");
         } else {
           if (result.projectId) {
-            navigate(`/projects/${result.projectId}?resourceId=${result.id}&tab=resource`);
+            navigate(
+              `/projects/${result.projectId}?resourceId=${result.id}&tab=resource`
+            );
           } else {
-            navigate('/inbox');
+            navigate("/inbox");
           }
         }
         break;
-      case 'thought':
+      case "thought":
         if (result.projectId) {
-          navigate(`/projects/${result.projectId}?thoughtId=${result.id}&tab=notes`);
+          navigate(
+            `/projects/${result.projectId}?thoughtId=${result.id}&tab=notes`
+          );
         } else {
-          navigate('/inbox');
+          navigate("/inbox");
         }
         break;
     }
@@ -140,123 +187,139 @@ export function CommandMenu() {
   // Filter projects that match the search query
   const filteredProjects = React.useMemo(() => {
     if (!projects) return [];
-    return projects.filter(project => matchesSearch(project.title));
+    return projects.filter((project) => matchesSearch(project.title));
   }, [projects, search]);
 
   // Filter navigation commands that match the search query
   const filteredNavigationCommands = React.useMemo(() => {
-    return navigationCommands.filter(cmd => matchesSearch(cmd.title));
+    return navigationCommands.filter((cmd) => matchesSearch(cmd.title));
   }, [navigationCommands, search]);
 
   // Check if action commands match the search query
-  const showHideCompletedAction = matchesSearch("Hide completed tasks") || matchesSearch("Show completed tasks");
-  const showSidebarAction = matchesSearch("Hide sidebar") || matchesSearch("Show sidebar");
+  const showHideCompletedAction =
+    matchesSearch("Hide completed tasks") ||
+    matchesSearch("Show completed tasks");
+  const showSidebarAction =
+    matchesSearch("Hide sidebar") || matchesSearch("Show sidebar");
 
   return (
     <CommandDialog shouldFilter={false} open={open} onOpenChange={setOpen}>
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
-      <CommandInput 
+      <CommandInput
         isLoading={isLoadingQuery && search.length > 0}
-        placeholder="Type a command or search..." 
+        placeholder="Type a command or search..."
         value={search}
         onValueChange={setSearch}
       />
-      <CommandList>
-        {searchResults && searchResults?.length > 0 && (
-          <CommandGroup heading="Search Results">
-            {searchResults.map((result: any, index: number) => (
-              <CommandItem
-                key={`${result.id}-${result.type}`}
-                onSelect={() => runCommand(() => handleSearchResultClick(result))}
-              >
-                {getIconForType(result.type)}
-                <div className="flex flex-col">
-                  <span>
-                    {result.title || result.content || 'Untitled'} 
-                    {result.type === 'resource' && result.url && (
-                      <span className="text-xs text-muted-foreground ml-2">
-                        ({result.url})
+      <AnimatePresence>
+        <CommandList>
+          {searchResults && searchResults?.length > 0 && (
+            <CommandGroup heading="Search Results">
+              {searchResults.map((result: any, index: number) => (
+                <MotionAnimateHeight key={`${result.id}-${result.type}`}>
+                  <CommandItem
+                    onSelect={() =>
+                      runCommand(() => handleSearchResultClick(result))
+                    }
+                  >
+                    {getIconForType(result.type)}
+                    <div className="flex flex-col">
+                      <span>
+                        {result.title || result.content || "Untitled"}
+                        {result.type === "resource" && result.url && (
+                          <span className="text-xs text-muted-foreground ml-2">
+                            ({result.url})
+                          </span>
+                        )}
                       </span>
-                    )}
-                  </span>
-                  {result.description && (
-                    <span className="text-xs text-muted-foreground line-clamp-2">
-                      {result.description}
-                    </span>
-                  )}
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-
-        {filteredProjects.length > 0 && (
-          <CommandGroup heading="Projects">
-            {filteredProjects.map((project: Project) => (
-              <CommandItem
-                key={project.id}
-                onSelect={() =>
-                  runCommand(() =>
-                    navigate(`/projects/${project.id}${window.location.search}`)
-                  )
-                }
-              >
-                <Folder className="mr-2 h-4 w-4" />
-                Open "{project.title}"
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-
-        {(showHideCompletedAction || showSidebarAction) && (
-          <CommandGroup heading="Actions">
-            {isProjectPage && showHideCompletedAction && (
-              <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
-                {hideCompletedTasks ? (
-                  <Eye className="mr-2 h-4 w-4" />
-                ) : (
-                  <EyeOff className="mr-2 h-4 w-4" />
-                )}
-                {hideCompletedTasks
-                  ? "Show completed tasks"
-                  : "Hide completed tasks"}
-              </CommandItem>
-            )}
-            {showSidebarAction && (
-              <CommandItem onSelect={() => runCommand(toggleSidebar)}>
-                {isSidebarOpen ? (
-                  <PanelLeftClose className="mr-2 h-4 w-4" />
-                ) : (
-                  <PanelLeftOpen className="mr-2 h-4 w-4" />
-                )}
-                {isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
-              </CommandItem>
-            )}
-          </CommandGroup>
-        )}
-
-        {filteredNavigationCommands.length > 0 && (
-          <>
-            <CommandSeparator />
-            <CommandGroup heading="Pages">
-              {filteredNavigationCommands.map((cmd) => (
-                <CommandItem
-                  key={cmd.path}
-                  onSelect={() => runCommand(() => navigate(cmd.path))}
-                >
-                  {cmd.icon}
-                  {cmd.title}
-                </CommandItem>
+                      {result.description && (
+                        <span className="text-xs text-muted-foreground line-clamp-2">
+                          {result.description}
+                        </span>
+                      )}
+                    </div>
+                  </CommandItem>
+                </MotionAnimateHeight>
               ))}
             </CommandGroup>
-          </>
-        )}
+          )}
 
-        <CommandSeparator />
-        {searchResults && searchResults?.length === 0 && (
-          <CommandEmpty>No results found.</CommandEmpty>
-        )}
-      </CommandList>
+          {filteredProjects.length > 0 && (
+            <CommandGroup heading="Projects">
+              {filteredProjects.map((project: Project) => (
+                <MotionAnimateHeight key={project.id}>
+                  <CommandItem
+                    onSelect={() =>
+                      runCommand(() =>
+                        navigate(
+                          `/projects/${project.id}${window.location.search}`
+                        )
+                      )
+                    }
+                  >
+                    <Folder className="mr-2 h-4 w-4" />
+                    Open "{project.title}"
+                  </CommandItem>
+                </MotionAnimateHeight>
+              ))}
+            </CommandGroup>
+          )}
+
+          {(showHideCompletedAction || showSidebarAction) && (
+            <CommandGroup heading="Actions">
+              {isProjectPage && showHideCompletedAction && (
+                <MotionAnimateHeight>
+                  <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
+                    {hideCompletedTasks ? (
+                      <Eye className="mr-2 h-4 w-4" />
+                    ) : (
+                      <EyeOff className="mr-2 h-4 w-4" />
+                    )}
+                    {hideCompletedTasks
+                      ? "Show completed tasks"
+                      : "Hide completed tasks"}
+                  </CommandItem>
+                </MotionAnimateHeight>
+              )}
+              {showSidebarAction && (
+                <MotionAnimateHeight>
+                  <CommandItem onSelect={() => runCommand(toggleSidebar)}>
+                    {isSidebarOpen ? (
+                      <PanelLeftClose className="mr-2 h-4 w-4" />
+                    ) : (
+                      <PanelLeftOpen className="mr-2 h-4 w-4" />
+                    )}
+                    {isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
+                  </CommandItem>
+                </MotionAnimateHeight>
+              )}
+            </CommandGroup>
+          )}
+
+          {filteredNavigationCommands.length > 0 && (
+            <>
+              <CommandSeparator />
+              <CommandGroup heading="Pages">
+                {filteredNavigationCommands.map((cmd) => (
+                  <MotionAnimateHeight key={cmd.path}>
+                    <CommandItem
+                      onSelect={() => runCommand(() => navigate(cmd.path))}
+                    >
+                      {cmd.icon}
+                      {cmd.title}
+                    </CommandItem>
+                  </MotionAnimateHeight>
+                ))}
+              </CommandGroup>
+            </>
+          )}
+
+          <CommandSeparator />
+          {searchResults && searchResults?.length === 0 && (
+            <CommandEmpty>No results found.</CommandEmpty>
+          )}
+        </CommandList>
+      </AnimatePresence>
     </CommandDialog>
   );
 }
