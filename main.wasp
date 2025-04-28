@@ -170,7 +170,7 @@ query getDocuments {
 
 query globalSearch {
   fn: import { globalSearch } from "@src/queries",
-  entities: [Task, Resource, Thought]
+  entities: [Task, Resource, Thought],
 }
 
 action createProject {

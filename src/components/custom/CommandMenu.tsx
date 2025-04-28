@@ -62,11 +62,14 @@ export function CommandMenu() {
   const { data: projects } = useQuery(getProjects, null, {
     enabled: debouncedSearch.length > 0,
   });
+  // Add a minimum search length to reduce unnecessary searches
   const { data: searchResults, isLoading: isLoadingQuery } = useQuery(
     globalSearch,
     { query: debouncedSearch },
     {
-      enabled: debouncedSearch.length > 0,
+      enabled: debouncedSearch.length >= 3, // Only search with 3+ characters
+      staleTime: 30000, // Cache results for 30 seconds
+      cacheTime: 300000, // Keep unused data in cache for 5 minutes
     }
   );
   const { hideCompletedTasks, toggleHideCompleted } = useLayoutState();
@@ -142,7 +145,16 @@ export function CommandMenu() {
     }
   };
 
-  const handleSearchResultClick = (result: any) => {
+  type SearchResult = {
+    id: string;
+    type: 'task' | 'resource' | 'thought';
+    projectId?: string;
+    title?: string;
+    content?: string;
+    url?: string;
+  };
+
+  const handleSearchResultClick = (result: SearchResult) => {
     switch (result.type) {
       case "task":
         if (result.projectId) {

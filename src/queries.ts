@@ -1205,7 +1205,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
         { description: { contains: query, mode: 'insensitive' } }
       ]
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    take: 5
   });
 
   // Search resources
@@ -1218,7 +1219,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
         { url: { contains: query, mode: 'insensitive' } }
       ]
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    take: 5
   });
 
   // Search thoughts
@@ -1227,7 +1229,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
       userId: context.user.id,
       content: { contains: query, mode: 'insensitive' }
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    take: 5
   });
 
   // Format and rank results
