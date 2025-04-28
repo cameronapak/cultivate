@@ -160,7 +160,7 @@ export function CommandMenu() {
       case "task":
         if (result.projectId) {
           navigate(
-            `/projects/${result.projectId}?taskId=${result.id}&tab=task`
+            `/projects/${result.projectId}?resource=${result.id}&tab=task`
           );
         } else {
           navigate(`/inbox?resource=${result.id}&type=task`);
@@ -182,7 +182,7 @@ export function CommandMenu() {
       case "thought":
         if (result.projectId) {
           navigate(
-            `/projects/${result.projectId}?thoughtId=${result.id}&tab=notes`
+            `/projects/${result.projectId}?resource=${result.id}&tab=notes`
           );
         } else {
           navigate(`/inbox?resource=${result.id}&type=thought`);
