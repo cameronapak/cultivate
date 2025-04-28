@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery, getProjects } from "wasp/client/operations";
+import { useQuery, getProjects, globalSearch } from "wasp/client/operations";
 import {
   CommandDialog,
   CommandEmpty,
@@ -21,15 +21,25 @@ import {
   BookOpen,
   InboxIcon,
   PencilRuler,
+  FileText,
+  Link as LinkIcon,
+  CheckSquare,
 } from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
 import { useSidebar } from "../ui/sidebar";
+
+type NavigationCommand = {
+  title: string;
+  icon: React.ReactNode;
+  path: string;
+};
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const navigate = useNavigate();
-  const { data: projects } = useQuery(getProjects, undefined, {
+  const { data: projects } = useQuery(getProjects);
+  const { data: searchResults, isLoading: isLoadingQuery } = useQuery(globalSearch, { query: search }, {
     enabled: search.length > 0,
   });
   const {
@@ -37,6 +47,14 @@ export function CommandMenu() {
     toggleHideCompleted,
   } = useLayoutState();
   const { open: isSidebarOpen, toggleSidebar } = useSidebar();
+
+  // Navigation commands
+  const navigationCommands: NavigationCommand[] = React.useMemo(() => [
+    { title: "Open Inbox", icon: <InboxIcon className="mr-2 h-4 w-4" />, path: "/inbox" },
+    { title: "Open Docs", icon: <BookOpen className="mr-2 h-4 w-4" />, path: "/documents" },
+    { title: "Open Projects", icon: <Folder className="mr-2 h-4 w-4" />, path: "/" },
+    { title: "Open Canvases", icon: <PencilRuler className="mr-2 h-4 w-4" />, path: "/canvases" },
+  ], []);
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -57,85 +75,107 @@ export function CommandMenu() {
   // Determine if the command menu is open on a project page
   const isProjectPage = window.location.pathname.includes("/projects/");
 
+  const getIconForType = (type: string) => {
+    switch (type) {
+      case 'task':
+        return <CheckSquare className="mr-2 h-4 w-4" />;
+      case 'resource':
+        return <LinkIcon className="mr-2 h-4 w-4" />;
+      case 'thought':
+        return <FileText className="mr-2 h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
+  const handleSearchResultClick = (result: any) => {
+    switch (result.type) {
+      case 'task':
+        if (result.projectId) {
+          navigate(`/projects/${result.projectId}?taskId=${result.id}`);
+        } else {
+          navigate('/inbox');
+        }
+        break;
+      case 'resource':
+        if (result.projectId) {
+          navigate(`/projects/${result.projectId}?resourceId=${result.id}`);
+        } else {
+          navigate('/inbox');
+        }
+        break;
+      case 'thought':
+        if (result.projectId) {
+          navigate(`/projects/${result.projectId}?thoughtId=${result.id}`);
+        } else {
+          navigate('/inbox');
+        }
+        break;
+    }
+  };
+
+  // Helper function to check if text matches search query
+  const matchesSearch = (text: string): boolean => {
+    if (!search) return true;
+    return text.toLowerCase().includes(search.toLowerCase());
+  };
+
+  // Filter projects that match the search query
+  const filteredProjects = React.useMemo(() => {
+    if (!projects) return [];
+    return projects.filter(project => matchesSearch(project.title));
+  }, [projects, search]);
+
+  // Filter navigation commands that match the search query
+  const filteredNavigationCommands = React.useMemo(() => {
+    return navigationCommands.filter(cmd => matchesSearch(cmd.title));
+  }, [navigationCommands, search]);
+
+  // Check if action commands match the search query
+  const showHideCompletedAction = matchesSearch("Hide completed tasks") || matchesSearch("Show completed tasks");
+  const showSidebarAction = matchesSearch("Hide sidebar") || matchesSearch("Show sidebar");
+
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
+    <CommandDialog shouldFilter={false} open={open} onOpenChange={setOpen}>
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
       <CommandInput 
+        isLoading={isLoadingQuery && search.length > 0}
         placeholder="Type a command or search..." 
         value={search}
         onValueChange={setSearch}
       />
       <CommandList>
-        <CommandGroup heading="Actions">
-          {isProjectPage && (
-            <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
-              {hideCompletedTasks ? (
-                <Eye className="mr-2 h-4 w-4" />
-              ) : (
-                <EyeOff className="mr-2 h-4 w-4" />
-              )}
-              {hideCompletedTasks
-                ? "Show completed tasks"
-                : "Hide completed tasks"}
-            </CommandItem>
-          )}
-          <CommandItem onSelect={() => runCommand(toggleSidebar)}>
-            {isSidebarOpen ? (
-              <PanelLeftClose className="mr-2 h-4 w-4" />
-            ) : (
-              <PanelLeftOpen className="mr-2 h-4 w-4" />
-            )}
-            {isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
-          </CommandItem>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Pages">
-          <CommandItem
-            onSelect={() =>
-              runCommand(() => {
-                navigate(`/inbox`);
-              })
-            }
-          >
-            <InboxIcon className="mr-2 h-4 w-4" />
-            Open Inbox
-          </CommandItem>
-          <CommandItem
-            onSelect={() =>
-              runCommand(() => {
-                navigate(`/documents`);
-              })
-            }
-          >
-            <BookOpen className="mr-2 h-4 w-4" />
-            Open Docs
-          </CommandItem>
-          <CommandItem
-            onSelect={() =>
-              runCommand(() => {
-                navigate(`/`);
-              })
-            }
-          >
-            <Folder className="mr-2 h-4 w-4" />
-            Open Projects
-          </CommandItem>
-          <CommandItem
-            onSelect={() =>
-              runCommand(() => {
-                navigate(`/canvases`);
-              })
-            }
-          >
-            <PencilRuler className="mr-2 h-4 w-4" />
-            Open Canvases
-          </CommandItem>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandEmpty>No results found.</CommandEmpty>
-        {search.length > 0 && (
+        {searchResults && searchResults?.length > 0 && (
+          <CommandGroup heading="Search Results">
+            {searchResults.map((result: any, index: number) => (
+              <CommandItem
+                key={`${result.id}-${result.type}`}
+                onSelect={() => runCommand(() => handleSearchResultClick(result))}
+              >
+                {getIconForType(result.type)}
+                <div className="flex flex-col">
+                  <span>
+                    {result.title || result.content || 'Untitled'} 
+                    {result.type === 'resource' && result.url && (
+                      <span className="text-xs text-muted-foreground ml-2">
+                        ({result.url})
+                      </span>
+                    )}
+                  </span>
+                  {result.description && (
+                    <span className="text-xs text-muted-foreground">
+                      {result.description}
+                    </span>
+                  )}
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+
+        {filteredProjects.length > 0 && (
           <CommandGroup heading="Projects">
-            {projects?.map((project: Project) => (
+            {filteredProjects.map((project: Project) => (
               <CommandItem
                 key={project.id}
                 onSelect={() =>
@@ -150,6 +190,53 @@ export function CommandMenu() {
             ))}
           </CommandGroup>
         )}
+
+        {(showHideCompletedAction || showSidebarAction) && (
+          <CommandGroup heading="Actions">
+            {isProjectPage && showHideCompletedAction && (
+              <CommandItem onSelect={() => runCommand(toggleHideCompleted)}>
+                {hideCompletedTasks ? (
+                  <Eye className="mr-2 h-4 w-4" />
+                ) : (
+                  <EyeOff className="mr-2 h-4 w-4" />
+                )}
+                {hideCompletedTasks
+                  ? "Show completed tasks"
+                  : "Hide completed tasks"}
+              </CommandItem>
+            )}
+            {showSidebarAction && (
+              <CommandItem onSelect={() => runCommand(toggleSidebar)}>
+                {isSidebarOpen ? (
+                  <PanelLeftClose className="mr-2 h-4 w-4" />
+                ) : (
+                  <PanelLeftOpen className="mr-2 h-4 w-4" />
+                )}
+                {isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
+              </CommandItem>
+            )}
+          </CommandGroup>
+        )}
+
+        {filteredNavigationCommands.length > 0 && (
+          <>
+            <CommandSeparator />
+            <CommandGroup heading="Pages">
+              {filteredNavigationCommands.map((cmd) => (
+                <CommandItem
+                  key={cmd.path}
+                  onSelect={() => runCommand(() => navigate(cmd.path))}
+                >
+                  {cmd.icon}
+                  {cmd.title}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </>
+        )}
+
+        <CommandSeparator />
+        <CommandEmpty>No results found.</CommandEmpty>
       </CommandList>
     </CommandDialog>
   );
