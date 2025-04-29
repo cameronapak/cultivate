@@ -48,6 +48,14 @@ interface ItemRowProps {
   hideDragHandle?: boolean;
 }
 
+const removeUrlParamsWithoutPageRefresh = (params: string[]) => {
+  const newUrl = new URL(window.location.href);
+  params.forEach((param) => {
+    newUrl.searchParams.delete(param);
+  });
+  window.history.replaceState({}, "", newUrl.toString());
+}
+
 export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(({
   item,
   isEditing,
@@ -72,6 +80,16 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(({
   };
   const rowRef = useRef<HTMLTableCellElement>(null);
 
+  // Scroll to the row when it becomes active
+  React.useEffect(() => {
+    if (isActive && rowRef?.current?.scrollIntoView) {
+      setTimeout(() => {
+        rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        removeUrlParamsWithoutPageRefresh(["resource", "type"]);
+      }, 250);
+    }
+  }, [isActive]);
+
   if (isEditing) {
     return (
       <TableRow>
@@ -81,18 +99,6 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(({
       </TableRow>
     );
   }
-
-  React.useEffect(() => {
-    if (isActive && rowRef.current) {
-      setTimeout(() => {
-        rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.delete("resource");
-        newUrl.searchParams.delete("type");
-        window.history.replaceState({}, "", newUrl.toString());
-      }, 250);
-    }
-  }, [isActive]);
 
   const commonRowClasses = cn(
     "group items-center",
