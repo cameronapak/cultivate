@@ -14,6 +14,7 @@ import {
   BookOpen,
   Folder,
   PencilRuler,
+  Archive,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { toast } from "sonner";
@@ -47,6 +48,7 @@ interface ItemRowProps {
     onCancel: () => void
   ) => React.ReactNode;
   hideDragHandle?: boolean;
+  onSendAway?: (item: DisplayItem) => void;
 }
 
 const removeUrlParamsWithoutPageRefresh = (params: string[]) => {
@@ -73,6 +75,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
       onMove,
       renderEditForm,
       hideDragHandle = false,
+      onSendAway,
     },
     ref
   ) => {
@@ -400,6 +403,22 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                 </TooltipTrigger>
                 <TooltipContent>Delete {item.type}</TooltipContent>
               </Tooltip>
+
+              {/* Send Away Button */}
+              {onSendAway && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onSendAway(item)}
+                    >
+                      <Archive className="h-4 w-4 mr-1" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Send {item.type} Away</TooltipContent>
+                </Tooltip>
+              )}
             </div>
           </TableCell>
         )}

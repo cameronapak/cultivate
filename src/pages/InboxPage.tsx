@@ -6,6 +6,10 @@ import {
   useQuery,
   getInboxThoughts,
   useAction,
+  // @ts-ignore: Wasp will generate these operations
+  sendTaskAway,
+  sendResourceAway,
+  sendThoughtAway,
 } from "wasp/client/operations";
 import type { Project, Task, Resource, Thought } from "wasp/entities";
 import {
@@ -43,6 +47,8 @@ import {
   ExternalLink,
   Heart,
   HandHeart,
+  Archive,
+  Pencil,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
@@ -854,28 +860,78 @@ export function InboxPage() {
                   className="w-full"
                 />
                 <div className="mt-4 w-full [&>tr]:border-none">
-                  <ItemRow
-                    hideActions={true}
-                    item={inboxItems[reviewIndex]}
-                    isEditing={
-                      editingItemId?.id === inboxItems[reviewIndex].id &&
-                      editingItemId?.type === inboxItems[reviewIndex].type
-                    }
-                    projects={projects || []}
-                    onEdit={handleEditItem}
-                    onSave={handleSaveItem}
-                    onCancelEdit={handleCancelEdit}
-                    onDelete={handleDeleteItem}
-                    onStatusChange={
-                      inboxItems[reviewIndex].type === "task"
-                        ? (taskItem, complete) =>
-                            handleStatusChange(taskItem as Task, complete)
-                        : undefined
-                    }
-                    onMove={handleMoveItem}
-                    renderEditForm={renderItemEditForm}
-                    hideDragHandle={true}
-                  />
+                  <TableRow
+                    className={cn(
+                      "group items-center",
+                      inboxItems[reviewIndex].type === "task" &&
+                        (inboxItems[reviewIndex] as Task).complete ? "completed" : ""
+                    )}
+                  >
+                    {/* Item Type Icon/Checkbox */}
+                    <TableCell className="w-6 p-2 pl-0">
+                      {inboxItems[reviewIndex].type === "task" ? (
+                        <Checkbox
+                          id={inboxItems[reviewIndex].id.toString()}
+                          checked={(inboxItems[reviewIndex] as Task).complete}
+                          onCheckedChange={(checked) => handleStatusChange(inboxItems[reviewIndex] as Task, checked === true)}
+                        />
+                      ) : inboxItems[reviewIndex].type === "resource" ? (
+                        <Link2 className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Minus className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </TableCell>
+                    {/* Item Content */}
+                    <TableCell className="py-2">
+                      {inboxItems[reviewIndex].type === "task" ? (
+                        <div className="flex flex-col">
+                          <span className={cn("text-sm leading-tight", (inboxItems[reviewIndex] as Task).complete ? "line-through text-muted-foreground" : "")}>{inboxItems[reviewIndex].title}</span>
+                          {(inboxItems[reviewIndex] as Task).description && !(inboxItems[reviewIndex] as Task).complete && (
+                            <span className="text-sm text-muted-foreground line-clamp-1">{(inboxItems[reviewIndex] as Task).description}</span>
+                          )}
+                          {(inboxItems[reviewIndex] as Task).complete && (
+                            <span className="text-sm text-muted-foreground line-clamp-1">Completed {new Date((inboxItems[reviewIndex] as Task).updatedAt).toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" })}</span>
+                          )}
+                        </div>
+                      ) : inboxItems[reviewIndex].type === "resource" ? (
+                        <span className="font-medium">{inboxItems[reviewIndex].title}</span>
+                      ) : (
+                        <span className="text-sm cursor-text">{(inboxItems[reviewIndex] as Thought).content}</span>
+                      )}
+                    </TableCell>
+                    {/* Actions */}
+                    <TableCell className="text-right p-2 pl-0">
+                      <div className="flex justify-end gap-1">
+                        {/* Edit Button */}
+                        <Button onClick={() => handleEditItem(inboxItems[reviewIndex])} variant="ghost" size="icon">
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        {/* Move Button (if projects exist) */}
+                        {projects && projects.length > 0 && (
+                          <Combobox
+                            button={<Button variant="ghost" size="icon"><MoveRight className="h-4 w-4" /></Button>}
+                            options={projects.map((p) => ({ label: p.title, value: p.id.toString() }))}
+                            onChange={async (_projectTitle, projectId) => {
+                              const projectIdInt = parseInt(projectId, 10);
+                              if (!isNaN(projectIdInt)) handleMoveItem(inboxItems[reviewIndex], projectIdInt);
+                            }}
+                          />
+                        )}
+                        {/* Delete Button */}
+                        <Button onClick={() => handleDeleteItem(inboxItems[reviewIndex])} variant="ghost" size="icon">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        {/* Send Away Button */}
+                        <Button size="sm" variant="ghost" onClick={async () => {
+                          if (inboxItems[reviewIndex].type === "task") await sendTaskAway({ id: inboxItems[reviewIndex].id });
+                          if (inboxItems[reviewIndex].type === "resource") await sendResourceAway({ id: inboxItems[reviewIndex].id });
+                          if (inboxItems[reviewIndex].type === "thought") await sendThoughtAway({ id: inboxItems[reviewIndex].id });
+                        }}>
+                          <Archive className="h-4 w-4 mr-1" /> Send Away
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 </div>
               </DialogDescription>
             </DialogHeader>
@@ -1050,30 +1106,24 @@ export function InboxPage() {
                                       editingItemId?.type === item.type
                                     }
                                     isActive={
-                                      (item.type === "resource" &&
-                                        item.id.toString() === activeItemId) ||
-                                      (item.type === "task" &&
-                                        item.id.toString() === activeItemId) ||
-                                      (item.type === "thought" &&
-                                        item.id.toString() === activeItemId)
+                                      (item.type === "resource" && item.id.toString() === activeItemId) ||
+                                      (item.type === "task" && item.id.toString() === activeItemId) ||
+                                      (item.type === "thought" && item.id.toString() === activeItemId)
                                     }
-                                    projects={projects || []}
+                                    projects={projects}
+                                    hideActions={false}
                                     onEdit={handleEditItem}
                                     onSave={handleSaveItem}
                                     onCancelEdit={handleCancelEdit}
                                     onDelete={handleDeleteItem}
-                                    onStatusChange={
-                                      item.type === "task"
-                                        ? (taskItem, complete) =>
-                                            handleStatusChange(
-                                              taskItem as Task,
-                                              complete
-                                            )
-                                        : undefined
-                                    }
+                                    onStatusChange={handleStatusChange}
                                     onMove={handleMoveItem}
                                     renderEditForm={renderItemEditForm}
-                                    hideDragHandle={true}
+                                    onSendAway={async (item) => {
+                                      if (item.type === "task") await sendTaskAway({ id: item.id as number });
+                                      if (item.type === "resource") await sendResourceAway({ id: item.id as number });
+                                      if (item.type === "thought") await sendThoughtAway({ id: item.id as string });
+                                    }}
                                   />
                                 ))}
                               </React.Fragment>
