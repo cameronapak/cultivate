@@ -367,3 +367,54 @@ action generateInviteCode {
   entities: [InviteCode, User] // Needs access to InviteCode and User entities
 }
 // #endregion
+
+//#region Away
+
+// Away queries
+query getAwayTasks {
+  fn: import { getAwayTasks } from "@src/queries",
+  entities: [Task]
+}
+query getAwayResources {
+  fn: import { getAwayResources } from "@src/queries",
+  entities: [Resource]
+}
+query getAwayThoughts {
+  fn: import { getAwayThoughts } from "@src/queries",
+  entities: [Thought]
+}
+
+// Away actions
+action sendTaskAway {
+  fn: import { sendTaskAway } from "@src/queries",
+  entities: [Task]
+}
+action returnTaskFromAway {
+  fn: import { returnTaskFromAway } from "@src/queries",
+  entities: [Task]
+}
+action sendResourceAway {
+  fn: import { sendResourceAway } from "@src/queries",
+  entities: [Resource]
+}
+action returnResourceFromAway {
+  fn: import { returnResourceFromAway } from "@src/queries",
+  entities: [Resource]
+}
+action sendThoughtAway {
+  fn: import { sendThoughtAway } from "@src/queries",
+  entities: [Thought]
+}
+action returnThoughtFromAway {
+  fn: import { returnThoughtFromAway } from "@src/queries",
+  entities: [Thought]
+}
+
+// Away route and page
+route AwayRoute { path: "/away", to: AwayPage }
+page AwayPage {
+  authRequired: true,
+  component: import { AwayPage } from "@src/pages/AwayPage"
+}
+
+//#endregion
