@@ -855,20 +855,11 @@ export function InboxPage() {
                 />
                 <div className="mt-4 w-full [&>tr]:border-none">
                   <ItemRow
+                    hideActions={true}
                     item={inboxItems[reviewIndex]}
                     isEditing={
                       editingItemId?.id === inboxItems[reviewIndex].id &&
                       editingItemId?.type === inboxItems[reviewIndex].type
-                    }
-                    isActive={
-                      (inboxItems[reviewIndex].type === "resource" &&
-                        inboxItems[reviewIndex].id.toString() ===
-                          activeItemId) ||
-                      (inboxItems[reviewIndex].type === "task" &&
-                        inboxItems[reviewIndex].id.toString() ===
-                          activeItemId) ||
-                      (inboxItems[reviewIndex].type === "thought" &&
-                        inboxItems[reviewIndex].id.toString() === activeItemId)
                     }
                     projects={projects || []}
                     onEdit={handleEditItem}
