@@ -68,8 +68,23 @@ import { Textarea } from "../components/ui/textarea";
 import { Toggle } from "../components/ui/toggle";
 import { Combobox } from "../components/custom/ComboBox";
 import { ItemRow, DisplayItem } from "../components/common/ItemRow";
-import { EditTaskForm, EditResourceForm, EditThoughtForm } from "../components/ProjectView";
+import {
+  EditTaskForm,
+  EditResourceForm,
+  EditThoughtForm,
+} from "../components/ProjectView";
 import { useSearchParams } from "react-router-dom";
+import {
+  DialogStack,
+  DialogStackContent,
+  DialogStackNext,
+  DialogStackPrevious,
+  DialogStackHeader,
+  DialogStackTitle,
+  DialogStackFooter,
+  DialogStackOverlay,
+  DialogStackBody,
+} from "../components/ui/kibo-ui/dialog-stack";
 
 // Create a type where the string is a date in the format "2025-04-20"
 type DateString =
@@ -155,7 +170,9 @@ const TaskReviewDialog = ({
     notes: "",
     showContext: false,
   });
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
 
   const handleDecision = (decision: "keep" | "defer" | "discard") => {
     onComplete(task.id, decision, reviewState.notes);
@@ -172,9 +189,7 @@ const TaskReviewDialog = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {task.title}
-          </DialogTitle>
+          <DialogTitle>{task.title}</DialogTitle>
           {/* <Input
             type="text"
             value={task.title}
@@ -283,26 +298,34 @@ export function InboxPage() {
     return showTasksLocalStorage;
   });
   const [filter, setFilter] = useState<InboxFilter>("all");
-  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
+  const [editingItemId, setEditingItemId] = useState<{
+    id: string | number | null;
+    type: string;
+  } | null>(null);
   const [previousFilter, setPreviousFilter] = useState<InboxFilter>(filter);
   const [isInitialRender, setIsInitialRender] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewIndex, setReviewIndex] = useState(0);
 
   // Add keyboard shortcut handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check for CMD+I (Mac) or CTRL+I (Windows)
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "i") {
         e.preventDefault();
         if (inputRef.current) {
           inputRef.current.focus();
-          inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          inputRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
         }
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   // Add optimistic updates for tasks
@@ -348,7 +371,9 @@ export function InboxPage() {
       {
         getQuerySpecifier: () => [getInboxTasks],
         updateQuery: (payload, oldData) => {
-          return (oldData || []).filter((task: Task & { type: "task" }) => task.id !== payload.id);
+          return (oldData || []).filter(
+            (task: Task & { type: "task" }) => task.id !== payload.id
+          );
         },
       },
     ],
@@ -381,10 +406,11 @@ export function InboxPage() {
       {
         getQuerySpecifier: () => [getInboxResources],
         updateQuery: (payload, oldData) => {
-          return (oldData || []).map((resource: Resource & { type: "resource" }) =>
-            resource.id === payload.id
-              ? { ...resource, ...payload, updatedAt: new Date() }
-              : resource
+          return (oldData || []).map(
+            (resource: Resource & { type: "resource" }) =>
+              resource.id === payload.id
+                ? { ...resource, ...payload, updatedAt: new Date() }
+                : resource
           );
         },
       },
@@ -396,7 +422,10 @@ export function InboxPage() {
       {
         getQuerySpecifier: () => [getInboxResources],
         updateQuery: (payload, oldData) => {
-          return (oldData || []).filter((resource: Resource & { type: "resource" }) => resource.id !== payload.id);
+          return (oldData || []).filter(
+            (resource: Resource & { type: "resource" }) =>
+              resource.id !== payload.id
+          );
         },
       },
     ],
@@ -414,7 +443,9 @@ export function InboxPage() {
             updatedAt: new Date(),
             projectId: null,
             type: "thought" as const,
-            title: payload.content.slice(0, 60) + (payload.content.length > 60 ? "..." : ""),
+            title:
+              payload.content.slice(0, 60) +
+              (payload.content.length > 60 ? "..." : ""),
           };
           return [...(oldData || []), newThought];
         },
@@ -448,7 +479,7 @@ export function InboxPage() {
           description: "",
           // No projectId means it goes to inbox
         });
-        toast.success('Resource created!');
+        toast.success("Resource created!");
         if (resource) {
           // Now, let's update the resource
           const metadata = await getMetadataFromUrl(newItemText.trim());
@@ -456,8 +487,8 @@ export function InboxPage() {
             id: resource.id,
             title: metadata.title || url,
             url: url,
-            description: metadata.description || '',
-          })
+            description: metadata.description || "",
+          });
         }
       } else if (isThought) {
         // Create a thought
@@ -501,14 +532,16 @@ export function InboxPage() {
     const confirmMessage = `Are you sure you want to delete this ${item.type}?`;
     if (confirm(confirmMessage)) {
       try {
-        if (item.type === 'task') {
+        if (item.type === "task") {
           await deleteTaskOptimistically({ id: item.id as number });
-        } else if (item.type === 'resource') {
+        } else if (item.type === "resource") {
           await deleteResourceOptimistically({ id: item.id as number });
-        } else if (item.type === 'thought') {
+        } else if (item.type === "thought") {
           await deleteThought({ id: item.id as string });
         }
-        toast.success(`${item.type.charAt(0).toUpperCase() + item.type.slice(1)} deleted`);
+        toast.success(
+          `${item.type.charAt(0).toUpperCase() + item.type.slice(1)} deleted`
+        );
       } catch (error) {
         console.error(`Failed to delete ${item.type}:`, error);
         toast.error(`Failed to delete ${item.type}`);
@@ -534,7 +567,11 @@ export function InboxPage() {
           projectId,
         });
       }
-      toast.success(`${item.type.charAt(0).toUpperCase() + item.type.slice(1)} moved to project`);
+      toast.success(
+        `${
+          item.type.charAt(0).toUpperCase() + item.type.slice(1)
+        } moved to project`
+      );
     } catch (error) {
       console.error(`Failed to move ${item.type}:`, error);
       toast.error(`Failed to move ${item.type}`);
@@ -544,7 +581,7 @@ export function InboxPage() {
   const handleEditItem = (item: DisplayItem) => {
     setEditingItemId({
       id: item.id,
-      type: item.type
+      type: item.type,
     });
   };
 
@@ -554,13 +591,22 @@ export function InboxPage() {
 
   const handleSaveItem = async (item: DisplayItem, values: any) => {
     try {
-      if (item.type === 'task') {
-        await updateTaskOptimistically({ id: item.id as number, title: values.title, description: values.description });
+      if (item.type === "task") {
+        await updateTaskOptimistically({
+          id: item.id as number,
+          title: values.title,
+          description: values.description,
+        });
         toast.success("Task updated");
-      } else if (item.type === 'resource') {
-        await updateResourceOptimistically({ id: item.id as number, title: values.title, url: values.url, description: values.description });
+      } else if (item.type === "resource") {
+        await updateResourceOptimistically({
+          id: item.id as number,
+          title: values.title,
+          url: values.url,
+          description: values.description,
+        });
         toast.success("Resource updated");
-      } else if (item.type === 'thought') {
+      } else if (item.type === "thought") {
         await updateThought({ id: item.id as string, content: values.content });
         toast.success("Thought updated");
       }
@@ -570,18 +616,36 @@ export function InboxPage() {
       toast.error(`Failed to update ${item.type}`);
     }
   };
-  
+
   // Function to render the correct edit form based on item type
-  const renderItemEditForm = (item: DisplayItem, onSave: (values: any) => void, onCancel: () => void) => {
-    if (item.type === 'task') {
+  const renderItemEditForm = (
+    item: DisplayItem,
+    onSave: (values: any) => void,
+    onCancel: () => void
+  ) => {
+    if (item.type === "task") {
       // Assuming EditTaskForm is imported and accepts Task
-      return <EditTaskForm task={item as Task} onSave={onSave} onCancel={onCancel} />;
-    } else if (item.type === 'resource') {
+      return (
+        <EditTaskForm task={item as Task} onSave={onSave} onCancel={onCancel} />
+      );
+    } else if (item.type === "resource") {
       // Assuming EditResourceForm is imported and accepts Resource
-      return <EditResourceForm resource={item as Resource} onSave={onSave} onCancel={onCancel} />;
-    } else if (item.type === 'thought') {
+      return (
+        <EditResourceForm
+          resource={item as Resource}
+          onSave={onSave}
+          onCancel={onCancel}
+        />
+      );
+    } else if (item.type === "thought") {
       // Need an EditThoughtForm component
-      return <EditThoughtForm thought={item as Thought} onSave={onSave} onCancel={onCancel} />;
+      return (
+        <EditThoughtForm
+          thought={item as Thought}
+          onSave={onSave}
+          onCancel={onCancel}
+        />
+      );
     }
     return null; // Or a placeholder/message for types without an edit form
   };
@@ -623,13 +687,15 @@ export function InboxPage() {
         })) || []),
         ...(thoughts?.map((thought) => ({
           ...thought,
-          title: thought.content.slice(0, 60) + (thought.content.length > 60 ? "..." : ""), 
+          title:
+            thought.content.slice(0, 60) +
+            (thought.content.length > 60 ? "..." : ""),
           type: "thought" as const,
           createdAt: new Date(thought.createdAt), // Ensure it's a Date object
         })) || []),
       ]
-      .filter((item) => filter !== 'all' ? filter === item.type : true)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+        .filter((item) => (filter !== "all" ? filter === item.type : true))
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
     [tasks, resources, thoughts, filter]
   );
 
@@ -676,7 +742,9 @@ export function InboxPage() {
     try {
       await updateTaskStatus({ id: task.id, complete });
       // Optionally add a success toast here if desired
-      toast.success(`Task "${task.title}" marked as ${complete ? 'complete' : 'incomplete'}`);
+      toast.success(
+        `Task "${task.title}" marked as ${complete ? "complete" : "incomplete"}`
+      );
       // Wasp query cache should update automatically
     } catch (err) {
       toast.error("Failed to update task status");
@@ -720,10 +788,15 @@ export function InboxPage() {
       ]}
       ctaButton={
         <div className="flex items-center gap-2">
-          {/* <Button variant="outline" onClick={startReviewingTasks}>
-            Review tasks
-          </Button> */}
-
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsReviewing(true);
+              setReviewIndex(0);
+            }}
+          >
+            Review Inbox
+          </Button>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -746,6 +819,60 @@ export function InboxPage() {
         </div>
       }
     >
+      {/* DialogStack for reviewing inbox items */}
+      {isReviewing && (
+        <>
+          <DialogStack
+            open={isReviewing}
+            onOpenChange={(open) => setIsReviewing(open)}
+            clickable
+          >
+            <DialogStackOverlay />
+            <DialogStackBody>
+              {inboxItems.map((item, _index) => (
+                <DialogStackContent key={item.id}>
+                  <DialogStackHeader>
+                    <DialogStackTitle>
+                      {item.title ||
+                        (item.type === "thought" && (item as any).content) ||
+                        "Untitled"}
+                    </DialogStackTitle>
+                  </DialogStackHeader>
+                  <div className="p-4">
+                    <div className="mb-2 text-xs text-muted-foreground font-semibold uppercase">
+                      {item.type}
+                    </div>
+                    {item.type === "task" && (item as any).description && (
+                      <div className="mb-2">{(item as any).description}</div>
+                    )}
+                    {item.type === "thought" && (item as any).content && (
+                      <div className="mb-2">{(item as any).content}</div>
+                    )}
+                    {item.type === "resource" && (item as any).url && (
+                      <a
+                        href={(item as any).url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        {(item as any).url}
+                      </a>
+                    )}
+                  </div>
+                  <DialogStackFooter>
+                  <DialogStackPrevious asChild>
+                      <Button variant="outline">Previous</Button>
+                    </DialogStackPrevious>
+                    <DialogStackNext asChild>
+                      <Button variant="outline">Next</Button>
+                    </DialogStackNext>
+                  </DialogStackFooter>
+                </DialogStackContent>
+              ))}
+            </DialogStackBody>
+          </DialogStack>
+        </>
+      )}
       <div>
         <div>
           {/* {showReviewDialog && reviewingTask && projects?.length ? (
@@ -808,11 +935,7 @@ export function InboxPage() {
                 aria-label="Filter inbox items"
               >
                 {tabs.map((tab) => (
-                  <motion.div
-                    key={tab.id}
-                    initial={false}
-                    className="relative"
-                  >
+                  <motion.div key={tab.id} initial={false} className="relative">
                     <Button
                       variant={filter === tab.id ? "secondary" : "ghost"}
                       size="sm"
@@ -828,7 +951,9 @@ export function InboxPage() {
                     >
                       {tab.icon}
                       <span>{tab.label}</span>
-                      <span className="sr-only">{getItemCount(tab.id)} items</span>
+                      <span className="sr-only">
+                        {getItemCount(tab.id)} items
+                      </span>
                     </Button>
                   </motion.div>
                 ))}
@@ -844,31 +969,40 @@ export function InboxPage() {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={filter}
-                    initial={{ 
-                      x: isInitialRender ? 0 : (tabs.findIndex(t => t.id === filter) > tabs.findIndex(t => t.id === previousFilter) ? "10%" : "-10%"),
+                    initial={{
+                      x: isInitialRender
+                        ? 0
+                        : tabs.findIndex((t) => t.id === filter) >
+                          tabs.findIndex((t) => t.id === previousFilter)
+                        ? "10%"
+                        : "-10%",
                       position: "absolute",
                       width: "100%",
                       top: 0,
                       left: 0,
                       opacity: 0.2,
-                      filter: "blur(4px)"
+                      filter: "blur(4px)",
                     }}
-                    animate={{ 
+                    animate={{
                       x: 0,
                       opacity: 1,
                       position: "relative",
                       filter: "blur(0px)",
                     }}
-                    exit={{ 
-                      x: tabs.findIndex(t => t.id === filter) > tabs.findIndex(t => t.id === previousFilter) ? "0" : "0",
+                    exit={{
+                      x:
+                        tabs.findIndex((t) => t.id === filter) >
+                        tabs.findIndex((t) => t.id === previousFilter)
+                          ? "0"
+                          : "0",
                       position: "absolute",
                       width: "100%",
                       top: 0,
                       left: 0,
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 0.25,
-                      ease: "easeInOut"
+                      ease: "easeInOut",
                     }}
                   >
                     <Table>
@@ -902,18 +1036,32 @@ export function InboxPage() {
                                   <ItemRow
                                     key={`${item.type}-${item.id}`}
                                     item={item}
-                                    isEditing={editingItemId?.id === item.id && editingItemId?.type === item.type}
+                                    isEditing={
+                                      editingItemId?.id === item.id &&
+                                      editingItemId?.type === item.type
+                                    }
                                     isActive={
-                                      (item.type === 'resource' && item.id.toString() === activeItemId) ||
-                                      (item.type === 'task' && item.id.toString() === activeItemId) ||
-                                      (item.type === 'thought' && item.id.toString() === activeItemId)
+                                      (item.type === "resource" &&
+                                        item.id.toString() === activeItemId) ||
+                                      (item.type === "task" &&
+                                        item.id.toString() === activeItemId) ||
+                                      (item.type === "thought" &&
+                                        item.id.toString() === activeItemId)
                                     }
                                     projects={projects || []}
                                     onEdit={handleEditItem}
                                     onSave={handleSaveItem}
                                     onCancelEdit={handleCancelEdit}
                                     onDelete={handleDeleteItem}
-                                    onStatusChange={item.type === 'task' ? (taskItem, complete) => handleStatusChange(taskItem as Task, complete) : undefined}
+                                    onStatusChange={
+                                      item.type === "task"
+                                        ? (taskItem, complete) =>
+                                            handleStatusChange(
+                                              taskItem as Task,
+                                              complete
+                                            )
+                                        : undefined
+                                    }
                                     onMove={handleMoveItem}
                                     renderEditForm={renderItemEditForm}
                                     hideDragHandle={true}
