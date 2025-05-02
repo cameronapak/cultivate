@@ -255,8 +255,39 @@ export const getInboxTasks: GetInboxTasks<void, Task[]> = async (_args: void, co
   return context.entities.Task.findMany({
     where: {
       projectId: null,
-      userId: context.user.id
+      userId: context.user.id,
+      isAway: false
     }
+  })
+}
+
+// Away Tasks
+export const getAwayTasks = async (_args: void, context: WaspContext) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  return context.entities.Task.findMany({
+    where: {
+      projectId: null,
+      userId: context.user.id,
+      isAway: true
+    }
+  })
+}
+
+export const sendTaskAway = async (args: { id: number }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Task.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: true }
+  })
+}
+
+export const returnTaskFromAway = async (args: { id: number }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Task.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: false }
   })
 }
 
@@ -772,13 +803,44 @@ export const getInboxResources: GetInboxResources<void, Resource[]> = async (_ar
   if (!context.user) {
     throw new HttpError(401)
   }
-
   return context.entities.Resource.findMany({
-    where: { 
+    where: {
       projectId: null,
-      userId: context.user.id 
+      userId: context.user.id,
+      isAway: false
     },
     orderBy: { createdAt: 'desc' }
+  })
+}
+
+// Away Resources
+export const getAwayResources = async (_args: void, context: WaspContext) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  return context.entities.Resource.findMany({
+    where: {
+      projectId: null,
+      userId: context.user.id,
+      isAway: true
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+export const sendResourceAway = async (args: { id: number }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Resource.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: true }
+  })
+}
+
+export const returnResourceFromAway = async (args: { id: number }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Resource.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: false }
   })
 }
 
@@ -1020,9 +1082,41 @@ export const getInboxThoughts: GetInboxThoughts<void, Thought[]> = async (_args:
   return context.entities.Thought.findMany({
     where: {
       projectId: null,
-      userId: context.user.id
+      userId: context.user.id,
+      isAway: false
     },
     orderBy: { createdAt: 'desc' }
+  })
+}
+
+// Away Thoughts
+export const getAwayThoughts = async (_args: void, context: WaspContext) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  return context.entities.Thought.findMany({
+    where: {
+      projectId: null,
+      userId: context.user.id,
+      isAway: true
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+export const sendThoughtAway = async (args: { id: string }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Thought.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: true }
+  })
+}
+
+export const returnThoughtFromAway = async (args: { id: string }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Thought.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: false }
   })
 }
 
