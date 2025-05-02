@@ -84,6 +84,7 @@ import {
   DialogStackFooter,
   DialogStackOverlay,
   DialogStackBody,
+  DialogStackDescription,
 } from "../components/ui/kibo-ui/dialog-stack";
 
 // Create a type where the string is a date in the format "2025-04-20"
@@ -828,7 +829,7 @@ export function InboxPage() {
             clickable
           >
             <DialogStackOverlay />
-            <DialogStackBody>
+            <DialogStackBody className="grid grid-cols-1 h-full">
               {inboxItems.map((item, _index) => (
                 <DialogStackContent key={item.id}>
                   <DialogStackHeader>
@@ -837,30 +838,25 @@ export function InboxPage() {
                         (item.type === "thought" && (item as any).content) ||
                         "Untitled"}
                     </DialogStackTitle>
+                    <DialogStackDescription>
+                      {item.type === "task" && (item as any).description && (
+                        <div className="mb-2">{(item as any).description}</div>
+                      )}
+                      {item.type === "resource" && (item as any).url && (
+                        <a
+                          href={(item as any).url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          {(item as any).url}
+                        </a>
+                      )}
+                    </DialogStackDescription>
                   </DialogStackHeader>
-                  <div className="p-4">
-                    <div className="mb-2 text-xs text-muted-foreground font-semibold uppercase">
-                      {item.type}
-                    </div>
-                    {item.type === "task" && (item as any).description && (
-                      <div className="mb-2">{(item as any).description}</div>
-                    )}
-                    {item.type === "thought" && (item as any).content && (
-                      <div className="mb-2">{(item as any).content}</div>
-                    )}
-                    {item.type === "resource" && (item as any).url && (
-                      <a
-                        href={(item as any).url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        {(item as any).url}
-                      </a>
-                    )}
-                  </div>
+
                   <DialogStackFooter>
-                  <DialogStackPrevious asChild>
+                    <DialogStackPrevious asChild>
                       <Button variant="outline">Previous</Button>
                     </DialogStackPrevious>
                     <DialogStackNext asChild>
