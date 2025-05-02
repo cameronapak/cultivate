@@ -74,18 +74,7 @@ import {
   EditThoughtForm,
 } from "../components/ProjectView";
 import { useSearchParams } from "react-router-dom";
-import {
-  DialogStack,
-  DialogStackContent,
-  DialogStackNext,
-  DialogStackPrevious,
-  DialogStackHeader,
-  DialogStackTitle,
-  DialogStackFooter,
-  DialogStackOverlay,
-  DialogStackBody,
-  DialogStackDescription,
-} from "../components/ui/kibo-ui/dialog-stack";
+import { Progress } from "../components/ui/progress";
 
 // Create a type where the string is a date in the format "2025-04-20"
 type DateString =
@@ -308,6 +297,13 @@ export function InboxPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewIndex, setReviewIndex] = useState(0);
+  const [reviewAnswers, setReviewAnswers] = useState<{
+    [key: string]: {
+      meaning: string;
+      actionable: boolean | null;
+      twoMinutes: boolean | null;
+    };
+  }>({});
 
   // Add keyboard shortcut handler
   useEffect(() => {
@@ -759,6 +755,32 @@ export function InboxPage() {
     setIsInitialRender(false);
   };
 
+  // Helper to get or initialize review state for an item
+  const getReviewState = (itemId: string | number) => {
+    return (
+      reviewAnswers[itemId] || {
+        meaning: "",
+        actionable: null,
+        twoMinutes: null,
+      }
+    );
+  };
+
+  // Handler to update review state for an item
+  const setReviewState = (
+    itemId: string | number,
+    field: string,
+    value: any
+  ) => {
+    setReviewAnswers((prev) => ({
+      ...prev,
+      [itemId]: {
+        ...getReviewState(itemId),
+        [field]: value,
+      },
+    }));
+  };
+
   if (tasksError || resourcesError || thoughtsError) {
     return (
       <div>
@@ -820,54 +842,54 @@ export function InboxPage() {
         </div>
       }
     >
-      {/* DialogStack for reviewing inbox items */}
-      {isReviewing && (
-        <>
-          <DialogStack
-            open={isReviewing}
-            onOpenChange={(open) => setIsReviewing(open)}
-            clickable
-          >
-            <DialogStackOverlay />
-            <DialogStackBody className="grid grid-cols-1 h-full">
-              {inboxItems.map((item, _index) => (
-                <DialogStackContent key={item.id}>
-                  <DialogStackHeader>
-                    <DialogStackTitle>
-                      {item.title ||
-                        (item.type === "thought" && (item as any).content) ||
-                        "Untitled"}
-                    </DialogStackTitle>
-                    <DialogStackDescription>
-                      {item.type === "task" && (item as any).description && (
-                        <div className="mb-2">{(item as any).description}</div>
-                      )}
-                      {item.type === "resource" && (item as any).url && (
-                        <a
-                          href={(item as any).url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          {(item as any).url}
-                        </a>
-                      )}
-                    </DialogStackDescription>
-                  </DialogStackHeader>
-
-                  <DialogStackFooter>
-                    <DialogStackPrevious asChild>
-                      <Button variant="outline">Previous</Button>
-                    </DialogStackPrevious>
-                    <DialogStackNext asChild>
-                      <Button variant="outline">Next</Button>
-                    </DialogStackNext>
-                  </DialogStackFooter>
-                </DialogStackContent>
-              ))}
-            </DialogStackBody>
-          </DialogStack>
-        </>
+      {/* Dialog for reviewing inbox items */}
+      {isReviewing && inboxItems.length > 0 && (
+        <Dialog open={isReviewing} onOpenChange={setIsReviewing}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Review</DialogTitle>
+              <DialogDescription>
+                <Progress
+                  value={((reviewIndex + 1) / inboxItems.length) * 100}
+                  className="w-full"
+                />
+                <div className="mt-4 w-full [&>tr]:border-none">
+                  <ItemRow
+                    item={inboxItems[reviewIndex]}
+                    isEditing={
+                      editingItemId?.id === inboxItems[reviewIndex].id &&
+                      editingItemId?.type === inboxItems[reviewIndex].type
+                    }
+                    isActive={
+                      (inboxItems[reviewIndex].type === "resource" &&
+                        inboxItems[reviewIndex].id.toString() ===
+                          activeItemId) ||
+                      (inboxItems[reviewIndex].type === "task" &&
+                        inboxItems[reviewIndex].id.toString() ===
+                          activeItemId) ||
+                      (inboxItems[reviewIndex].type === "thought" &&
+                        inboxItems[reviewIndex].id.toString() === activeItemId)
+                    }
+                    projects={projects || []}
+                    onEdit={handleEditItem}
+                    onSave={handleSaveItem}
+                    onCancelEdit={handleCancelEdit}
+                    onDelete={handleDeleteItem}
+                    onStatusChange={
+                      inboxItems[reviewIndex].type === "task"
+                        ? (taskItem, complete) =>
+                            handleStatusChange(taskItem as Task, complete)
+                        : undefined
+                    }
+                    onMove={handleMoveItem}
+                    renderEditForm={renderItemEditForm}
+                    hideDragHandle={true}
+                  />
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       )}
       <div>
         <div>
@@ -922,7 +944,7 @@ export function InboxPage() {
             </Button>
           </div>
 
-          {showInbox ? (
+          {showInbox && !isReviewing ? (
             <div>
               {/* Replace Tabs with segmented control */}
               <div
