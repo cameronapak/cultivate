@@ -29,6 +29,7 @@ type DialogStackContextType = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   clickable: boolean;
+  maxDialogsBehind?: number;
 };
 
 const DialogStackContext = createContext<DialogStackContextType>({
@@ -50,6 +51,7 @@ export type DialogStackProps = HTMLAttributes<HTMLDivElement> & {
   clickable?: boolean;
   onOpenChange?: (open: boolean) => void;
   defaultOpen?: boolean;
+  maxDialogsBehind?: number;
 };
 
 export const DialogStack = ({
@@ -59,6 +61,7 @@ export const DialogStack = ({
   defaultOpen = false,
   onOpenChange,
   clickable = false,
+  maxDialogsBehind = 2,
   ...props
 }: DialogStackProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -84,6 +87,7 @@ export const DialogStack = ({
         isOpen: isOpen ?? false,
         setIsOpen: (value) => setIsOpen(Boolean(value)),
         clickable,
+        maxDialogsBehind,
       }}
     >
       <div className={className} {...props}>
@@ -202,6 +206,12 @@ export const DialogStackBody = ({
     return null;
   }
 
+  const childrenArray = Children.toArray(children);
+  const { activeIndex, maxDialogsBehind = 2 } = context as any;
+  const startIdx = Math.max(0, activeIndex - maxDialogsBehind);
+  const endIdx = activeIndex + 1;
+  const visibleChildren = childrenArray.slice(startIdx, endIdx);
+
   return (
     <DialogStackContext.Provider
       value={{
@@ -219,16 +229,16 @@ export const DialogStackBody = ({
           {...props}
         >
           <div className="pointer-events-auto relative flex w-full flex-col items-center justify-center">
-            {Children.map(children, (child, index) => {
+            {visibleChildren.map((child, idx) => {
+              const realIndex = startIdx + idx;
               const childElement = child as ReactElement<{
                 index: number;
                 onClick: MouseEventHandler<HTMLButtonElement>;
                 className?: string;
               }>;
-
               return cloneElement(childElement, {
                 ...childElement.props,
-                index,
+                index: realIndex,
               });
             })}
           </div>
