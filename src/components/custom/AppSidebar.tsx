@@ -1,4 +1,4 @@
-import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail, MailPlus, Loader2 } from "lucide-react";
+import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail, MailPlus, Loader2, Archive } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -73,6 +73,14 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
                   <InboxIcon className="h-5 w-5" />
                   <span>Inbox</span>
                   <Kbd>⌘ + i</Kbd>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton className="group" asChild isActive={currentPath === "/away"}>
+                <Link to={"/away"}>
+                  <Archive className="h-5 w-5" />
+                  <span>Away</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
