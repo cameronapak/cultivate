@@ -75,7 +75,7 @@ export function AwayPage() {
           <EmptyStateView
             Icon={<PackageOpen className="h-10 w-10 text-muted-foreground mb-2" />}
             title="Away"
-            description="Send items to 'Away' for safe storage. Like a digital junk drawer, it's easy to search, reflect on, or restore them to your daily flow."
+            description="Send items 'Away' for safe storage, like a digital junk drawer. It's easy to search, reflect on, or restore them to your daily flow."
             action={
               <Button variant="outline" size="sm" className="w-full max-w-md">  
                 <Search className="h-4 w-4 mr-2" />
