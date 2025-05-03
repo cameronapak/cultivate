@@ -1,4 +1,4 @@
-import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail, MailPlus, Loader2, Archive, Package, PackageOpen } from "lucide-react";
+import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail, MailPlus, Loader2, Archive, Package, PackageOpen, Search } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -7,7 +7,8 @@ import {
   SidebarHeader,
   SidebarMenuButton,
   SidebarMenu,
-  SidebarMenuItem
+  SidebarMenuItem,
+  SidebarMenuAction
 } from "../../components/ui/sidebar";
 import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
@@ -20,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { useState } from "react";
 import { Kbd } from "./Kbd";
+import { useCommandMenu } from "./CommandMenu";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -32,6 +34,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
   // Get the current path
   const currentPath = window.location.pathname;
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+  const { openCommandMenu } = useCommandMenu();
 
   const handleGenerateCode = async () => {
     setIsGeneratingCode(true);
@@ -61,6 +64,9 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
             >
               <Logo />
             </SidebarMenuButton>
+            <SidebarMenuAction onClick={openCommandMenu}>
+              <Search className="h-5 w-5" /> <span className="sr-only">Search</span>
+            </SidebarMenuAction>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
