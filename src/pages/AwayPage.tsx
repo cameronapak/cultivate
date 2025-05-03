@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { getAwayTasksByDate, getAwayResourcesByDate, getAwayThoughtsByDate, returnTaskFromAway, returnResourceFromAway, returnThoughtFromAway, updateTask, updateResource, updateThought } from "wasp/client/operations";
 import type { Task, Resource, Thought, Project } from "wasp/entities";
 import { Button } from "../components/ui/button";
@@ -44,6 +44,7 @@ export function AwayPage() {
   const [loadingDates, setLoadingDates] = useState<Set<string>>(new Set());
   const [hasMore, setHasMore] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Helper: get the last N days as YYYY-MM-DD strings
   const getLastNDates = (n: number, offset: number = 0) => {
@@ -68,6 +69,38 @@ export function AwayPage() {
     }
     // eslint-disable-next-line
   }, []);
+
+  // Auto-load more days when the button is in view
+  useEffect(() => {
+    if (!hasMore) return;
+    const node = loadMoreRef.current;
+    if (!node) return;
+    let didCancel = false;
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (
+          entry.isIntersecting &&
+          hasMore &&
+          loadingDates.size === 0 &&
+          !isInitialLoading
+        ) {
+          loadMoreDays();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1,
+      }
+    );
+    observer.observe(node);
+    return () => {
+      didCancel = true;
+      observer.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMore, loadingDates.size, isInitialLoading]);
 
   // Function to load more days (paged)
   const loadMoreDays = async () => {
@@ -205,7 +238,7 @@ export function AwayPage() {
                     {(grouped[dateKey] || []).map((item) => (
                       <ItemRow
                         hideDragHandle={true}
-                        key={item.id}
+                        key={`${item.id}-${item.type}`}
                         item={item}
                         isActive={`${activeResourceId}` === `${item.id}` && `${activeResourceType}` === `${item.type}`}
                         isEditing={editingItemId?.id === item.id && editingItemId?.type === item.type}
@@ -243,7 +276,7 @@ export function AwayPage() {
             </div>
           )}
           {hasMore && (
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-4" ref={loadMoreRef}>
               <Button onClick={loadMoreDays} disabled={Array.from(loadingDates).length > 0} variant="outline">
                 {Array.from(loadingDates).length > 0 ? (
                   <span className="flex items-center"><span className="animate-spin inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full mr-2" /> Loading...</span>
