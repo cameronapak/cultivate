@@ -1,16 +1,17 @@
 import React, { useMemo, useState } from "react";
-import { useQuery, getAwayTasks, getAwayResources, getAwayThoughts, returnTaskFromAway, returnResourceFromAway, returnThoughtFromAway } from "wasp/client/operations";
+import { useQuery, getAwayTasks, getAwayResources, getAwayThoughts, returnTaskFromAway, returnResourceFromAway, returnThoughtFromAway, updateTask, updateResource, updateThought } from "wasp/client/operations";
 import type { Task, Resource, Thought, Project } from "wasp/entities";
 import { Button } from "../components/ui/button";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import { Layout } from "../components/Layout";
 import { ItemRow, type DisplayItem } from "../components/common/ItemRow";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
-import { Coffee, Undo2, Archive, Package, PackageOpen, Search } from "lucide-react";
+import { Coffee, Undo2, Archive, Package, PackageOpen, Search, Pencil } from "lucide-react";
 import { Input } from "../components/ui/input";
 import { Kbd } from "../components/custom/Kbd";
 import { useCommandMenu } from "../components/custom/CommandMenu";
 import { useSearchParams } from "react-router-dom";
+import { EditTaskForm, EditResourceForm, EditThoughtForm } from "../components/ProjectView";
 
 // Helper for date grouping
 const formatDate = (date: Date) => date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
@@ -43,6 +44,7 @@ export function AwayPage() {
   const [searchParams] = useSearchParams();
   const activeResourceId = searchParams.get("resource");
   const activeResourceType = searchParams.get("type");
+  const [editingItemId, setEditingItemId] = useState<{ id: string | number | null, type: string } | null>(null);
 
   // Combine and filter items
   const awayItems: DisplayItem[] = useMemo(() => {
@@ -75,12 +77,57 @@ export function AwayPage() {
 
   const sortedDates = Object.keys(grouped).sort().reverse();
 
-  // Unarchive handlers
-  // const handleReturn = async (item: DisplayItem) => {
-  //   if (item.type === "task") await returnTaskFromAway({ id: item.id as number });
-  //   if (item.type === "resource") await returnResourceFromAway({ id: item.id as number });
-  //   if (item.type === "thought") await returnThoughtFromAway({ id: item.id as string });
-  // };
+  // Edit handlers
+  const handleEdit = (item: DisplayItem) => {
+    setEditingItemId({ id: item.id, type: item.type });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+  };
+
+  const handleSave = async (item: DisplayItem, values: any) => {
+    try {
+      if (item.type === "task") {
+        await updateTask({
+          id: item.id as number,
+          title: values.title,
+          description: values.description,
+        });
+      } else if (item.type === "resource") {
+        await updateResource({
+          id: item.id as number,
+          title: values.title,
+          url: values.url,
+          description: values.description,
+        });
+      } else if (item.type === "thought") {
+        await updateThought({
+          id: item.id as string,
+          content: values.content,
+        });
+      }
+      setEditingItemId(null);
+    } catch (error) {
+      // Optionally show a toast
+      setEditingItemId(null);
+    }
+  };
+
+  const renderEditForm = (
+    item: DisplayItem,
+    onSave: (values: any) => void,
+    onCancel: () => void
+  ) => {
+    if (item.type === "task") {
+      return <EditTaskForm task={item as Task} onSave={onSave} onCancel={onCancel} />;
+    } else if (item.type === "resource") {
+      return <EditResourceForm resource={item as Resource} onSave={onSave} onCancel={onCancel} />;
+    } else if (item.type === "thought") {
+      return <EditThoughtForm thought={item as Thought} onSave={onSave} onCancel={onCancel} />;
+    }
+    return null;
+  };
 
   return (
     <Layout
@@ -112,18 +159,24 @@ export function AwayPage() {
                         </TableCell>
                       </TableRow>
                       {grouped[dateKey].map((item) => (
-                        <ItemRow 
+                        <ItemRow
                           hideDragHandle={true}
-                          key={item.id} 
-                          item={item} 
+                          key={item.id}
+                          item={item}
                           isActive={`${activeResourceId}` === `${item.id}` && `${activeResourceType}` === `${item.type}`}
-                          isEditing={false}
-                          renderEditForm={() => null}
-                          onEdit={() => {}}
-                          onCancelEdit={() => {}}
+                          isEditing={editingItemId?.id === item.id && editingItemId?.type === item.type}
+                          renderEditForm={(item, onSave, onCancel) => renderEditForm(item, (values) => handleSave(item, values), onCancel)}
+                          onEdit={handleEdit}
+                          onCancelEdit={handleCancelEdit}
                           actions={[
                             {
-                              icon: <Undo2 className="h-4 w-4" />, 
+                              icon: <Pencil className="w-4 h-4" />,
+                              label: "Refine",
+                              tooltip: "Refine",
+                              onClick: () => handleEdit(item),
+                            },
+                            {
+                              icon: <Undo2 className="h-4 w-4" />,
                               label: "Restore to Inbox",
                               tooltip: "Restore to Inbox",
                               onClick: async () => {

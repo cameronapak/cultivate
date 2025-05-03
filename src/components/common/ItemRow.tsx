@@ -103,6 +103,12 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
     }, [isActive]);
 
     if (isEditing) {
+      // Define onSave for the edit form
+      const onSave = (values: any) => {
+        if (onUpdate) {
+          onUpdate({ ...item, ...values });
+        }
+      };
       return (
         <TableRow>
           <TableCell colSpan={4} className="bg-background p-0">
