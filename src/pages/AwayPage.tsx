@@ -9,6 +9,7 @@ import { EmptyStateView } from "../components/custom/EmptyStateView";
 import { Coffee, Undo2, Archive, Package, PackageOpen, Search } from "lucide-react";
 import { Input } from "../components/ui/input";
 import { Kbd } from "../components/custom/Kbd";
+import { useCommandMenu } from "../components/custom/CommandMenu";
 
 // Helper for date grouping
 const formatDate = (date: Date) => date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
@@ -16,6 +17,19 @@ const formatDate = (date: Date) => date.toLocaleDateString(undefined, { weekday:
 type DateString = string;
 
 type GroupedItems = { [key: DateString]: DisplayItem[] };
+
+// I have to do this because the useCommandMenu hook is
+// not available until inside the Layout component.
+function SearchButton() {
+  const { openCommandMenu } = useCommandMenu();
+  return (
+    <Button variant="outline" size="sm" className="w-full max-w-md" onClick={openCommandMenu}>  
+      <Search className="h-4 w-4 mr-2" />
+      Search
+      <Kbd className="ml-2 bg-secondary text-foreground rounded-md px-1.5 py-0.5 relative">⌘ + k</Kbd>
+    </Button>
+  );
+}
 
 export function AwayPage() {
   const { data: tasksRaw = [], isLoading: loadingTasks } = useQuery(getAwayTasks);
@@ -77,11 +91,7 @@ export function AwayPage() {
             title="Away"
             description="Send items 'Away' for safe storage, like a digital junk drawer. It's easy to search, reflect on, or restore them to your daily flow."
             action={
-              <Button variant="outline" size="sm" className="w-full max-w-md">  
-                <Search className="h-4 w-4 mr-2" />
-                Search
-                <Kbd className="ml-2 bg-secondary text-foreground rounded-md px-1.5 py-0.5 relative">⌘ + k</Kbd>
-              </Button>
+              <SearchButton />
             }
           />
         </div>

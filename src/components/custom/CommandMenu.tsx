@@ -55,8 +55,31 @@ function MotionAnimateHeight({
   );
 }
 
-export function CommandMenu() {
+// CommandMenuContext for global open/close
+const CommandMenuContext = React.createContext<{
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  openCommandMenu: () => void;
+} | undefined>(undefined);
+
+export function useCommandMenu() {
+  const ctx = React.useContext(CommandMenuContext);
+  if (!ctx) throw new Error("useCommandMenu must be used within CommandMenuProvider");
+  return ctx;
+}
+
+export function CommandMenuProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
+  const openCommandMenu = React.useCallback(() => setOpen(true), []);
+  return (
+    <CommandMenuContext.Provider value={{ open, setOpen, openCommandMenu }}>
+      {children}
+    </CommandMenuContext.Provider>
+  );
+}
+
+export function CommandMenu() {
+  const { open, setOpen } = useCommandMenu();
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [search, setSearch] = React.useState("");
   const navigate = useNavigate();

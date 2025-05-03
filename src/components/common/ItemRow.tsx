@@ -51,6 +51,7 @@ interface ItemRowProps {
   onEdit: (item: DisplayItem) => void;
   onCancelEdit: () => void;
   onCheckedChange?: (item: Task, checked: boolean) => void;
+  onUpdate?: (item: DisplayItem) => void;
   renderEditForm: (
     item: DisplayItem,
     onSave: (values: any) => void,
@@ -79,6 +80,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
       onEdit,
       onCancelEdit,
       onCheckedChange,
+      onUpdate,
       renderEditForm,
       hideDragHandle = false,
       actions,
@@ -104,7 +106,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
       return (
         <TableRow>
           <TableCell colSpan={4} className="bg-background p-0">
-            {renderEditForm(item, () => {}, onCancelEdit)}
+            {renderEditForm(item, onSave, onCancelEdit)}
           </TableCell>
         </TableRow>
       );
