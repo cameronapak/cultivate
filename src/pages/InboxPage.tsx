@@ -136,124 +136,6 @@ type GroupedInboxItems = {
 // Add this type for filter options
 type InboxFilter = "all" | "task" | "resource" | "thought";
 
-// Add these types after the InboxItem type
-type TaskReviewState = {
-  isVital: boolean | null;
-  doesMatter: boolean | null;
-  notes: string;
-  showContext: boolean;
-};
-
-type TaskReviewDialogProps = {
-  task: DisplayItem;
-  isOpen: boolean;
-  onClose: () => void;
-  onComplete: (
-    taskId: number | string,
-    decision: "keep" | "defer" | "discard",
-    notes: string
-  ) => void;
-  projects: Project[];
-};
-
-const TaskReviewDialog = ({
-  task,
-  isOpen,
-  onClose,
-  onComplete,
-  projects,
-}: TaskReviewDialogProps) => {
-  const [reviewState, setReviewState] = useState<TaskReviewState>({
-    isVital: null,
-    doesMatter: null,
-    notes: "",
-    showContext: false,
-  });
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
-
-  const handleDecision = (decision: "keep" | "defer" | "discard") => {
-    onComplete(task.id, decision, reviewState.notes);
-    setReviewState({
-      isVital: null,
-      doesMatter: null,
-      notes: "",
-      showContext: false,
-    });
-    onClose();
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{task.title}</DialogTitle>
-          {/* <Input
-            type="text"
-            value={task.title}
-          /> */}
-        </DialogHeader>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Toggle variant="outline">
-            <Heart className="h-4 w-4" />
-            This task is vital
-          </Toggle>
-          <Toggle variant="outline">
-            <HandHeart className="h-4 w-4" />
-            This task matters
-          </Toggle>
-        </div>
-
-        {/* I want to have a combobox to select a project */}
-        {/* <Combobox
-          options={projects?.map((project) => ({
-            label: project.title,
-            value: project.id.toString(),
-          }))}
-          value={selectedProjectId || ""}
-          onChange={setSelectedProjectId}
-          placeholder="Select a project"
-        /> */}
-
-        {/* <DialogFooter className="flex justify-center gap-2">
-          <Button
-            variant="default"
-            onClick={() => handleDecision("keep")}
-            disabled={
-              reviewState.isVital === null || reviewState.doesMatter === null
-            }
-          >
-            <Check className="h-4 w-4 mr-2" />
-            Keep
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleDecision("defer")}
-            disabled={
-              reviewState.isVital === null || reviewState.doesMatter === null
-            }
-          >
-            <Clock className="h-4 w-4 mr-2" />
-            Defer
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => handleDecision("discard")}
-            disabled={
-              reviewState.isVital === null || reviewState.doesMatter === null
-            }
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Discard
-          </Button>
-        </DialogFooter> */}
-      </DialogContent>
-    </Dialog>
-  );
-};
-
 // Add this type for tab data
 type TabData = {
   id: InboxFilter;
@@ -820,15 +702,6 @@ export function InboxPage() {
       ]}
       ctaButton={
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setIsReviewing(true);
-              setReviewIndex(0);
-            }}
-          >
-            Review Inbox
-          </Button>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -851,111 +724,8 @@ export function InboxPage() {
         </div>
       }
     >
-      {/* Dialog for reviewing inbox items */}
-      {isReviewing && inboxItems.length > 0 && (
-        <Dialog open={isReviewing} onOpenChange={setIsReviewing}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Review</DialogTitle>
-              <DialogDescription>
-                <Progress
-                  value={((reviewIndex + 1) / inboxItems.length) * 100}
-                  className="w-full"
-                />
-                <div className="mt-4 w-full [&>tr]:border-none">
-                  <TableRow
-                    className={cn(
-                      "group items-center",
-                      inboxItems[reviewIndex].type === "task" &&
-                        (inboxItems[reviewIndex] as Task).complete ? "completed" : ""
-                    )}
-                  >
-                    {/* Item Type Icon/Checkbox */}
-                    <TableCell className="w-6 p-2 pl-0">
-                      {inboxItems[reviewIndex].type === "task" ? (
-                        <Checkbox
-                          id={inboxItems[reviewIndex].id.toString()}
-                          checked={(inboxItems[reviewIndex] as Task).complete}
-                          onCheckedChange={(checked) => handleStatusChange(inboxItems[reviewIndex] as Task, checked === true)}
-                        />
-                      ) : inboxItems[reviewIndex].type === "resource" ? (
-                        <Link2 className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <Minus className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </TableCell>
-                    {/* Item Content */}
-                    <TableCell className="py-2">
-                      {inboxItems[reviewIndex].type === "task" ? (
-                        <div className="flex flex-col">
-                          <span className={cn("text-sm leading-tight", (inboxItems[reviewIndex] as Task).complete ? "line-through text-muted-foreground" : "")}>{inboxItems[reviewIndex].title}</span>
-                          {(inboxItems[reviewIndex] as Task).description && !(inboxItems[reviewIndex] as Task).complete && (
-                            <span className="text-sm text-muted-foreground line-clamp-1">{(inboxItems[reviewIndex] as Task).description}</span>
-                          )}
-                          {(inboxItems[reviewIndex] as Task).complete && (
-                            <span className="text-sm text-muted-foreground line-clamp-1">Completed {new Date((inboxItems[reviewIndex] as Task).updatedAt).toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" })}</span>
-                          )}
-                        </div>
-                      ) : inboxItems[reviewIndex].type === "resource" ? (
-                        <span className="font-medium">{inboxItems[reviewIndex].title}</span>
-                      ) : (
-                        <span className="text-sm cursor-text">{(inboxItems[reviewIndex] as Thought).content}</span>
-                      )}
-                    </TableCell>
-                    {/* Actions */}
-                    <TableCell className="text-right p-2 pl-0">
-                      <div className="flex justify-end gap-1">
-                        {/* Edit Button */}
-                        <Button onClick={() => handleEditItem(inboxItems[reviewIndex])} variant="ghost" size="icon">
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        {/* Move Button (if projects exist) */}
-                        {projects && projects.length > 0 && (
-                          <Combobox
-                            button={<Button variant="ghost" size="icon"><MoveRight className="h-4 w-4" /></Button>}
-                            options={projects.map((p) => ({ label: p.title, value: p.id.toString() }))}
-                            onChange={async (_projectTitle, projectId) => {
-                              const projectIdInt = parseInt(projectId, 10);
-                              if (!isNaN(projectIdInt)) handleMoveItem(inboxItems[reviewIndex], projectIdInt);
-                            }}
-                          />
-                        )}
-                        {/* Delete Button */}
-                        <Button onClick={() => handleDeleteItem(inboxItems[reviewIndex])} variant="ghost" size="icon">
-                          <Trash className="w-4 h-4" />
-                        </Button>
-                        {/* Send Away Button */}
-                        <Button size="sm" variant="ghost" onClick={async () => {
-                          if (inboxItems[reviewIndex].type === "task") await sendTaskAway({ id: inboxItems[reviewIndex].id });
-                          if (inboxItems[reviewIndex].type === "resource") await sendResourceAway({ id: inboxItems[reviewIndex].id });
-                          if (inboxItems[reviewIndex].type === "thought") await sendThoughtAway({ id: inboxItems[reviewIndex].id });
-                        }}>
-                          <Archive className="h-4 w-4 mr-1" /> Send Away
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </div>
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
-      )}
       <div>
         <div>
-          {/* {showReviewDialog && reviewingTask && projects?.length ? (
-            <TaskReviewDialog
-              task={reviewingTask}
-              isOpen={showReviewDialog}
-              onClose={() => {
-                setReviewingTask(null);
-                setShowReviewDialog(false);
-              }}
-              projects={projects}
-              onComplete={handleTaskReviewComplete}
-            />
-          ) : null} */}
-
           <div className="relative flex gap-4 mb-6">
             <Button
               className="absolute shadow-none top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
@@ -1102,6 +872,7 @@ export function InboxPage() {
                                 {/* Items for this date */}
                                 {dateItems.map((item) => (
                                   <ItemRow
+                                    hideDragHandle={true}
                                     key={`${item.type}-${item.id}`}
                                     item={item}
                                     isEditing={
@@ -1119,19 +890,6 @@ export function InboxPage() {
                                     onEdit={handleEditItem}
                                     onCancelEdit={handleCancelEdit}
                                     actions={[
-                                      // {
-                                      //   icon: <ExternalLink className="h-4 w-4" />, 
-                                      //   label: "Open Link",
-                                      //   tooltip: "Open link in new tab",
-                                      //   render: (item: DisplayItem) => (
-                                      //     <a href={(item as Resource).url} target="_blank" rel="noopener noreferrer">
-                                      //       <Button variant="ghost" size="icon">
-                                      //         <ExternalLink className="h-4 w-4" />
-                                      //       </Button>
-                                      //     </a>
-                                      //   ),
-                                      //   show: (item: DisplayItem) => item.type === "resource"
-                                      // },
                                       // Edit
                                       {
                                         icon: <Pencil className="w-4 h-4" />, 
@@ -1171,7 +929,7 @@ export function InboxPage() {
                                           } else if (item.type === "thought") {
                                             await sendThoughtAway({ id: item.id as string });
                                           }
-                                          toast.success("Item sent to Away");
+                                          toast.success("Item sent Away");
                                         },
                                         show: () => true
                                       },
@@ -1224,15 +982,6 @@ export function InboxPage() {
           )}
         </div>
       </div>
-      {/* {reviewingTask && (
-        <TaskReviewDialog
-          task={reviewingTask}
-          isOpen={!!reviewingTask}
-          onClose={() => setReviewingTask(null)}
-          onComplete={handleTaskReviewComplete}
-          projects={projects || []}
-        />
-      )} */}
     </Layout>
   );
 }
