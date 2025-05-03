@@ -193,9 +193,7 @@ export function CommandMenu() {
         }
         break;
       case "resource":
-        if (result.url) {
-          window.open(result.url, "_blank");
-        } else if (result.projectId) {
+        if (result.projectId) {
           navigate(
             `/projects/${result.projectId}?resource=${result.id}&tab=resource`
           );
