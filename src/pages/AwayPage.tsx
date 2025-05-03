@@ -26,6 +26,7 @@ import {
   EditThoughtForm,
 } from "../components/ProjectView";
 import { useQuery } from "wasp/client/operations";
+import { AnimatePresence, motion } from "motion/react";
 
 // Helper for date grouping
 const formatDate = (date: Date) =>
@@ -44,11 +45,7 @@ type GroupedItems = { [key: DateString]: DisplayItem[] };
 function SearchButton() {
   const { openCommandMenu } = useCommandMenu();
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={openCommandMenu}
-    >
+    <Button variant="outline" size="icon" onClick={openCommandMenu}>
       <Search className="h-4 w-4" />
       <span className="sr-only">Search</span>
     </Button>
@@ -74,7 +71,8 @@ export function AwayPage() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Fetch the oldest Away item date
-  const { data: oldestAwayDate, isLoading: isLoadingOldest } = useQuery(getOldestAwayDate);
+  const { data: oldestAwayDate, isLoading: isLoadingOldest } =
+    useQuery(getOldestAwayDate);
 
   // Helper: get the last N days as YYYY-MM-DD strings
   const getLastNDates = (n: number, offset: number = 0) => {
@@ -186,7 +184,10 @@ export function AwayPage() {
     }
     // If the last date loaded is the oldest date, stop loading more
     const lastLoaded = nextDates[nextDates.length - 1];
-    if (lastLoaded && new Date(lastLoaded).getTime() === oldestDate.setHours(0,0,0,0)) {
+    if (
+      lastLoaded &&
+      new Date(lastLoaded).getTime() === oldestDate.setHours(0, 0, 0, 0)
+    ) {
       setHasMore(false);
     }
   };
@@ -306,16 +307,43 @@ export function AwayPage() {
       <div className="max-w-2xl mx-auto">
         {sortedDates.length > 0 ? (
           <Table>
-            <TableBody>
+            <AnimatePresence mode="wait">
               {sortedDates.map((dateKey) => {
                 const itemsForDate = grouped[dateKey] || [];
                 if (itemsForDate.length === 0) return null;
                 return (
-                  <React.Fragment key={dateKey}>
-                    <TableRow>
+                  <motion.tbody
+                    className="w-full"
+                    key={dateKey}
+                    initial={{
+                      position: "absolute",
+                      width: "100%",
+                      top: 0,
+                      left: 0,
+                      opacity: 0.2,
+                      filter: "blur(4px)",
+                    }}
+                    animate={{
+                      x: 0,
+                      opacity: 1,
+                      position: "relative",
+                      filter: "blur(0px)",
+                    }}
+                    exit={{
+                      position: "absolute",
+                      width: "100%",
+                      top: 0,
+                      left: 0,
+                    }}
+                    transition={{
+                      duration: 0.25,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <TableRow className="w-full">
                       <TableCell
                         colSpan={3}
-                        className="bg-muted/50 py-1 px-4 text-xs font-semibold text-muted-foreground"
+                        className="w-full bg-muted/50 py-1 px-4 text-xs font-semibold text-muted-foreground"
                       >
                         {formatDate(new Date(dateKey))}
                         {loadingDates.has(dateKey) && (
@@ -374,10 +402,10 @@ export function AwayPage() {
                         ]}
                       />
                     ))}
-                  </React.Fragment>
+                  </motion.tbody>
                 );
               })}
-            </TableBody>
+            </AnimatePresence>
           </Table>
         ) : (
           <div className="flex justify-center items-center h-full">
@@ -391,16 +419,23 @@ export function AwayPage() {
           </div>
         )}
         {hasMore && (
-            <div className="flex justify-center mt-4" ref={loadMoreRef}>
-              <Button onClick={loadMoreDays} disabled={Array.from(loadingDates).length > 0} variant="outline">
-                {Array.from(loadingDates).length > 0 ? (
-                  <span className="flex items-center"><span className="animate-spin inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full mr-2" /> Loading...</span>
-                ) : (
-                  "Load More Days"
-                )}
-              </Button>
-            </div>
-          )}
+          <div className="flex justify-center mt-4" ref={loadMoreRef}>
+            <Button
+              onClick={loadMoreDays}
+              disabled={Array.from(loadingDates).length > 0}
+              variant="outline"
+            >
+              {Array.from(loadingDates).length > 0 ? (
+                <span className="flex items-center">
+                  <span className="animate-spin inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full mr-2" />{" "}
+                  Loading...
+                </span>
+              ) : (
+                "Load More Days"
+              )}
+            </Button>
+          </div>
+        )}
         {/* End of list message */}
         {!hasMore && sortedDates.length > 0 && (
           <div className="flex justify-center mt-8">
