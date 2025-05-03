@@ -10,6 +10,7 @@ import { Coffee, Undo2, Archive, Package, PackageOpen, Search } from "lucide-rea
 import { Input } from "../components/ui/input";
 import { Kbd } from "../components/custom/Kbd";
 import { useCommandMenu } from "../components/custom/CommandMenu";
+import { useSearchParams } from "react-router-dom";
 
 // Helper for date grouping
 const formatDate = (date: Date) => date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
@@ -39,6 +40,9 @@ export function AwayPage() {
   const resources = resourcesRaw as Resource[];
   const thoughts = thoughtsRaw as Thought[];
   const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const activeResourceId = searchParams.get("resource");
+  const activeResourceType = searchParams.get("type");
 
   // Combine and filter items
   const awayItems: DisplayItem[] = useMemo(() => {
@@ -112,6 +116,7 @@ export function AwayPage() {
                           hideDragHandle={true}
                           key={item.id} 
                           item={item} 
+                          isActive={`${activeResourceId}` === `${item.id}` && `${activeResourceType}` === `${item.type}`}
                           isEditing={false}
                           renderEditForm={() => null}
                           onEdit={() => {}}

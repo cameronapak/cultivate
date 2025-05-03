@@ -141,12 +141,12 @@ export function CommandMenu() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen(open ? false : true);
       }
     };
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [open]);
 
   const runCommand = React.useCallback((command: () => void) => {
     setOpen(false);
@@ -172,10 +172,11 @@ export function CommandMenu() {
   type SearchResult = {
     id: string;
     type: "task" | "resource" | "thought";
-    projectId?: string;
+    projectId?: string | number | null;
     title?: string;
     content?: string;
     url?: string;
+    isAway: boolean;
   };
 
   const handleSearchResultClick = (result: SearchResult) => {
@@ -185,6 +186,8 @@ export function CommandMenu() {
           navigate(
             `/projects/${result.projectId}?resource=${result.id}&tab=task`
           );
+        } else if (result.isAway) {
+          navigate(`/away?resource=${result.id}&type=task`);
         } else {
           navigate(`/inbox?resource=${result.id}&type=task`);
         }
@@ -192,14 +195,14 @@ export function CommandMenu() {
       case "resource":
         if (result.url) {
           window.open(result.url, "_blank");
+        } else if (result.projectId) {
+          navigate(
+            `/projects/${result.projectId}?resource=${result.id}&tab=resource`
+          );
+        } else if (result.isAway) {
+          navigate(`/away?resource=${result.id}&type=resource`);
         } else {
-          if (result.projectId) {
-            navigate(
-              `/projects/${result.projectId}?resource=${result.id}&tab=resource`
-            );
-          } else {
-            navigate(`/inbox?resource=${result.id}&type=resource`);
-          }
+          navigate(`/inbox?resource=${result.id}&type=resource`);
         }
         break;
       case "thought":
@@ -207,6 +210,8 @@ export function CommandMenu() {
           navigate(
             `/projects/${result.projectId}?resource=${result.id}&tab=notes`
           );
+        } else if (result.isAway) {
+          navigate(`/away?resource=${result.id}&type=thought`);
         } else {
           navigate(`/inbox?resource=${result.id}&type=thought`);
         }
