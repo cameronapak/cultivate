@@ -375,7 +375,7 @@ export function AwayPage() {
             />
           </div>
         )}
-        {/* {hasMore && (
+        {hasMore && (
             <div className="flex justify-center mt-4" ref={loadMoreRef}>
               <Button onClick={loadMoreDays} disabled={Array.from(loadingDates).length > 0} variant="outline">
                 {Array.from(loadingDates).length > 0 ? (
@@ -385,7 +385,7 @@ export function AwayPage() {
                 )}
               </Button>
             </div>
-          )} */}
+          )}
       </div>
     </Layout>
   );
