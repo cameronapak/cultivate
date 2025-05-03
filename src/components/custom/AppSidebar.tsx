@@ -78,7 +78,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
                 <Link to={"/inbox"}>
                   <InboxIcon className="h-5 w-5" />
                   <span>Inbox</span>
-                  <Kbd>⌘ + i</Kbd>
+                  <Kbd className="absolute right-2 top-0 bottom-0 h-fit my-auto group-hover:opacity-100 opacity-0 transition-all duration-300 border border-border rounded-sm px-1">⌘ + i</Kbd>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
