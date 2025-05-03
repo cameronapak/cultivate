@@ -52,6 +52,7 @@ import {
   Trash,
   PackageOpen,
   Package,
+  Folder,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
@@ -893,8 +894,8 @@ export function InboxPage() {
                                       // Edit
                                       {
                                         icon: <Pencil className="w-4 h-4" />, 
-                                        label: "Edit",
-                                        tooltip: "Edit this item",
+                                        label: "Refine",
+                                        tooltip: "Refine",
                                         onClick: () => handleEditItem(item),
                                       },
                                       // Move (if projects exist)
@@ -905,7 +906,7 @@ export function InboxPage() {
                                             tooltip: "Move to Project",
                                             render: (item: DisplayItem) => (
                                               <Combobox
-                                                button={<Button variant="ghost" size="icon"><MoveRight className="h-4 w-4" /></Button>}
+                                                button={<Button variant="ghost" size="icon"><Folder className="h-4 w-4" /></Button>}
                                                 options={projects.map((p) => ({ label: p.title, value: p.id.toString() }))}
                                                 onChange={async (_projectTitle, projectId) => {
                                                   const projectIdInt = parseInt(projectId, 10);
@@ -920,7 +921,7 @@ export function InboxPage() {
                                       {
                                         icon: <Package className="h-4 w-4 mr-1" />, 
                                         label: "Send Away",
-                                        tooltip: "Send to Away",
+                                        tooltip: "Send Away",
                                         onClick: async () => {
                                           if (item.type === "task") {
                                             await sendTaskAway({ id: item.id as number });
@@ -937,7 +938,7 @@ export function InboxPage() {
                                       {
                                         icon: <Trash className="w-4 h-4" />, 
                                         label: "Delete",
-                                        tooltip: "Delete this item",
+                                        tooltip: "Delete",
                                         onClick: () => handleDeleteItem(item),
                                         show: () => true
                                       },
