@@ -1555,3 +1555,30 @@ export const getAwayThoughtsPaginated = async (
   }
   return { items, nextCursor };
 };
+
+export const getOldestAwayDate = async (_args: any, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401);
+
+  const [oldestTask] = await context.entities.Task.findMany({
+    where: { userId: context.user.id, isAway: true },
+    orderBy: { createdAt: 'asc' },
+    take: 1,
+    select: { createdAt: true },
+  });
+  const [oldestResource] = await context.entities.Resource.findMany({
+    where: { userId: context.user.id, isAway: true },
+    orderBy: { createdAt: 'asc' },
+    take: 1,
+    select: { createdAt: true },
+  });
+  const [oldestThought] = await context.entities.Thought.findMany({
+    where: { userId: context.user.id, isAway: true },
+    orderBy: { createdAt: 'asc' },
+    take: 1,
+    select: { createdAt: true },
+  });
+
+  const dates = [oldestTask?.createdAt, oldestResource?.createdAt, oldestThought?.createdAt].filter(Boolean);
+  if (dates.length === 0) return null;
+  return new Date(Math.min(...dates.map(d => new Date(d).getTime())));
+};

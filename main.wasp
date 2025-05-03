@@ -385,28 +385,28 @@ query getAwayThoughts {
 }
 
 query getAwayTasksByDate {
-  fn: import { getAwayTasksByDate } from "@src/queries.ts",
+  fn: import { getAwayTasksByDate } from "@src/queries",
   entities: [Task]
 }
 query getAwayResourcesByDate {
-  fn: import { getAwayResourcesByDate } from "@src/queries.ts",
+  fn: import { getAwayResourcesByDate } from "@src/queries",
   entities: [Resource]
 }
 query getAwayThoughtsByDate {
-  fn: import { getAwayThoughtsByDate } from "@src/queries.ts",
+  fn: import { getAwayThoughtsByDate } from "@src/queries",
   entities: [Thought]
 }
 
 query getAwayTasksPaginated {
-  fn: import { getAwayTasksPaginated } from "@src/queries.ts",
+  fn: import { getAwayTasksPaginated } from "@src/queries",
   entities: [Task]
 }
 query getAwayResourcesPaginated {
-  fn: import { getAwayResourcesPaginated } from "@src/queries.ts",
+  fn: import { getAwayResourcesPaginated } from "@src/queries",
   entities: [Resource]
 }
 query getAwayThoughtsPaginated {
-  fn: import { getAwayThoughtsPaginated } from "@src/queries.ts",
+  fn: import { getAwayThoughtsPaginated } from "@src/queries",
   entities: [Thought]
 }
 
@@ -443,4 +443,8 @@ page AwayPage {
   component: import { AwayPage } from "@src/pages/AwayPage"
 }
 
+query getOldestAwayDate {
+  fn: import { getOldestAwayDate } from "@src/queries",
+  entities: [Task, Resource, Thought]
+}
 //#endregion

@@ -9,6 +9,7 @@ import {
   updateTask,
   updateResource,
   updateThought,
+  getOldestAwayDate,
 } from "wasp/client/operations";
 import type { Task, Resource, Thought } from "wasp/entities";
 import { Button } from "../components/ui/button";
@@ -25,6 +26,7 @@ import {
   EditResourceForm,
   EditThoughtForm,
 } from "../components/ProjectView";
+import { useQuery } from "wasp/client/operations";
 
 // Helper for date grouping
 const formatDate = (date: Date) =>
@@ -75,6 +77,9 @@ export function AwayPage() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
+  // Fetch the oldest Away item date
+  const { data: oldestAwayDate, isLoading: isLoadingOldest } = useQuery(getOldestAwayDate);
+
   // Helper: get the last N days as YYYY-MM-DD strings
   const getLastNDates = (n: number, offset: number = 0) => {
     const dates: string[] = [];
@@ -90,14 +95,14 @@ export function AwayPage() {
     return dates;
   };
 
-  // Load the most recent 3 days on mount
-  React.useEffect(() => {
-    if (isInitialLoading) {
+  // Load the most recent 3 days on mount, but only after oldestAwayDate is loaded
+  useEffect(() => {
+    if (isInitialLoading && !isLoadingOldest && oldestAwayDate !== undefined) {
       loadMoreDays();
       setIsInitialLoading(false);
     }
     // eslint-disable-next-line
-  }, []);
+  }, [isInitialLoading, isLoadingOldest, oldestAwayDate]);
 
   // Auto-load more days when the button is in view
   useEffect(() => {
@@ -133,9 +138,14 @@ export function AwayPage() {
 
   // Function to load more days (paged)
   const loadMoreDays = async () => {
-    const nextDates = getLastNDates(3, loadedDates.length).filter(
-      (d) => !loadedDates.includes(d)
-    );
+    if (!oldestAwayDate) {
+      setHasMore(false);
+      return;
+    }
+    const oldestDate = new Date(oldestAwayDate);
+    const nextDates = getLastNDates(3, loadedDates.length)
+      .filter((d) => !loadedDates.includes(d))
+      .filter((d) => new Date(d) >= oldestDate);
     if (nextDates.length === 0) {
       setHasMore(false);
       return;
@@ -177,6 +187,11 @@ export function AwayPage() {
         newSet.delete(date);
         return newSet;
       });
+    }
+    // If the last date loaded is the oldest date, stop loading more
+    const lastLoaded = nextDates[nextDates.length - 1];
+    if (lastLoaded && new Date(lastLoaded).getTime() === oldestDate.setHours(0,0,0,0)) {
+      setHasMore(false);
     }
   };
 
@@ -296,72 +311,76 @@ export function AwayPage() {
         {sortedDates.length > 0 ? (
           <Table>
             <TableBody>
-              {sortedDates.map((dateKey) => (
-                <React.Fragment key={dateKey}>
-                  <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      className="bg-muted/50 py-1 px-4 text-xs font-semibold text-muted-foreground"
-                    >
-                      {formatDate(new Date(dateKey))}
-                      {loadingDates.has(dateKey) && (
-                        <span className="ml-2 animate-spin inline-block w-3 h-3 border-2 border-primary border-t-transparent rounded-full align-middle" />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                  {(grouped[dateKey] || []).map((item) => (
-                    <ItemRow
-                      hideDragHandle={true}
-                      key={`${item.id}-${item.type}`}
-                      item={item}
-                      isActive={
-                        `${activeResourceId}` === `${item.id}` &&
-                        `${activeResourceType}` === `${item.type}`
-                      }
-                      isEditing={
-                        editingItemId?.id === item.id &&
-                        editingItemId?.type === item.type
-                      }
-                      renderEditForm={(item, onSave, onCancel) =>
-                        renderEditForm(
-                          item,
-                          (values) => handleSave(item, values),
-                          onCancel
-                        )
-                      }
-                      onEdit={handleEdit}
-                      onCancelEdit={handleCancelEdit}
-                      actions={[
-                        {
-                          icon: <Pencil className="w-4 h-4" />,
-                          label: "Refine",
-                          tooltip: "Refine",
-                          onClick: () => handleEdit(item),
-                        },
-                        {
-                          icon: <Undo2 className="h-4 w-4" />,
-                          label: "Restore to Inbox",
-                          tooltip: "Restore to Inbox",
-                          onClick: async () => {
-                            if (item.type === "task")
-                              await returnTaskFromAway({
-                                id: item.id as number,
-                              });
-                            if (item.type === "resource")
-                              await returnResourceFromAway({
-                                id: item.id as number,
-                              });
-                            if (item.type === "thought")
-                              await returnThoughtFromAway({
-                                id: item.id as string,
-                              });
+              {sortedDates.map((dateKey) => {
+                const itemsForDate = grouped[dateKey] || [];
+                if (itemsForDate.length === 0) return null;
+                return (
+                  <React.Fragment key={dateKey}>
+                    <TableRow>
+                      <TableCell
+                        colSpan={3}
+                        className="bg-muted/50 py-1 px-4 text-xs font-semibold text-muted-foreground"
+                      >
+                        {formatDate(new Date(dateKey))}
+                        {loadingDates.has(dateKey) && (
+                          <span className="ml-2 animate-spin inline-block w-3 h-3 border-2 border-primary border-t-transparent rounded-full align-middle" />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                    {itemsForDate.map((item) => (
+                      <ItemRow
+                        hideDragHandle={true}
+                        key={`${item.id}-${item.type}`}
+                        item={item}
+                        isActive={
+                          `${activeResourceId}` === `${item.id}` &&
+                          `${activeResourceType}` === `${item.type}`
+                        }
+                        isEditing={
+                          editingItemId?.id === item.id &&
+                          editingItemId?.type === item.type
+                        }
+                        renderEditForm={(item, onSave, onCancel) =>
+                          renderEditForm(
+                            item,
+                            (values) => handleSave(item, values),
+                            onCancel
+                          )
+                        }
+                        onEdit={handleEdit}
+                        onCancelEdit={handleCancelEdit}
+                        actions={[
+                          {
+                            icon: <Pencil className="w-4 h-4" />,
+                            label: "Refine",
+                            tooltip: "Refine",
+                            onClick: () => handleEdit(item),
                           },
-                        },
-                      ]}
-                    />
-                  ))}
-                </React.Fragment>
-              ))}
+                          {
+                            icon: <Undo2 className="h-4 w-4" />,
+                            label: "Restore to Inbox",
+                            tooltip: "Restore to Inbox",
+                            onClick: async () => {
+                              if (item.type === "task")
+                                await returnTaskFromAway({
+                                  id: item.id as number,
+                                });
+                              if (item.type === "resource")
+                                await returnResourceFromAway({
+                                  id: item.id as number,
+                                });
+                              if (item.type === "thought")
+                                await returnThoughtFromAway({
+                                  id: item.id as string,
+                                });
+                            },
+                          },
+                        ]}
+                      />
+                    ))}
+                  </React.Fragment>
+                );
+              })}
             </TableBody>
           </Table>
         ) : (
@@ -386,6 +405,15 @@ export function AwayPage() {
               </Button>
             </div>
           )}
+        {/* End of list message */}
+        {!hasMore && sortedDates.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <EmptyStateView
+              Icon={<Coffee />}
+              title="All done!"
+            />
+          </div>
+        )}
       </div>
     </Layout>
   );
