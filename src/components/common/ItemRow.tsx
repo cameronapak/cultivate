@@ -250,6 +250,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
         case "task":
           return (
             <Checkbox
+              disabled={item.isAway}
               id={item.id.toString()}
               checked={item.complete}
               onCheckedChange={(checked) => {}}
