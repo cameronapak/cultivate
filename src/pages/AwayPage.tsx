@@ -17,8 +17,7 @@ import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import { Layout } from "../components/Layout";
 import { ItemRow, type DisplayItem } from "../components/common/ItemRow";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
-import { Coffee, Undo2, PackageOpen, Search, Pencil } from "lucide-react";
-import { Kbd } from "../components/custom/Kbd";
+import { Undo2, PackageOpen, Search, Pencil, Footprints } from "lucide-react";
 import { useCommandMenu } from "../components/custom/CommandMenu";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -47,14 +46,11 @@ function SearchButton() {
   return (
     <Button
       variant="outline"
-      size="sm"
+      size="icon"
       onClick={openCommandMenu}
     >
-      <Search className="h-4 w-4 mr-2" />
-      Search
-      <Kbd className="ml-2 bg-secondary text-foreground rounded-md px-1.5 py-0.5 relative">
-        ⌘ + k
-      </Kbd>
+      <Search className="h-4 w-4" />
+      <span className="sr-only">Search</span>
     </Button>
   );
 }
@@ -409,8 +405,9 @@ export function AwayPage() {
         {!hasMore && sortedDates.length > 0 && (
           <div className="flex justify-center mt-8">
             <EmptyStateView
-              Icon={<Coffee />}
-              title="All done!"
+              Icon={<Footprints />}
+              title="The end"
+              description="Or, the beginning?"
             />
           </div>
         )}
