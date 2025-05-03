@@ -1,14 +1,14 @@
 https://github.com/user-attachments/assets/6f489e2e-d820-4cb5-a796-f504aadc8648
 
 
-# 🌱 Cultivate (beta)
+# 🌱 Cultivate (alpha)
 
 Imagine if Notion & Basecamp had a baby. 
 
 Cultivate is a PKM tool where you can calmly brain dump, write, manage projects, and get things done.
 
 > [!WARNING]
-> This is a beta project in active development. There will be bugs and breaking changes. Please report any issues in the Issues tab.
+> This is a alpha project in active development. There will be bugs and breaking changes. Please report any issues in the Issues tab.
 
 ## Stack
 
