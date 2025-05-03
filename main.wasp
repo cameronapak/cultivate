@@ -384,6 +384,32 @@ query getAwayThoughts {
   entities: [Thought]
 }
 
+query getAwayTasksByDate {
+  fn: import { getAwayTasksByDate } from "@src/queries.ts",
+  entities: [Task]
+}
+query getAwayResourcesByDate {
+  fn: import { getAwayResourcesByDate } from "@src/queries.ts",
+  entities: [Resource]
+}
+query getAwayThoughtsByDate {
+  fn: import { getAwayThoughtsByDate } from "@src/queries.ts",
+  entities: [Thought]
+}
+
+query getAwayTasksPaginated {
+  fn: import { getAwayTasksPaginated } from "@src/queries.ts",
+  entities: [Task]
+}
+query getAwayResourcesPaginated {
+  fn: import { getAwayResourcesPaginated } from "@src/queries.ts",
+  entities: [Resource]
+}
+query getAwayThoughtsPaginated {
+  fn: import { getAwayThoughtsPaginated } from "@src/queries.ts",
+  entities: [Thought]
+}
+
 // Away actions
 action sendTaskAway {
   fn: import { sendTaskAway } from "@src/queries",

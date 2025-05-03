@@ -1378,3 +1378,180 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
 
   return combinedResults;
 };
+
+// Date-filtered paged Away Tasks
+export const getAwayTasksByDate = async (
+  args: { date: string; cursor?: number; limit?: number },
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { date, cursor, limit = 20 } = args;
+  const start = new Date(date + 'T00:00:00');
+  const end = new Date(date + 'T23:59:59.999');
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+    createdAt: { gte: start, lte: end },
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Task.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Date-filtered paged Away Resources
+export const getAwayResourcesByDate = async (
+  args: { date: string; cursor?: number; limit?: number },
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { date, cursor, limit = 20 } = args;
+  const start = new Date(date + 'T00:00:00');
+  const end = new Date(date + 'T23:59:59.999');
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+    createdAt: { gte: start, lte: end },
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Resource.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Date-filtered paged Away Thoughts
+export const getAwayThoughtsByDate = async (
+  args: { date: string; cursor?: string; limit?: number },
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { date, cursor, limit = 20 } = args;
+  const start = new Date(date + 'T00:00:00');
+  const end = new Date(date + 'T23:59:59.999');
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+    createdAt: { gte: start, lte: end },
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Thought.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Paginated Away Tasks
+export const getAwayTasksPaginated = async (
+  args: { cursor?: number; limit?: number } = {},
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { cursor, limit = 20 } = args;
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Task.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Paginated Away Resources
+export const getAwayResourcesPaginated = async (
+  args: { cursor?: number; limit?: number } = {},
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { cursor, limit = 20 } = args;
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Resource.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Paginated Away Thoughts
+export const getAwayThoughtsPaginated = async (
+  args: { cursor?: string; limit?: number } = {},
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { cursor, limit = 20 } = args;
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Thought.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
