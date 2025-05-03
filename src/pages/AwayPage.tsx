@@ -109,7 +109,8 @@ export function AwayPage() {
                           actions={[
                             {
                               icon: <Undo2 className="h-4 w-4" />, 
-                              label: `Restore to Inbox`,
+                              label: "Restore to Inbox",
+                              tooltip: "Restore to Inbox",
                               onClick: async () => {
                                 if (item.type === "task") await returnTaskFromAway({ id: item.id as number });
                                 if (item.type === "resource") await returnResourceFromAway({ id: item.id as number });

@@ -1119,37 +1119,32 @@ export function InboxPage() {
                                     onEdit={handleEditItem}
                                     onCancelEdit={handleCancelEdit}
                                     actions={[
-                                      // Open link for resources
-                                      item.type === "resource"
-                                        ? {
-                                            icon: <ExternalLink className="h-4 w-4" />, 
-                                            label: "Open Link",
-                                            asChild: true,
-                                            render: (item: DisplayItem) => (
-                                              <a
-                                                href={(item as Resource).url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                              >
-                                                <Button variant="ghost" size="icon">
-                                                  <ExternalLink className="h-4 w-4" />
-                                                </Button>
-                                              </a>
-                                            ),
-                                            show: (item: DisplayItem) => item.type === "resource"
-                                          } as const
-                                        : undefined,
+                                      // {
+                                      //   icon: <ExternalLink className="h-4 w-4" />, 
+                                      //   label: "Open Link",
+                                      //   tooltip: "Open link in new tab",
+                                      //   render: (item: DisplayItem) => (
+                                      //     <a href={(item as Resource).url} target="_blank" rel="noopener noreferrer">
+                                      //       <Button variant="ghost" size="icon">
+                                      //         <ExternalLink className="h-4 w-4" />
+                                      //       </Button>
+                                      //     </a>
+                                      //   ),
+                                      //   show: (item: DisplayItem) => item.type === "resource"
+                                      // },
                                       // Edit
                                       {
                                         icon: <Pencil className="w-4 h-4" />, 
-                                        label: `Edit ${item.type}`,
+                                        label: "Edit",
+                                        tooltip: "Edit this item",
                                         onClick: () => handleEditItem(item),
                                       },
                                       // Move (if projects exist)
                                       projects && projects.length > 0
                                         ? {
                                             icon: <MoveRight className="h-4 w-4" />,
-                                            label: "Move to Project",
+                                            label: "Move",
+                                            tooltip: "Move to Project",
                                             render: (item: DisplayItem) => (
                                               <Combobox
                                                 button={<Button variant="ghost" size="icon"><MoveRight className="h-4 w-4" /></Button>}
@@ -1163,21 +1158,29 @@ export function InboxPage() {
                                             show: () => projects && projects.length > 0
                                           } as const
                                         : undefined,
-                                      // Delete
-                                      {
-                                        icon: <Trash className="w-4 h-4" />, 
-                                        label: `Delete ${item.type}`,
-                                        onClick: () => handleDeleteItem(item),
-                                      },
                                       // Send Away
                                       {
                                         icon: <Package className="h-4 w-4 mr-1" />, 
-                                        label: `Send ${item.type} Away`,
+                                        label: "Send Away",
+                                        tooltip: "Send to Away",
                                         onClick: async () => {
-                                          if (item.type === "task") await sendTaskAway({ id: item.id as number });
-                                          if (item.type === "resource") await sendResourceAway({ id: item.id as number });
-                                          if (item.type === "thought") await sendThoughtAway({ id: item.id as string });
+                                          if (item.type === "task") {
+                                            await sendTaskAway({ id: item.id as number });
+                                          } else if (item.type === "resource") {  
+                                            await sendResourceAway({ id: item.id as number });
+                                          } else if (item.type === "thought") {
+                                            await sendThoughtAway({ id: item.id as string });
+                                          }
+                                          toast.success("Item sent to Away");
                                         },
+                                        show: () => true
+                                      },
+                                      // Delete
+                                      {
+                                        icon: <Trash className="w-4 h-4" />, 
+                                        label: "Delete",
+                                        tooltip: "Delete this item",
+                                        onClick: () => handleDeleteItem(item),
                                         show: () => true
                                       },
                                     ].filter((a): a is NonNullable<typeof a> => a !== undefined)}
