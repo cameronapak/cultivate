@@ -1,13 +1,12 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { getAwayTasksByDate, getAwayResourcesByDate, getAwayThoughtsByDate, returnTaskFromAway, returnResourceFromAway, returnThoughtFromAway, updateTask, updateResource, updateThought } from "wasp/client/operations";
-import type { Task, Resource, Thought, Project } from "wasp/entities";
+import type { Task, Resource, Thought } from "wasp/entities";
 import { Button } from "../components/ui/button";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
 import { Layout } from "../components/Layout";
 import { ItemRow, type DisplayItem } from "../components/common/ItemRow";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
-import { Coffee, Undo2, Archive, Package, PackageOpen, Search, Pencil } from "lucide-react";
-import { Input } from "../components/ui/input";
+import { Coffee, Undo2, PackageOpen, Search, Pencil } from "lucide-react";
 import { Kbd } from "../components/custom/Kbd";
 import { useCommandMenu } from "../components/custom/CommandMenu";
 import { useSearchParams } from "react-router-dom";
