@@ -173,12 +173,7 @@ export function InboxPage() {
   const activeItemId = searchParams.get("resource");
   const [newItemText, setNewItemText] = useState("");
   const [isThought, setIsThought] = useState(false);
-  const [showInbox, setShowInbox] = useState(() => {
-    const showTasksLocalStorage = JSON.parse(
-      localStorage.getItem("shouldShowTasks") || "true"
-    );
-    return showTasksLocalStorage;
-  });
+  const [showInbox, setShowInbox] = useState(false);
   const [filter, setFilter] = useState<InboxFilter>("all");
   const [editingItemId, setEditingItemId] = useState<{
     id: string | number | null;
@@ -978,6 +973,7 @@ export function InboxPage() {
                 <EmptyStateView
                   Icon={<EyeClosed className="h-10 w-10" />}
                   title="Inbox is safely hidden"
+                  description={inboxItems.length > 0 ? `${inboxItems.length} items ready for review` : "No items in the inbox"}
                 />
               </div>
             </motion.div>
