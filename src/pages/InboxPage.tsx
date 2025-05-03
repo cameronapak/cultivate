@@ -49,6 +49,9 @@ import {
   HandHeart,
   Archive,
   Pencil,
+  Trash,
+  PackageOpen,
+  Package,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
@@ -919,7 +922,7 @@ export function InboxPage() {
                         )}
                         {/* Delete Button */}
                         <Button onClick={() => handleDeleteItem(inboxItems[reviewIndex])} variant="ghost" size="icon">
-                          <Trash2 className="w-4 h-4" />
+                          <Trash className="w-4 h-4" />
                         </Button>
                         {/* Send Away Button */}
                         <Button size="sm" variant="ghost" onClick={async () => {
@@ -1112,18 +1115,72 @@ export function InboxPage() {
                                     }
                                     projects={projects}
                                     hideActions={false}
-                                    onEdit={handleEditItem}
-                                    onSave={handleSaveItem}
-                                    onCancelEdit={handleCancelEdit}
-                                    onDelete={handleDeleteItem}
-                                    onStatusChange={handleStatusChange}
-                                    onMove={handleMoveItem}
                                     renderEditForm={renderItemEditForm}
-                                    onSendAway={async (item) => {
-                                      if (item.type === "task") await sendTaskAway({ id: item.id as number });
-                                      if (item.type === "resource") await sendResourceAway({ id: item.id as number });
-                                      if (item.type === "thought") await sendThoughtAway({ id: item.id as string });
-                                    }}
+                                    onEdit={handleEditItem}
+                                    onCancelEdit={handleCancelEdit}
+                                    actions={[
+                                      // Open link for resources
+                                      item.type === "resource"
+                                        ? {
+                                            icon: <ExternalLink className="h-4 w-4" />, 
+                                            label: "Open Link",
+                                            asChild: true,
+                                            render: (item: DisplayItem) => (
+                                              <a
+                                                href={(item as Resource).url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                              >
+                                                <Button variant="ghost" size="icon">
+                                                  <ExternalLink className="h-4 w-4" />
+                                                </Button>
+                                              </a>
+                                            ),
+                                            show: (item: DisplayItem) => item.type === "resource"
+                                          } as const
+                                        : undefined,
+                                      // Edit
+                                      {
+                                        icon: <Pencil className="w-4 h-4" />, 
+                                        label: `Edit ${item.type}`,
+                                        onClick: () => handleEditItem(item),
+                                      },
+                                      // Move (if projects exist)
+                                      projects && projects.length > 0
+                                        ? {
+                                            icon: <MoveRight className="h-4 w-4" />,
+                                            label: "Move to Project",
+                                            render: (item: DisplayItem) => (
+                                              <Combobox
+                                                button={<Button variant="ghost" size="icon"><MoveRight className="h-4 w-4" /></Button>}
+                                                options={projects.map((p) => ({ label: p.title, value: p.id.toString() }))}
+                                                onChange={async (_projectTitle, projectId) => {
+                                                  const projectIdInt = parseInt(projectId, 10);
+                                                  if (!isNaN(projectIdInt)) handleMoveItem(item, projectIdInt);
+                                                }}
+                                              />
+                                            ),
+                                            show: () => projects && projects.length > 0
+                                          } as const
+                                        : undefined,
+                                      // Delete
+                                      {
+                                        icon: <Trash className="w-4 h-4" />, 
+                                        label: `Delete ${item.type}`,
+                                        onClick: () => handleDeleteItem(item),
+                                      },
+                                      // Send Away
+                                      {
+                                        icon: <Package className="h-4 w-4 mr-1" />, 
+                                        label: `Send ${item.type} Away`,
+                                        onClick: async () => {
+                                          if (item.type === "task") await sendTaskAway({ id: item.id as number });
+                                          if (item.type === "resource") await sendResourceAway({ id: item.id as number });
+                                          if (item.type === "thought") await sendThoughtAway({ id: item.id as string });
+                                        },
+                                        show: () => true
+                                      },
+                                    ].filter((a): a is NonNullable<typeof a> => a !== undefined)}
                                   />
                                 ))}
                               </React.Fragment>

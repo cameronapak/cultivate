@@ -30,6 +30,17 @@ export type DisplayItem =
   | (Resource & { type: "resource"; projects?: Project[] })
   | (Thought & { type: "thought"; title: string; projects?: Project[] });
 
+// New: Action button type for flexible actions
+export type ItemRowActionButton = {
+  icon: React.ReactNode;
+  label: string;
+  onClick?: (item: DisplayItem) => void | Promise<void>;
+  asChild?: boolean; // for anchor links
+  render?: (item: DisplayItem) => React.ReactNode; // for custom rendering
+  show?: (item: DisplayItem) => boolean;
+  disabled?: boolean | ((item: DisplayItem) => boolean);
+};
+
 interface ItemRowProps {
   item: DisplayItem;
   isEditing: boolean;
@@ -37,18 +48,14 @@ interface ItemRowProps {
   projects?: Project[];
   hideActions?: boolean;
   onEdit: (item: DisplayItem) => void;
-  onSave: (item: DisplayItem, values: any) => Promise<void>;
   onCancelEdit: () => void;
-  onDelete: (item: DisplayItem) => void;
-  onStatusChange?: (item: Task, complete: boolean) => void;
-  onMove?: (item: DisplayItem, projectId: number) => void;
   renderEditForm: (
     item: DisplayItem,
     onSave: (values: any) => void,
     onCancel: () => void
   ) => React.ReactNode;
   hideDragHandle?: boolean;
-  onSendAway?: (item: DisplayItem) => void;
+  actions?: ItemRowActionButton[];
 }
 
 const removeUrlParamsWithoutPageRefresh = (params: string[]) => {
@@ -68,25 +75,13 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
       isActive = false,
       projects,
       onEdit,
-      onSave,
       onCancelEdit,
-      onDelete,
-      onStatusChange,
-      onMove,
       renderEditForm,
       hideDragHandle = false,
-      onSendAway,
+      actions,
     },
     ref
   ) => {
-    const handleSave = async (values: any) => {
-      try {
-        await onSave(item, values);
-        onCancelEdit();
-      } catch (err) {
-        console.error("Save failed from ItemRow", err);
-      }
-    };
     const rowRef = useRef<HTMLTableCellElement>(null);
 
     // Scroll to the row when it becomes active
@@ -106,7 +101,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
       return (
         <TableRow>
           <TableCell colSpan={4} className="bg-background p-0">
-            {renderEditForm(item, handleSave, onCancelEdit)}
+            {renderEditForm(item, () => {}, onCancelEdit)}
           </TableCell>
         </TableRow>
       );
@@ -256,9 +251,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
             <Checkbox
               id={item.id.toString()}
               checked={item.complete}
-              onCheckedChange={(checked) =>
-                onStatusChange?.(item, checked === true)
-              }
+              onCheckedChange={(checked) => {}}
             />
           );
         case "resource": {
@@ -322,103 +315,131 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
         {hideActions ? null : (
           <TableCell className="text-right p-2 pl-0">
             <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto justify-end gap-1">
-              {/* External Link for Resources */}
-              {item.type === "resource" && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button asChild variant="ghost" size="icon">
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Open Link</TooltipContent>
-                </Tooltip>
-              )}
-
-              {/* Edit Button */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => onEdit(item)}
-                    variant="ghost"
-                    size="icon"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Edit {item.type}</TooltipContent>
-              </Tooltip>
-
-              {/* Move Button (Optional) */}
-              {onMove && projects && projects.length > 0 && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    {/* Wrapper div needed for Combobox trigger inside TooltipTrigger */}
-                    <div>
-                      <Combobox
-                        button={
-                          <Button variant="ghost" size="icon">
-                            <MoveRight className="h-4 w-4" />
+              {/* Custom actions if provided */}
+              {Array.isArray(actions) && actions.length > 0
+                ? actions
+                    .filter((action) =>
+                      typeof action.show === "function" ? action.show(item) : true
+                    )
+                    .map((action, idx) => {
+                      if (action.render) {
+                        return <React.Fragment key={idx}>{action.render(item)}</React.Fragment>;
+                      }
+                      const isDisabled = typeof action.disabled === "function"
+                        ? action.disabled(item)
+                        : !!action.disabled;
+                      // If asChild, wrap in Button asChild, else regular Button
+                      return (
+                        <Tooltip key={idx}>
+                          <TooltipTrigger asChild>
+                            {action.asChild ? (
+                              <Button asChild variant="ghost" size="icon" disabled={isDisabled}>
+                                {action.onClick ? (
+                                  <span onClick={() => action.onClick?.(item)}>{action.icon}</span>
+                                ) : (
+                                  action.icon
+                                )}
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => action.onClick?.(item)}
+                                disabled={isDisabled}
+                              >
+                                {action.icon}
+                              </Button>
+                            )}
+                          </TooltipTrigger>
+                          <TooltipContent>{action.label}</TooltipContent>
+                        </Tooltip>
+                      );
+                    })
+                : (
+                  // Default actions (legacy)
+                  <>
+                    {/* External Link for Resources */}
+                    {item.type === "resource" && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button asChild variant="ghost" size="icon">
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
                           </Button>
-                        }
-                        options={projects.map((p) => ({
-                          label: p.title,
-                          value: p.id.toString(),
-                        }))}
-                        onChange={async (
-                          _projectTitle: string,
-                          projectId: string
-                        ) => {
-                          try {
-                            const projectIdInt = parseInt(projectId, 10);
-                            if (!isNaN(projectIdInt)) {
-                              onMove(item, projectIdInt);
-                            }
-                          } catch (error) {
-                            toast.error(`Failed to move ${item.type}`);
-                          }
-                        }}
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>Move to Project</TooltipContent>
-                </Tooltip>
-              )}
+                        </TooltipTrigger>
+                        <TooltipContent>Open Link</TooltipContent>
+                      </Tooltip>
+                    )}
 
-              {/* Delete Button */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => onDelete(item)}
-                    variant="ghost"
-                    size="icon"
-                  >
-                    <Trash className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Delete {item.type}</TooltipContent>
-              </Tooltip>
+                    {/* Edit Button */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={() => onEdit(item)}
+                          variant="ghost"
+                          size="icon"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit {item.type}</TooltipContent>
+                    </Tooltip>
 
-              {/* Send Away Button */}
-              {onSendAway && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => onSendAway(item)}
-                    >
-                      <Archive className="h-4 w-4 mr-1" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Send {item.type} Away</TooltipContent>
-                </Tooltip>
-              )}
+                    {/* Move Button (Optional) */}
+                    {projects && projects.length > 0 && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {/* Wrapper div needed for Combobox trigger inside TooltipTrigger */}
+                          <div>
+                            <Combobox
+                              button={
+                                <Button variant="ghost" size="icon">
+                                  <MoveRight className="h-4 w-4" />
+                                </Button>
+                              }
+                              options={projects.map((p) => ({
+                                label: p.title,
+                                value: p.id.toString(),
+                              }))}
+                              onChange={async (
+                                _projectTitle: string,
+                                projectId: string
+                              ) => {
+                                try {
+                                  const projectIdInt = parseInt(projectId, 10);
+                                  if (!isNaN(projectIdInt)) {
+                                    // onMove(item, projectIdInt);
+                                  }
+                                } catch (error) {
+                                  toast.error(`Failed to move ${item.type}`);
+                                }
+                              }}
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>Move to Project</TooltipContent>
+                      </Tooltip>
+                    )}
+
+                    {/* Delete Button */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete {item.type}</TooltipContent>
+                    </Tooltip>
+                  </>
+                )}
             </div>
           </TableCell>
         )}

@@ -103,12 +103,20 @@ export function AwayPage() {
                           key={item.id} 
                           item={item} 
                           isEditing={false}
-                          onEdit={() => {}}
-                          onSave={async () => {}}
-                          onCancelEdit={() => {}}
-                          onDelete={() => {}}
-                          onSendAway={() => {}}
                           renderEditForm={() => null}
+                          onEdit={() => {}}
+                          onCancelEdit={() => {}}
+                          actions={[
+                            {
+                              icon: <Undo2 className="h-4 w-4" />, 
+                              label: `Restore to Inbox`,
+                              onClick: async () => {
+                                if (item.type === "task") await returnTaskFromAway({ id: item.id as number });
+                                if (item.type === "resource") await returnResourceFromAway({ id: item.id as number });
+                                if (item.type === "thought") await returnThoughtFromAway({ id: item.id as string });
+                              },
+                            },
+                          ]}
                         />
                       ))}
                     </React.Fragment>
