@@ -627,12 +627,12 @@ export function InboxPage() {
   };
 
   // Add handler for status change
-  const handleStatusChange = async (task: Task, complete: boolean) => {
+  const handleCheckedChange = async (task: Task, checked: boolean) => {
     try {
-      await updateTaskStatus({ id: task.id, complete });
+      await updateTaskStatus({ id: task.id, complete: checked });
       // Optionally add a success toast here if desired
       toast.success(
-        `Task "${task.title}" marked as ${complete ? "complete" : "incomplete"}`
+        `Task "${task.title}" marked as ${checked ? "complete" : "incomplete"}`
       );
       // Wasp query cache should update automatically
     } catch (err) {
@@ -880,6 +880,7 @@ export function InboxPage() {
                                       editingItemId?.id === item.id &&
                                       editingItemId?.type === item.type
                                     }
+                                    onCheckedChange={handleCheckedChange}
                                     isActive={
                                       (item.type === "resource" && item.id.toString() === activeItemId) ||
                                       (item.type === "task" && item.id.toString() === activeItemId) ||

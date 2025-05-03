@@ -50,6 +50,7 @@ interface ItemRowProps {
   hideActions?: boolean;
   onEdit: (item: DisplayItem) => void;
   onCancelEdit: () => void;
+  onCheckedChange?: (item: Task, checked: boolean) => void;
   renderEditForm: (
     item: DisplayItem,
     onSave: (values: any) => void,
@@ -77,6 +78,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
       projects,
       onEdit,
       onCancelEdit,
+      onCheckedChange,
       renderEditForm,
       hideDragHandle = false,
       actions,
@@ -161,9 +163,14 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
           return (
             <div className="flex flex-col">
               <label
+                onClick={(e) => {
+                  // I don't want this to trigger the checkbox.
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
                 htmlFor={item.id.toString()}
                 className={cn(
-                  "text-sm leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                  "cursor-text text-sm leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
                   item.complete ? "line-through text-muted-foreground" : ""
                 )}
               >
@@ -253,7 +260,9 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
               disabled={item.isAway}
               id={item.id.toString()}
               checked={item.complete}
-              onCheckedChange={(checked) => {}}
+              onCheckedChange={(checked: boolean) => {
+                onCheckedChange?.(item as Task, checked);
+              }}
             />
           );
         case "resource": {
