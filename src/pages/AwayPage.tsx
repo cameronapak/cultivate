@@ -293,7 +293,7 @@ export function AwayPage() {
       ctaButton={<SearchButton />}
     >
       <div className="max-w-2xl mx-auto">
-        {sortedDates.length < 0 ? (
+        {sortedDates.length > 0 ? (
           <Table>
             <TableBody>
               {sortedDates.map((dateKey) => (
