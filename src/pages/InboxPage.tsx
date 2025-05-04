@@ -153,21 +153,22 @@ const tabs: TabData[] = [
 ];
 
 export function InboxPage() {
+  const [isShowingAwayItems, setIsShowingAwayItems] = useState(false);
   const {
     data: tasks,
     isLoading: isLoadingTasks,
     error: tasksError,
-  } = useQuery(getInboxTasks);
+  } = useQuery(getInboxTasks, { isAway: isShowingAwayItems });
   const {
     data: resources,
     isLoading: isLoadingResources,
     error: resourcesError,
-  } = useQuery(getInboxResources);
+  } = useQuery(getInboxResources, { isAway: isShowingAwayItems });
   const {
     data: thoughts,
     isLoading: isLoadingThoughts,
     error: thoughtsError,
-  } = useQuery(getInboxThoughts);
+  } = useQuery(getInboxThoughts, { isAway: isShowingAwayItems });
   const { data: projects } = useQuery(getProjects);
   const [searchParams] = useSearchParams();
   const activeItemId = searchParams.get("resource");
@@ -340,6 +341,13 @@ export function InboxPage() {
   const handleToggleTasks = () => {
     setShowInbox((prev: boolean) => {
       localStorage.setItem("shouldShowTasks", (!prev).toString());
+      return !prev;
+    });
+  };
+
+  const handleToggleAwayItems = () => {
+    setIsShowingAwayItems((prev: boolean) => {
+      localStorage.setItem("shouldShowAwayItems", (!prev).toString());
       return !prev;
     });
   };
@@ -693,11 +701,31 @@ export function InboxPage() {
       isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
       breadcrumbItems={[
         {
-          title: "Inbox",
+          title: isShowingAwayItems ? "Away" : "Inbox",
         },
       ]}
       ctaButton={
         <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={isShowingAwayItems ? "default" : "outline"}
+                type="submit"
+                onClick={handleToggleAwayItems}
+                size="icon"
+              >
+                {isShowingAwayItems ? (
+                  <PackageOpen className="h-5 w-5" />
+                ) : (
+                  <Package className="h-5 w-5" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {isShowingAwayItems ? "Show inbox" : "Show away items"}
+            </TooltipContent>
+          </Tooltip>
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -722,43 +750,50 @@ export function InboxPage() {
     >
       <div>
         <div>
-          <div className="relative flex gap-4 mb-6">
-            <Button
-              className="absolute shadow-none top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
-              size="icon"
-              variant="outline"
-              onClick={handleToggleIsThought}
-            >
-              {itemTypeButton}
-              <span className="sr-only">
-                {isThought ? "Add a thought" : "Add a task"}
-              </span>
-            </Button>
+          {isShowingAwayItems ? (
+            <div className="flex items-center gap-2 h-[36px] mb-6">
+              <PackageOpen className="h-5 w-5 text-muted-foreground" />
+              <h1 className="heading-1">Away</h1>
+            </div>
+          ) : (
+            <div className="relative flex gap-4 mb-6">
+              <Button
+                className="absolute shadow-none top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
+                size="icon"
+                variant="outline"
+                onClick={handleToggleIsThought}
+              >
+                {itemTypeButton}
+                <span className="sr-only">
+                  {isThought ? "Add a thought" : "Add a task"}
+                </span>
+              </Button>
 
-            <Input
-              ref={inputRef}
-              autoFocus={true}
-              type="text"
-              placeholder={
-                isThought ? "Add a thought or URL..." : "Add a task..."
-              }
-              value={newItemText}
-              onChange={(e) => setNewItemText(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="pl-11 flex-1 pr-10"
-            />
+              <Input
+                ref={inputRef}
+                autoFocus={true}
+                type="text"
+                placeholder={
+                  isThought ? "Add a thought or URL..." : "Add a task..."
+                }
+                value={newItemText}
+                onChange={(e) => setNewItemText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="pl-11 flex-1 pr-10"
+              />
 
-            <Button
-              disabled={!newItemText.trim()}
-              className="absolute top-0 right-0 rounded-tl-none rounded-bl-none"
-              type="submit"
-              onClick={handleCreateItem}
-              size="icon"
-            >
-              <Send className="h-4 w-4" />
-              <span className="sr-only">Add to inbox</span>
-            </Button>
-          </div>
+              <Button
+                disabled={!newItemText.trim()}
+                className="absolute top-0 right-0 rounded-tl-none rounded-bl-none"
+                type="submit"
+                onClick={handleCreateItem}
+                size="icon"
+              >
+                <Send className="h-4 w-4" />
+                <span className="sr-only">Add to inbox</span>
+              </Button>
+            </div>
+          )}
 
           {showInbox && !isReviewing ? (
             <div>
@@ -877,9 +912,12 @@ export function InboxPage() {
                                     }
                                     onCheckedChange={handleCheckedChange}
                                     isActive={
-                                      (item.type === "resource" && item.id.toString() === activeItemId) ||
-                                      (item.type === "task" && item.id.toString() === activeItemId) ||
-                                      (item.type === "thought" && item.id.toString() === activeItemId)
+                                      (item.type === "resource" &&
+                                        item.id.toString() === activeItemId) ||
+                                      (item.type === "task" &&
+                                        item.id.toString() === activeItemId) ||
+                                      (item.type === "thought" &&
+                                        item.id.toString() === activeItemId)
                                     }
                                     projects={projects}
                                     hideActions={false}
@@ -889,56 +927,90 @@ export function InboxPage() {
                                     actions={[
                                       // Edit
                                       {
-                                        icon: <Pencil className="w-4 h-4" />, 
+                                        icon: <Pencil className="w-4 h-4" />,
                                         label: "Refine",
                                         tooltip: "Refine",
                                         onClick: () => handleEditItem(item),
                                       },
                                       // Move (if projects exist)
                                       projects && projects.length > 0
-                                        ? {
-                                            icon: <MoveRight className="h-4 w-4" />,
+                                        ? ({
+                                            icon: (
+                                              <MoveRight className="h-4 w-4" />
+                                            ),
                                             label: "Move",
                                             tooltip: "Move to Project",
                                             render: (item: DisplayItem) => (
                                               <Combobox
-                                                button={<Button variant="ghost" size="icon"><Folder className="h-4 w-4" /></Button>}
-                                                options={projects.map((p) => ({ label: p.title, value: p.id.toString() }))}
-                                                onChange={async (_projectTitle, projectId) => {
-                                                  const projectIdInt = parseInt(projectId, 10);
-                                                  if (!isNaN(projectIdInt)) handleMoveItem(item, projectIdInt);
+                                                button={
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                  >
+                                                    <Folder className="h-4 w-4" />
+                                                  </Button>
+                                                }
+                                                options={projects.map((p) => ({
+                                                  label: p.title,
+                                                  value: p.id.toString(),
+                                                }))}
+                                                onChange={async (
+                                                  _projectTitle,
+                                                  projectId
+                                                ) => {
+                                                  const projectIdInt = parseInt(
+                                                    projectId,
+                                                    10
+                                                  );
+                                                  if (!isNaN(projectIdInt))
+                                                    handleMoveItem(
+                                                      item,
+                                                      projectIdInt
+                                                    );
                                                 }}
                                               />
                                             ),
-                                            show: () => projects && projects.length > 0
-                                          } as const
+                                            show: () =>
+                                              projects && projects.length > 0,
+                                          } as const)
                                         : undefined,
                                       // Send Away
                                       {
-                                        icon: <Package className="h-4 w-4 mr-1" />, 
+                                        icon: (
+                                          <Package className="h-4 w-4 mr-1" />
+                                        ),
                                         label: "Send Away",
                                         tooltip: "Send Away",
                                         onClick: async () => {
                                           if (item.type === "task") {
-                                            await sendTaskAway({ id: item.id as number });
-                                          } else if (item.type === "resource") {  
-                                            await sendResourceAway({ id: item.id as number });
+                                            await sendTaskAway({
+                                              id: item.id as number,
+                                            });
+                                          } else if (item.type === "resource") {
+                                            await sendResourceAway({
+                                              id: item.id as number,
+                                            });
                                           } else if (item.type === "thought") {
-                                            await sendThoughtAway({ id: item.id as string });
+                                            await sendThoughtAway({
+                                              id: item.id as string,
+                                            });
                                           }
                                           toast.success("Item sent Away");
                                         },
-                                        show: () => true
+                                        show: () => true,
                                       },
                                       // Delete
                                       {
-                                        icon: <Trash className="w-4 h-4" />, 
+                                        icon: <Trash className="w-4 h-4" />,
                                         label: "Delete",
                                         tooltip: "Delete",
                                         onClick: () => handleDeleteItem(item),
-                                        show: () => true
+                                        show: () => true,
                                       },
-                                    ].filter((a): a is NonNullable<typeof a> => a !== undefined)}
+                                    ].filter(
+                                      (a): a is NonNullable<typeof a> =>
+                                        a !== undefined
+                                    )}
                                   />
                                 ))}
                               </React.Fragment>
@@ -973,7 +1045,11 @@ export function InboxPage() {
                 <EmptyStateView
                   Icon={<EyeClosed className="h-10 w-10" />}
                   title="Inbox is safely hidden"
-                  description={inboxItems.length > 0 ? "You have items ready for review" : "No items in the inbox"}
+                  description={
+                    inboxItems.length > 0
+                      ? "You have items ready for review"
+                      : "No items in the inbox"
+                  }
                 />
               </div>
             </motion.div>
