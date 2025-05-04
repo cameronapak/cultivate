@@ -14,9 +14,7 @@ import {
 } from "./ui/breadcrumb";
 import { Progress } from "./ui/progress";
 import { ThemeProvider } from "./custom/ThemeProvider";
-import { EllipsisVertical, Folder } from "lucide-react";
-import { getProjects } from "wasp/client/operations";
-import { useQuery } from "wasp/client/operations";
+import { EllipsisVertical } from "lucide-react";
 import { Link } from "wasp/client/router";
 import { Button } from "./ui/button";
 import {
@@ -56,23 +54,24 @@ export function Layout({
   ctaButton,
 }: LayoutProps) {
   const navigate = useNavigate();
-  const isSidebarHidden = JSON.parse(
-    localStorage.getItem("isSidebarHidden") || "false"
-  );
-  const [open, setOpen] = useState(Boolean(isSidebarHidden));
-  const { data: projects, isLoading: areProjectsLoading } =
-    useQuery(getProjects);
+  const [open, setOpen] = useState(() => {
+    return !JSON.parse(localStorage.getItem("isSidebarHidden") || "false");
+  });
 
-  // Add keyboard shortcut handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Check for CMD+I (Mac) or CTRL+I (Windows)
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "i") {
         e.preventDefault();
-        // if I'm on the inbox page, toggle the inbox
         if (window.location.pathname !== "/inbox") {
           navigate("/inbox");
         }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        setOpen((prev) => {
+          localStorage.setItem("isSidebarHidden", (!prev).toString());
+          return !prev;
+        });
       }
     };
 
@@ -80,36 +79,18 @@ export function Layout({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
 
-  const toggleSidebar = () => {
-    setOpen((open) => {
-      localStorage.setItem("isSidebarHidden", (!open).toString());
-      return !open;
-    });
+  const handleSidebarOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    localStorage.setItem("isSidebarHidden", (!nextOpen).toString());
   };
-
-  const sidebarItems: SidebarItem[] = areProjectsLoading
-    ? []
-    : [
-        {
-          isActive: true,
-          title: "Projects",
-          icon: Folder,
-          items:
-            projects?.map((project: { id: number; title: string }) => ({
-              title: project.title,
-              url: `/projects/${project.id}`,
-              isActive: project.id === activeProjectId,
-            })) || [],
-        },
-      ];
 
   return (
     <ThemeProvider>
-      <SidebarProvider onOpenChange={toggleSidebar} open={open}>
+      <SidebarProvider open={open} onOpenChange={handleSidebarOpenChange}>
         <CommandMenuProvider>
           <CommandMenu />
           <Toaster />
-          <AppSidebar items={sidebarItems} />
+          <AppSidebar />
           <SidebarInset>
             {import.meta.env.DEV && (
               <div className="pointer-events-none fixed px-12 py-1 -right-12 bottom-4 bg-muted text-muted-foreground rotate-[-38deg] text-base font-medium">

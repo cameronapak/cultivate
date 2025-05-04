@@ -14,7 +14,7 @@ import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "../ui/button";
 import Logo from "./Logo";
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardDescription, CardHeader } from "../ui/card";
 import {
   generateInviteCode
 } from "wasp/client/operations";
@@ -27,10 +27,9 @@ export type SidebarItem = {
   isActive: boolean;
   title: string;
   icon: any;
-  items: { title: string; url: string }[];
 };
 
-export function AppSidebar({ items }: { items: SidebarItem[] }) {
+export function AppSidebar() {
   // Get the current path
   const currentPath = window.location.pathname;
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
