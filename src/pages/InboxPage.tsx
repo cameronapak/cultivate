@@ -33,7 +33,6 @@ import {
   MoveRight,
   Eye,
   EyeClosed,
-  Coffee,
   // ExternalLink,
   Send,
   Link2,
@@ -45,6 +44,7 @@ import {
   PackageOpen,
   Package,
   Folder,
+  PartyPopper,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
@@ -1050,7 +1050,7 @@ export function InboxPage() {
                               className="text-center flex flex-col items-center justify-center text-muted-foreground"
                             >
                               <EmptyStateView
-                                Icon={<Coffee className="h-10 w-10" />}
+                                Icon={<PartyPopper className="h-10 w-10" />}
                                 title="Inbox Zero"
                               />
                             </TableCell>

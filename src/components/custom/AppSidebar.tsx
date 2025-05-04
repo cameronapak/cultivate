@@ -82,14 +82,6 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton className="group" asChild isActive={currentPath === "/away"}>
-                <Link to={"/away"}>
-                  {currentPath === "/away" ? <PackageOpen className="h-5 w-5" /> : <Package className="h-5 w-5" />}
-                  <span>Away</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={currentPath.includes("/canvas")}>
                 <Link to={"/canvases"}>
                   <PencilRuler className="h-5 w-5" />
