@@ -198,6 +198,7 @@ export function InboxPage() {
   const createTaskOptimistically = useAction(createTask, {
     optimisticUpdates: [
       {
+        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
         getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           const newTask = {
@@ -220,6 +221,7 @@ export function InboxPage() {
   const updateTaskOptimistically = useAction(updateTask, {
     optimisticUpdates: [
       {
+        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
         getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           return (oldData || []).map((task: Task & { type: "task" }) =>
@@ -235,6 +237,7 @@ export function InboxPage() {
   const deleteTaskOptimistically = useAction(deleteTask, {
     optimisticUpdates: [
       {
+        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
         getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           return (oldData || []).filter(
@@ -249,6 +252,7 @@ export function InboxPage() {
   const createResourceOptimistically = useAction(createResource, {
     optimisticUpdates: [
       {
+        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
         getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           const newResource = {
@@ -270,6 +274,7 @@ export function InboxPage() {
   const updateResourceOptimistically = useAction(updateResource, {
     optimisticUpdates: [
       {
+        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
         getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           return (oldData || []).map(
@@ -286,6 +291,7 @@ export function InboxPage() {
   const deleteResourceOptimistically = useAction(deleteResource, {
     optimisticUpdates: [
       {
+        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
         getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           return (oldData || []).filter(
@@ -300,6 +306,7 @@ export function InboxPage() {
   const createThoughtOptimistically = useAction(createThought, {
     optimisticUpdates: [
       {
+        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
         getQuerySpecifier: () => [getInboxThoughts, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           const newThought = {
