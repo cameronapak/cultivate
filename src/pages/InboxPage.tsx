@@ -153,15 +153,13 @@ export function InboxPage() {
   } = useQuery(getInboxThoughts, { isAway: isShowingAwayItems });
   const { data: projects } = useQuery(getProjects);
   const activeItemId = searchParams.get("resource");
+  const activeItemType = searchParams.get("type");
   const [newItemText, setNewItemText] = useState("");
   const [isThought, setIsThought] = useState(false);
   const [showInbox, setShowInbox] = useState(() => {
-    const isAway = searchParams.get("away") === "true";
-    if (isAway) {
-      return true;
-    } else {
-      return false;
-    }
+    const shouldShowTheAwayItems = searchParams.get("away") === "true";
+    const activeItemIdExists = Boolean(searchParams.get("resource"));
+    return shouldShowTheAwayItems || activeItemIdExists;
   });
   const [filter, setFilter] = useState<InboxFilter>("all");
   const [editingItemId, setEditingItemId] = useState<{
@@ -943,11 +941,7 @@ export function InboxPage() {
                                     }
                                     onCheckedChange={handleCheckedChange}
                                     isActive={
-                                      (item.type === "resource" &&
-                                        item.id.toString() === activeItemId) ||
-                                      (item.type === "task" &&
-                                        item.id.toString() === activeItemId) ||
-                                      (item.type === "thought" &&
+                                      (item.type === activeItemType &&
                                         item.id.toString() === activeItemId)
                                     }
                                     projects={projects}
