@@ -720,10 +720,14 @@ export function InboxPage() {
           title: "Inbox",
           url: "/inbox",
         },
-        ...(isShowingAwayItems ? [{
-          title: "Away",
-          url: "/away",
-        }] : []),
+        ...(isShowingAwayItems
+          ? [
+              {
+                title: "Away",
+                url: "/away",
+              },
+            ]
+          : []),
       ]}
       ctaButton={
         <div className="flex items-center gap-2">
@@ -750,121 +754,135 @@ export function InboxPage() {
         </div>
       }
     >
-      <div>
+      <AnimatePresence mode="wait">
         <div>
-          {isShowingAwayItems ? (
-            <div className="flex items-center gap-2 h-[36px] mb-6">
-              <PackageOpen className="h-5 w-5 text-muted-foreground" />
-              <h1 className="heading-1">Away</h1>
-            </div>
-          ) : (
-            <div className="relative flex gap-4 mb-6">
-              <Button
-                className="absolute shadow-none top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
-                size="icon"
-                variant="outline"
-                onClick={handleToggleIsThought}
+          <div>
+            {isShowingAwayItems ? (
+              <motion.div
+                key="away"
+                className="flex items-center gap-2 h-[36px] mb-6"
+                initial={{ opacity: 1, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 1, y: -10 }}
+                transition={{ duration: 0.2, type: "spring", bounce: 0 }}
               >
-                {itemTypeButton}
-                <span className="sr-only">
-                  {isThought ? "Add a thought" : "Add a task"}
-                </span>
-              </Button>
-
-              <Input
-                ref={inputRef}
-                autoFocus={true}
-                type="text"
-                placeholder={
-                  isThought ? "Add a thought or URL..." : "Add a task..."
-                }
-                value={newItemText}
-                onChange={(e) => setNewItemText(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="pl-11 flex-1 pr-10"
-              />
-
-              <Button
-                disabled={!newItemText.trim()}
-                className="absolute top-0 right-0 rounded-tl-none rounded-bl-none"
-                type="submit"
-                onClick={handleCreateItem}
-                size="icon"
+                <PackageOpen className="h-5 w-5 text-muted-foreground" />
+                <h1 className="heading-1">Away</h1>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="inbox"
+                className="relative flex gap-4 mb-6"
+                initial={{ opacity: 1, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 1, y: 10 }}
+                transition={{ duration: 0.2, type: "spring", bounce: 0 }}
               >
-                <Send className="h-4 w-4" />
-                <span className="sr-only">Add to inbox</span>
-              </Button>
-            </div>
-          )}
-
-          {showInbox && !isReviewing ? (
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-6">
-                {/* Replace Tabs with segmented control */}
-                <div
-                  className="flex items-center w-fit"
-                  role="tablist"
-                  aria-label="Filter inbox items"
+                <Button
+                  className="absolute shadow-none top-0 left-0 text-muted-foreground rounded-tr-none rounded-br-none"
+                  size="icon"
+                  variant="outline"
+                  onClick={handleToggleIsThought}
                 >
-                  {tabs.map((tab) => (
-                    <motion.div
-                      key={tab.id}
-                      initial={false}
-                      className="relative"
-                    >
-                      <Button
-                        variant={filter === tab.id ? "secondary" : "ghost"}
-                        size="sm"
-                        onClick={() => handleFilterChange(tab.id)}
-                        className={cn(
-                          "relative px-3 rounded-full text-muted-foreground shadow-none",
-                          filter === tab.id && "text-primary"
-                        )}
-                        role="tab"
-                        aria-selected={filter === tab.id}
-                        aria-controls={`${tab.id}-items-tab`}
-                        id={`${tab.id}-tab`}
+                  {itemTypeButton}
+                  <span className="sr-only">
+                    {isThought ? "Add a thought" : "Add a task"}
+                  </span>
+                </Button>
+
+                <Input
+                  ref={inputRef}
+                  autoFocus={true}
+                  type="text"
+                  placeholder={
+                    isThought ? "Add a thought or URL..." : "Add a task..."
+                  }
+                  value={newItemText}
+                  onChange={(e) => setNewItemText(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="pl-11 flex-1 pr-10"
+                />
+
+                <Button
+                  disabled={!newItemText.trim()}
+                  className="absolute top-0 right-0 rounded-tl-none rounded-bl-none"
+                  type="submit"
+                  onClick={handleCreateItem}
+                  size="icon"
+                >
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">Add to inbox</span>
+                </Button>
+              </motion.div>
+            )}
+
+            {showInbox && !isReviewing ? (
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-6">
+                  {/* Replace Tabs with segmented control */}
+                  <div
+                    className="flex items-center w-fit"
+                    role="tablist"
+                    aria-label="Filter inbox items"
+                  >
+                    {tabs.map((tab) => (
+                      <motion.div
+                        key={tab.id}
+                        initial={false}
+                        className="relative"
                       >
-                        {tab.icon}
-                        <span>{tab.label}</span>
-                        <span className="sr-only">
-                          {getItemCount(tab.id)} items
-                        </span>
+                        <Button
+                          variant={filter === tab.id ? "secondary" : "ghost"}
+                          size="sm"
+                          onClick={() => handleFilterChange(tab.id)}
+                          className={cn(
+                            "relative px-3 rounded-full text-muted-foreground shadow-none",
+                            filter === tab.id && "text-primary"
+                          )}
+                          role="tab"
+                          aria-selected={filter === tab.id}
+                          aria-controls={`${tab.id}-items-tab`}
+                          id={`${tab.id}-tab`}
+                        >
+                          {tab.icon}
+                          <span>{tab.label}</span>
+                          <span className="sr-only">
+                            {getItemCount(tab.id)} items
+                          </span>
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        disabled={!showInbox}
+                        variant={isShowingAwayItems ? "default" : "outline"}
+                        type="submit"
+                        onClick={handleToggleAwayItems}
+                        size="icon"
+                      >
+                        {isShowingAwayItems ? (
+                          <PackageOpen className="h-5 w-5" />
+                        ) : (
+                          <Package className="h-5 w-5" />
+                        )}
                       </Button>
-                    </motion.div>
-                  ))}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {isShowingAwayItems ? "Show inbox" : "Show away items"}
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      disabled={!showInbox}
-                      variant={isShowingAwayItems ? "default" : "outline"}
-                      type="submit"
-                      onClick={handleToggleAwayItems}
-                      size="icon"
-                    >
-                      {isShowingAwayItems ? (
-                        <PackageOpen className="h-5 w-5" />
-                      ) : (
-                        <Package className="h-5 w-5" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {isShowingAwayItems ? "Show inbox" : "Show away items"}
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-
-              <div
-                role="tabpanel"
-                id={`${filter}-items-tab`}
-                aria-labelledby={`${filter}-tab`}
-                tabIndex={0}
-                className="relative overflow-hidden"
-              >
-                <AnimatePresence mode="wait">
+                <div
+                  role="tabpanel"
+                  id={`${filter}-items-tab`}
+                  aria-labelledby={`${filter}-tab`}
+                  tabIndex={0}
+                  className="relative overflow-hidden"
+                >
                   <motion.div
                     key={filter}
                     initial={{
@@ -941,8 +959,8 @@ export function InboxPage() {
                                     }
                                     onCheckedChange={handleCheckedChange}
                                     isActive={
-                                      (item.type === activeItemType &&
-                                        item.id.toString() === activeItemId)
+                                      item.type === activeItemType &&
+                                      item.id.toString() === activeItemId
                                     }
                                     projects={projects}
                                     hideActions={false}
@@ -1003,30 +1021,36 @@ export function InboxPage() {
                                           } as const)
                                         : undefined,
                                       // Send Away
-                                      isShowingAwayItems ? undefined : {
-                                        icon: (
-                                          <Package className="h-5 w-5" />
-                                        ),
-                                        label: "Send Away",
-                                        tooltip: "Send Away",
-                                        onClick: async () => {
-                                          if (item.type === "task") {
-                                            await sendTaskAway({
-                                              id: item.id as number,
-                                            });
-                                          } else if (item.type === "resource") {
-                                            await sendResourceAway({
-                                              id: item.id as number,
-                                            });
-                                          } else if (item.type === "thought") {
-                                            await sendThoughtAway({
-                                              id: item.id as string,
-                                            });
-                                          }
-                                          toast.success("Item sent Away");
-                                        },
-                                        show: () => true,
-                                      },
+                                      isShowingAwayItems
+                                        ? undefined
+                                        : {
+                                            icon: (
+                                              <Package className="h-5 w-5" />
+                                            ),
+                                            label: "Send Away",
+                                            tooltip: "Send Away",
+                                            onClick: async () => {
+                                              if (item.type === "task") {
+                                                await sendTaskAway({
+                                                  id: item.id as number,
+                                                });
+                                              } else if (
+                                                item.type === "resource"
+                                              ) {
+                                                await sendResourceAway({
+                                                  id: item.id as number,
+                                                });
+                                              } else if (
+                                                item.type === "thought"
+                                              ) {
+                                                await sendThoughtAway({
+                                                  id: item.id as string,
+                                                });
+                                              }
+                                              toast.success("Item sent Away");
+                                            },
+                                            show: () => true,
+                                          },
                                       // Delete
                                       {
                                         icon: <Trash className="w-4 h-4" />,
@@ -1060,30 +1084,30 @@ export function InboxPage() {
                       </TableBody>
                     </Table>
                   </motion.div>
-                </AnimatePresence>
+                </div>
               </div>
-            </div>
-          ) : (
-            <motion.div
-              initial={{ filter: "blur(4px)", opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-            >
-              <div className="opacity-50 flex justify-center items-center h-full">
-                <EmptyStateView
-                  Icon={<EyeClosed className="h-10 w-10" />}
-                  title="Inbox is safely hidden"
-                  description={
-                    inboxItems.length > 0
-                      ? "You have items ready for review"
-                      : "No items in the inbox"
-                  }
-                />
-              </div>
-            </motion.div>
-          )}
+            ) : (
+              <motion.div
+                initial={{ filter: "blur(4px)", opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              >
+                <div className="opacity-50 flex justify-center items-center h-full">
+                  <EmptyStateView
+                    Icon={<EyeClosed className="h-10 w-10" />}
+                    title="Inbox is safely hidden"
+                    description={
+                      inboxItems.length > 0
+                        ? "You have items ready for review"
+                        : "Nothing to review"
+                    }
+                  />
+                </div>
+              </motion.div>
+            )}
+          </div>
         </div>
-      </div>
+      </AnimatePresence>
     </Layout>
   );
 }
