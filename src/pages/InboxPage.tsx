@@ -710,8 +710,13 @@ export function InboxPage() {
       isLoading={isLoadingTasks || isLoadingResources || isLoadingThoughts}
       breadcrumbItems={[
         {
-          title: isShowingAwayItems ? "Away" : "Inbox",
+          title: "Inbox",
+          url: "/inbox",
         },
+        ...(isShowingAwayItems ? [{
+          title: "Away",
+          url: "/away",
+        }] : []),
       ]}
       ctaButton={
         <div className="flex items-center gap-2">
@@ -995,7 +1000,7 @@ export function InboxPage() {
                                           } as const)
                                         : undefined,
                                       // Send Away
-                                      {
+                                      isShowingAwayItems ? undefined : {
                                         icon: (
                                           <Package className="h-4 w-4 mr-1" />
                                         ),
