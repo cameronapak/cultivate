@@ -248,15 +248,19 @@ export const deletePitch: DeletePitch<DeletePitchPayload, Pitch> = async (
   })
 }
 
-export const getInboxTasks: GetInboxTasks<void, Task[]> = async (_args: void, context: WaspContext) => {
+export const getInboxTasks: GetInboxTasks<{ isAway?: boolean }, Task[]> = async (
+  args: { isAway?: boolean } = {},
+  context: WaspContext
+) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+  const isAway = args.isAway ?? false;
   return context.entities.Task.findMany({
     where: {
       projectId: null,
       userId: context.user.id,
-      isAway: false
+      isAway
     }
   })
 }
@@ -799,15 +803,19 @@ export const deleteCanvas = async (args: { id: string }, context: WaspContext) =
 };
 //#endregion
 
-export const getInboxResources: GetInboxResources<void, Resource[]> = async (_args: void, context: WaspContext) => {
+export const getInboxResources: GetInboxResources<{ isAway?: boolean }, Resource[]> = async (
+  args: { isAway?: boolean } = {},
+  context: WaspContext
+) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+  const isAway = args.isAway ?? false;
   return context.entities.Resource.findMany({
     where: {
       projectId: null,
       userId: context.user.id,
-      isAway: false
+      isAway
     },
     orderBy: { createdAt: 'desc' }
   })
@@ -1075,15 +1083,19 @@ export const moveThought: MoveThought<MoveThoughtArgs, Thought> = async (args: M
   })
 }
 
-export const getInboxThoughts: GetInboxThoughts<void, Thought[]> = async (_args: void, context: WaspContext) => {
+export const getInboxThoughts: GetInboxThoughts<{ isAway?: boolean }, Thought[]> = async (
+  args: { isAway?: boolean } = {},
+  context: WaspContext
+) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+  const isAway = args.isAway ?? false;
   return context.entities.Thought.findMany({
     where: {
       projectId: null,
       userId: context.user.id,
-      isAway: false
+      isAway
     },
     orderBy: { createdAt: 'desc' }
   })
