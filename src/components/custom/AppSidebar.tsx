@@ -1,4 +1,4 @@
-import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail, MailPlus, Loader2 } from "lucide-react";
+import { InboxIcon, BookOpen, PencilRuler, Github, FolderOpen, Folder, Mail, MailPlus, Loader2, Archive, Package, PackageOpen, Search } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -7,31 +7,33 @@ import {
   SidebarHeader,
   SidebarMenuButton,
   SidebarMenu,
-  SidebarMenuItem
+  SidebarMenuItem,
+  SidebarMenuAction
 } from "../../components/ui/sidebar";
 import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "../ui/button";
 import Logo from "./Logo";
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardDescription, CardHeader } from "../ui/card";
 import {
   generateInviteCode
 } from "wasp/client/operations";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Kbd } from "./Kbd";
+import { useCommandMenu } from "./CommandMenu";
 
 export type SidebarItem = {
   isActive: boolean;
   title: string;
   icon: any;
-  items: { title: string; url: string }[];
 };
 
-export function AppSidebar({ items }: { items: SidebarItem[] }) {
+export function AppSidebar() {
   // Get the current path
   const currentPath = window.location.pathname;
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+  const { openCommandMenu } = useCommandMenu();
 
   const handleGenerateCode = async () => {
     setIsGeneratingCode(true);
@@ -61,6 +63,9 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
             >
               <Logo />
             </SidebarMenuButton>
+            <SidebarMenuAction onClick={openCommandMenu}>
+              <Search className="h-5 w-5" /> <span className="sr-only">Search</span>
+            </SidebarMenuAction>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -72,7 +77,7 @@ export function AppSidebar({ items }: { items: SidebarItem[] }) {
                 <Link to={"/inbox"}>
                   <InboxIcon className="h-5 w-5" />
                   <span>Inbox</span>
-                  <Kbd>⌘ + i</Kbd>
+                  <Kbd className="absolute right-2 top-0 bottom-0 h-fit my-auto group-hover:opacity-100 opacity-0 transition-all duration-300 border border-border rounded-sm px-1">⌘ + i</Kbd>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

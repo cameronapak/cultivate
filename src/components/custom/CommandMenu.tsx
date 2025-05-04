@@ -55,8 +55,31 @@ function MotionAnimateHeight({
   );
 }
 
-export function CommandMenu() {
+// CommandMenuContext for global open/close
+const CommandMenuContext = React.createContext<{
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  openCommandMenu: () => void;
+} | undefined>(undefined);
+
+export function useCommandMenu() {
+  const ctx = React.useContext(CommandMenuContext);
+  if (!ctx) throw new Error("useCommandMenu must be used within CommandMenuProvider");
+  return ctx;
+}
+
+export function CommandMenuProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
+  const openCommandMenu = React.useCallback(() => setOpen(true), []);
+  return (
+    <CommandMenuContext.Provider value={{ open, setOpen, openCommandMenu }}>
+      {children}
+    </CommandMenuContext.Provider>
+  );
+}
+
+export function CommandMenu() {
+  const { open, setOpen } = useCommandMenu();
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [search, setSearch] = React.useState("");
   const navigate = useNavigate();
@@ -118,12 +141,12 @@ export function CommandMenu() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen(open ? false : true);
       }
     };
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [open]);
 
   const runCommand = React.useCallback((command: () => void) => {
     setOpen(false);
@@ -149,10 +172,11 @@ export function CommandMenu() {
   type SearchResult = {
     id: string;
     type: "task" | "resource" | "thought";
-    projectId?: string;
+    projectId?: string | number | null;
     title?: string;
     content?: string;
     url?: string;
+    isAway: boolean;
   };
 
   const handleSearchResultClick = (result: SearchResult) => {
@@ -163,20 +187,16 @@ export function CommandMenu() {
             `/projects/${result.projectId}?resource=${result.id}&tab=task`
           );
         } else {
-          navigate(`/inbox?resource=${result.id}&type=task`);
+          navigate(`/inbox?resource=${result.id}&type=task&away=${result.isAway}`);
         }
         break;
       case "resource":
-        if (result.url) {
-          window.open(result.url, "_blank");
+        if (result.projectId) {
+          navigate(
+            `/projects/${result.projectId}?resource=${result.id}&tab=resource`
+          );
         } else {
-          if (result.projectId) {
-            navigate(
-              `/projects/${result.projectId}?resource=${result.id}&tab=resource`
-            );
-          } else {
-            navigate(`/inbox?resource=${result.id}&type=resource`);
-          }
+          navigate(`/inbox?resource=${result.id}&type=resource&away=${result.isAway}`);
         }
         break;
       case "thought":
@@ -185,7 +205,7 @@ export function CommandMenu() {
             `/projects/${result.projectId}?resource=${result.id}&tab=notes`
           );
         } else {
-          navigate(`/inbox?resource=${result.id}&type=thought`);
+          navigate(`/inbox?resource=${result.id}&type=thought&away=${result.isAway}`);
         }
         break;
     }

@@ -10,7 +10,7 @@ const Logo = ({ className }: { className?: string }) => {
 
       <p className="text-lg font-medium">Cultivate</p>
 
-      <Badge variant="outline">Beta</Badge>
+      <Badge variant="outline">Alpha</Badge>
     </Link>
   );
 };

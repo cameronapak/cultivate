@@ -303,11 +303,8 @@ const TaskList = ({
             item={{ ...task, type: 'task' }}
             isEditing={editingItemId?.id === task.id && editingItemId?.type === 'task'}
             onEdit={handleEdit}
-            onSave={handleSave}
             onCancelEdit={handleCancelEdit}
-            onDelete={handleDelete}
-            onStatusChange={(item, complete) => handleStatusChange(item as Task, complete)}
-            renderEditForm={renderTaskEditForm}
+            renderEditForm={(item, onSave, onCancel) => renderTaskEditForm(item, (values) => handleSave(item, values), onCancel)}
           />
         ))}
       </TableBody>
@@ -871,10 +868,8 @@ const ResourcesSection = ({ project }: { project: Project }) => {
                   item={{ ...resource, type: 'resource' }}
                   isEditing={editingItemId?.id === resource.id && editingItemId?.type === 'resource'}
                   onEdit={handleEdit}
-                  onSave={handleSave}
                   onCancelEdit={handleCancelEdit}
-                  onDelete={handleDelete}
-                  renderEditForm={renderResourceEditForm}
+                  renderEditForm={(item, onSave, onCancel) => renderResourceEditForm(item, (values) => handleSave(item, values), onCancel)}
                 />
             ))}
           </TableBody>
@@ -1363,25 +1358,14 @@ export const ProjectView = ({ project }: { project: Project }) => {
                           }} 
                           isEditing={editingItemId?.id === thought.id && editingItemId?.type === 'thought'}
                           onEdit={handleEditNote}
-                          onSave={handleSaveNote}
                           onCancelEdit={handleCancelEditNote}
-                          onDelete={async (item) => {
-                             if (item.type === 'thought') {
-                                if (confirm("Are you sure you want to delete this note?")) {
-                                   await deleteThoughtOptimistically({ id: item.id as string });
-                                   toast.success("Note deleted successfully");
-                                }
-                             }
-                          }}
-                          renderEditForm={(item, onSave, onCancel) => 
-                            item.type === 'thought' ? (
-                              <EditThoughtForm 
-                                thought={item as Thought} 
-                                onSave={onSave} 
-                                onCancel={onCancel} 
-                              />
-                            ) : null
-                          } 
+                          renderEditForm={(item, onSave, onCancel) => item.type === 'thought' ? (
+                            <EditThoughtForm 
+                              thought={item as Thought} 
+                              onSave={(values) => handleSaveNote(item, values)} 
+                              onCancel={onCancel} 
+                            />
+                          ) : null}
                        />
                     ))}
                   </TableBody>

@@ -62,6 +62,7 @@ model Task {
   projectId   Int?
   user        User?    @relation(fields: [userId], references: [id])
   userId      Int?
+  isAway      Boolean  @default(false)
 
   @@index([title, description])
 }
@@ -75,6 +76,7 @@ model Thought {
   projectId   Int?
   user        User?    @relation(fields: [userId], references: [id])
   userId      Int?
+  isAway      Boolean  @default(false)
 
   @@index([content])
 }
@@ -90,6 +92,7 @@ model Resource {
   projectId   Int?
   user        User?    @relation(fields: [userId], references: [id])
   userId      Int?
+  isAway      Boolean  @default(false)
 
   @@index([title, description, url])
 }

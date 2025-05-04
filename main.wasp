@@ -367,3 +367,77 @@ action generateInviteCode {
   entities: [InviteCode, User] // Needs access to InviteCode and User entities
 }
 // #endregion
+
+//#region Away
+
+// Away queries
+query getAwayTasks {
+  fn: import { getAwayTasks } from "@src/queries",
+  entities: [Task]
+}
+query getAwayResources {
+  fn: import { getAwayResources } from "@src/queries",
+  entities: [Resource]
+}
+query getAwayThoughts {
+  fn: import { getAwayThoughts } from "@src/queries",
+  entities: [Thought]
+}
+
+query getAwayTasksByDate {
+  fn: import { getAwayTasksByDate } from "@src/queries",
+  entities: [Task]
+}
+query getAwayResourcesByDate {
+  fn: import { getAwayResourcesByDate } from "@src/queries",
+  entities: [Resource]
+}
+query getAwayThoughtsByDate {
+  fn: import { getAwayThoughtsByDate } from "@src/queries",
+  entities: [Thought]
+}
+
+query getAwayTasksPaginated {
+  fn: import { getAwayTasksPaginated } from "@src/queries",
+  entities: [Task]
+}
+query getAwayResourcesPaginated {
+  fn: import { getAwayResourcesPaginated } from "@src/queries",
+  entities: [Resource]
+}
+query getAwayThoughtsPaginated {
+  fn: import { getAwayThoughtsPaginated } from "@src/queries",
+  entities: [Thought]
+}
+
+// Away actions
+action sendTaskAway {
+  fn: import { sendTaskAway } from "@src/queries",
+  entities: [Task]
+}
+action returnTaskFromAway {
+  fn: import { returnTaskFromAway } from "@src/queries",
+  entities: [Task]
+}
+action sendResourceAway {
+  fn: import { sendResourceAway } from "@src/queries",
+  entities: [Resource]
+}
+action returnResourceFromAway {
+  fn: import { returnResourceFromAway } from "@src/queries",
+  entities: [Resource]
+}
+action sendThoughtAway {
+  fn: import { sendThoughtAway } from "@src/queries",
+  entities: [Thought]
+}
+action returnThoughtFromAway {
+  fn: import { returnThoughtFromAway } from "@src/queries",
+  entities: [Thought]
+}
+
+query getOldestAwayDate {
+  fn: import { getOldestAwayDate } from "@src/queries",
+  entities: [Task, Resource, Thought]
+}
+//#endregion

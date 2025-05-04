@@ -2,10 +2,9 @@ import { Fragment, ReactNode, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar, type SidebarItem } from "./custom/AppSidebar";
-import { CommandMenu } from "./custom/CommandMenu";
+import { CommandMenu, CommandMenuProvider } from "./custom/CommandMenu";
 import { Separator } from "./ui/separator";
 import { Toaster } from "sonner";
-import { env } from "wasp/client";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -15,9 +14,7 @@ import {
 } from "./ui/breadcrumb";
 import { Progress } from "./ui/progress";
 import { ThemeProvider } from "./custom/ThemeProvider";
-import { EllipsisVertical, Folder } from "lucide-react";
-import { getProjects } from "wasp/client/operations";
-import { useQuery } from "wasp/client/operations";
+import { EllipsisVertical } from "lucide-react";
 import { Link } from "wasp/client/router";
 import { Button } from "./ui/button";
 import {
@@ -57,125 +54,112 @@ export function Layout({
   ctaButton,
 }: LayoutProps) {
   const navigate = useNavigate();
-  const isSidebarHidden = JSON.parse(
-    localStorage.getItem("isSidebarHidden") || "false"
-  );
-  const [open, setOpen] = useState(Boolean(isSidebarHidden));
-  const { data: projects, isLoading: areProjectsLoading } =
-    useQuery(getProjects);
+  const [open, setOpen] = useState(() => {
+    return !JSON.parse(localStorage.getItem("isSidebarHidden") || "false");
+  });
 
-  // Add keyboard shortcut handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Check for CMD+I (Mac) or CTRL+I (Windows)
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "i") {
         e.preventDefault();
-        // if I'm on the inbox page, toggle the inbox
-        if (window.location.pathname !== '/inbox') {
-          navigate('/inbox');
+        if (window.location.pathname !== "/inbox") {
+          navigate("/inbox");
         }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        setOpen((prev) => {
+          localStorage.setItem("isSidebarHidden", (!prev).toString());
+          return !prev;
+        });
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
 
-  const toggleSidebar = () => {
-    setOpen((open) => {
-      localStorage.setItem("isSidebarHidden", (!open).toString());
-      return !open;
-    });
+  const handleSidebarOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    localStorage.setItem("isSidebarHidden", (!nextOpen).toString());
   };
-
-  const sidebarItems: SidebarItem[] = areProjectsLoading
-    ? []
-    : [
-        {
-          isActive: true,
-          title: "Projects",
-          icon: Folder,
-          items:
-            projects?.map((project: { id: number; title: string }) => ({
-              title: project.title,
-              url: `/projects/${project.id}`,
-              isActive: project.id === activeProjectId,
-            })) || [],
-        },
-      ];
 
   return (
     <ThemeProvider>
-      <SidebarProvider onOpenChange={toggleSidebar} open={open}>
-        <CommandMenu />
-        <Toaster />
-        <AppSidebar items={sidebarItems} />
-        <SidebarInset>
-          {import.meta.env.DEV && (
-            <div className="pointer-events-none fixed px-12 py-1 -right-12 bottom-4 bg-muted text-muted-foreground rotate-[-38deg] text-base font-medium">
-              STAGING
-            </div>
-          )}
-          <header className="sticky left-0 right-0 top-0 z-20 bg-[hsl(var(--background))] flex h-16 shrink-0 items-center gap-2 border-b px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb className="flex-1">
-              <BreadcrumbList>
-                {breadcrumbItems.map((item, index) => (
-                  <Fragment key={index}>
-                    {index > 0 && <BreadcrumbSeparator />}
-                    <BreadcrumbItem>
-                      {item.url ? (
-                        <Link to={item.url}>{item.title}</Link>
-                      ) : (
-                        <BreadcrumbPage className="ellipsis">
-                          {item.title}
-                        </BreadcrumbPage>
-                      )}
-                    </BreadcrumbItem>
-                  </Fragment>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            {ctaButton || null}
-
-            {menuItems.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <EllipsisVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {menuItems.map((item, index) => (
-                    <DropdownMenuItem
-                      key={index}
-                      className={`flex items-center gap-2 ${
-                        item.isDestructive
-                          ? "group hover:!text-destructive-foreground hover:!bg-destructive"
-                          : ""
-                      }`}
-                      onClick={item.action}
-                    >
-                      {item.icon}
-                      {item.title}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : null}
-
-            {isLoading ? (
-              <div className="absolute -bottom-1 left-0 right-0">
-                <Progress indeterminate />
+      <SidebarProvider open={open} onOpenChange={handleSidebarOpenChange}>
+        <CommandMenuProvider>
+          <CommandMenu />
+          <Toaster />
+          <AppSidebar />
+          <SidebarInset>
+            {import.meta.env.DEV && (
+              <div className="pointer-events-none fixed px-12 py-1 -right-12 bottom-4 bg-muted text-muted-foreground rotate-[-38deg] text-base font-medium">
+                STAGING
               </div>
-            ) : null}
-          </header>
-          <div className={`max-w-2xl w-full mx-auto p-6 ${mainContentClasses}`}>
-            {children}
-          </div>
-        </SidebarInset>
+            )}
+            <header className="sticky left-0 right-0 top-0 z-20 bg-[hsl(var(--background))] flex h-16 shrink-0 items-center gap-2 border-b px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              <Breadcrumb className="flex-1">
+                <BreadcrumbList>
+                  {breadcrumbItems.map((item, index) => (
+                    <Fragment key={index}>
+                      {index > 0 && <BreadcrumbSeparator />}
+                      <BreadcrumbItem>
+                        {item.url ? (
+                          <Link to={item.url}>{item.title}</Link>
+                        ) : (
+                          <BreadcrumbPage className="ellipsis">
+                            {item.title}
+                          </BreadcrumbPage>
+                        )}
+                      </BreadcrumbItem>
+                    </Fragment>
+                  ))}
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              {ctaButton || null}
+
+              {menuItems.length > 0 ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <EllipsisVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {menuItems.map((item, index) => (
+                      <DropdownMenuItem
+                        key={index}
+                        className={`flex items-center gap-2 ${
+                          item.isDestructive
+                            ? "group hover:!text-destructive-foreground hover:!bg-destructive"
+                            : ""
+                        }`}
+                        onClick={item.action}
+                      >
+                        {item.icon}
+                        {item.title}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : null}
+
+              {isLoading ? (
+                <div className="absolute -bottom-1 left-0 right-0">
+                  <Progress indeterminate />
+                </div>
+              ) : null}
+            </header>
+            <div
+              className={`max-w-2xl w-full mx-auto p-6 ${mainContentClasses}`}
+            >
+              {children}
+            </div>
+          </SidebarInset>
+        </CommandMenuProvider>
       </SidebarProvider>
     </ThemeProvider>
   );

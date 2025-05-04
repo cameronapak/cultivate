@@ -248,15 +248,50 @@ export const deletePitch: DeletePitch<DeletePitchPayload, Pitch> = async (
   })
 }
 
-export const getInboxTasks: GetInboxTasks<void, Task[]> = async (_args: void, context: WaspContext) => {
+export const getInboxTasks: GetInboxTasks<{ isAway?: boolean }, Task[]> = async (
+  args: { isAway?: boolean } = {},
+  context: WaspContext
+) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const isAway = args.isAway ?? false;
+  return context.entities.Task.findMany({
+    where: {
+      projectId: null,
+      userId: context.user.id,
+      isAway
+    }
+  })
+}
+
+// Away Tasks
+export const getAwayTasks = async (_args: void, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
   return context.entities.Task.findMany({
     where: {
       projectId: null,
-      userId: context.user.id
+      userId: context.user.id,
+      isAway: true
     }
+  })
+}
+
+export const sendTaskAway = async (args: { id: number }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Task.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: true }
+  })
+}
+
+export const returnTaskFromAway = async (args: { id: number }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Task.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: false }
   })
 }
 
@@ -768,17 +803,52 @@ export const deleteCanvas = async (args: { id: string }, context: WaspContext) =
 };
 //#endregion
 
-export const getInboxResources: GetInboxResources<void, Resource[]> = async (_args: void, context: WaspContext) => {
+export const getInboxResources: GetInboxResources<{ isAway?: boolean }, Resource[]> = async (
+  args: { isAway?: boolean } = {},
+  context: WaspContext
+) => {
   if (!context.user) {
     throw new HttpError(401)
   }
-
+  const isAway = args.isAway ?? false;
   return context.entities.Resource.findMany({
-    where: { 
+    where: {
       projectId: null,
-      userId: context.user.id 
+      userId: context.user.id,
+      isAway
     },
     orderBy: { createdAt: 'desc' }
+  })
+}
+
+// Away Resources
+export const getAwayResources = async (_args: void, context: WaspContext) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  return context.entities.Resource.findMany({
+    where: {
+      projectId: null,
+      userId: context.user.id,
+      isAway: true
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+export const sendResourceAway = async (args: { id: number }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Resource.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: true }
+  })
+}
+
+export const returnResourceFromAway = async (args: { id: number }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Resource.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: false }
   })
 }
 
@@ -1013,16 +1083,52 @@ export const moveThought: MoveThought<MoveThoughtArgs, Thought> = async (args: M
   })
 }
 
-export const getInboxThoughts: GetInboxThoughts<void, Thought[]> = async (_args: void, context: WaspContext) => {
+export const getInboxThoughts: GetInboxThoughts<{ isAway?: boolean }, Thought[]> = async (
+  args: { isAway?: boolean } = {},
+  context: WaspContext
+) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+  const isAway = args.isAway ?? false;
+  return context.entities.Thought.findMany({
+    where: {
+      projectId: null,
+      userId: context.user.id,
+      isAway
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+// Away Thoughts
+export const getAwayThoughts = async (_args: void, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
   return context.entities.Thought.findMany({
     where: {
       projectId: null,
-      userId: context.user.id
+      userId: context.user.id,
+      isAway: true
     },
     orderBy: { createdAt: 'desc' }
+  })
+}
+
+export const sendThoughtAway = async (args: { id: string }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Thought.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: true }
+  })
+}
+
+export const returnThoughtFromAway = async (args: { id: string }, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401)
+  return context.entities.Thought.update({
+    where: { id: args.id, userId: context.user.id },
+    data: { isAway: false }
   })
 }
 
@@ -1174,6 +1280,7 @@ type SearchResult = {
   createdAt: Date;
   rank: number;
   url?: string;
+  isAway: boolean;
 }
 
 // Calculate relevance scores based on match positions and number of matches
@@ -1242,7 +1349,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
     projectId: task.projectId,
     createdAt: task.createdAt,
     rank: calculateRelevance(task.title, query) + calculateRelevance(task.description, query),
-    url: null
+    url: null,
+    isAway: task.isAway,
   }));
 
   const formattedResources: SearchResult[] = resources.map((resource: Resource) => ({
@@ -1255,7 +1363,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
     rank: calculateRelevance(resource.title, query) + 
           calculateRelevance(resource.description, query) + 
           calculateRelevance(resource.url, query),
-    url: resource.url
+    url: resource.url,
+    isAway: resource.isAway,
   }));
 
   const formattedThoughts: SearchResult[] = thoughts.map((thought: Thought) => ({
@@ -1266,7 +1375,8 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
     projectId: thought.projectId,
     createdAt: thought.createdAt,
     rank: calculateRelevance(thought.content, query),
-    url: null
+    url: null,
+    isAway: thought.isAway,
   }));
 
   // Combine all results and sort by rank (higher rank first) and then by date
@@ -1279,4 +1389,208 @@ export const globalSearch = async (args: GlobalSearchInput, context: WaspContext
   });
 
   return combinedResults;
+};
+
+// Date-filtered paged Away Tasks
+export const getAwayTasksByDate = async (
+  args: { date: string; cursor?: number; limit?: number },
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { date, cursor, limit = 20 } = args;
+  const start = new Date(date + 'T00:00:00');
+  const end = new Date(date + 'T23:59:59.999');
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+    createdAt: { gte: start, lte: end },
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Task.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Date-filtered paged Away Resources
+export const getAwayResourcesByDate = async (
+  args: { date: string; cursor?: number; limit?: number },
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { date, cursor, limit = 20 } = args;
+  const start = new Date(date + 'T00:00:00');
+  const end = new Date(date + 'T23:59:59.999');
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+    createdAt: { gte: start, lte: end },
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Resource.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Date-filtered paged Away Thoughts
+export const getAwayThoughtsByDate = async (
+  args: { date: string; cursor?: string; limit?: number },
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { date, cursor, limit = 20 } = args;
+  const start = new Date(date + 'T00:00:00');
+  const end = new Date(date + 'T23:59:59.999');
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+    createdAt: { gte: start, lte: end },
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Thought.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Paginated Away Tasks
+export const getAwayTasksPaginated = async (
+  args: { cursor?: number; limit?: number } = {},
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { cursor, limit = 20 } = args;
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Task.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Paginated Away Resources
+export const getAwayResourcesPaginated = async (
+  args: { cursor?: number; limit?: number } = {},
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { cursor, limit = 20 } = args;
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Resource.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+// Paginated Away Thoughts
+export const getAwayThoughtsPaginated = async (
+  args: { cursor?: string; limit?: number } = {},
+  context: WaspContext
+) => {
+  if (!context.user) throw new HttpError(401);
+  const { cursor, limit = 20 } = args;
+  const where: any = {
+    projectId: null,
+    userId: context.user.id,
+    isAway: true,
+  };
+  if (cursor) {
+    where.id = { lt: cursor };
+  }
+  const items = await context.entities.Thought.findMany({
+    where,
+    orderBy: { id: 'desc' },
+    take: limit + 1,
+  });
+  let nextCursor = null;
+  if (items.length > limit) {
+    nextCursor = items[limit].id;
+    items.pop();
+  }
+  return { items, nextCursor };
+};
+
+export const getOldestAwayDate = async (_args: any, context: WaspContext) => {
+  if (!context.user) throw new HttpError(401);
+
+  const [oldestTask] = await context.entities.Task.findMany({
+    where: { userId: context.user.id, isAway: true },
+    orderBy: { createdAt: 'asc' },
+    take: 1,
+    select: { createdAt: true },
+  });
+  const [oldestResource] = await context.entities.Resource.findMany({
+    where: { userId: context.user.id, isAway: true },
+    orderBy: { createdAt: 'asc' },
+    take: 1,
+    select: { createdAt: true },
+  });
+  const [oldestThought] = await context.entities.Thought.findMany({
+    where: { userId: context.user.id, isAway: true },
+    orderBy: { createdAt: 'asc' },
+    take: 1,
+    select: { createdAt: true },
+  });
+
+  const dates = [oldestTask?.createdAt, oldestResource?.createdAt, oldestThought?.createdAt].filter(Boolean);
+  if (dates.length === 0) return null;
+  return new Date(Math.min(...dates.map(d => new Date(d).getTime())));
 };
