@@ -883,7 +883,7 @@ export function InboxPage() {
                   className="relative overflow-hidden"
                 >
                   <motion.div
-                    key={filter + isShowingAwayItems ? "away" : "inbox"}
+                    key={`${filter}-${isShowingAwayItems ? "away" : "inbox"}`}
                     initial={{
                       x: isInitialRender
                         ? 0
