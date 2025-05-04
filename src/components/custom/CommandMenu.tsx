@@ -186,8 +186,6 @@ export function CommandMenu() {
           navigate(
             `/projects/${result.projectId}?resource=${result.id}&tab=task`
           );
-        } else if (result.isAway) {
-          navigate(`/away?resource=${result.id}&type=task`);
         } else {
           navigate(`/inbox?resource=${result.id}&type=task`);
         }
@@ -197,8 +195,6 @@ export function CommandMenu() {
           navigate(
             `/projects/${result.projectId}?resource=${result.id}&tab=resource`
           );
-        } else if (result.isAway) {
-          navigate(`/away?resource=${result.id}&type=resource`);
         } else {
           navigate(`/inbox?resource=${result.id}&type=resource`);
         }
@@ -208,8 +204,6 @@ export function CommandMenu() {
           navigate(
             `/projects/${result.projectId}?resource=${result.id}&tab=notes`
           );
-        } else if (result.isAway) {
-          navigate(`/away?resource=${result.id}&type=thought`);
         } else {
           navigate(`/inbox?resource=${result.id}&type=thought`);
         }

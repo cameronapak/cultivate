@@ -155,7 +155,14 @@ export function InboxPage() {
   const activeItemId = searchParams.get("resource");
   const [newItemText, setNewItemText] = useState("");
   const [isThought, setIsThought] = useState(false);
-  const [showInbox, setShowInbox] = useState(false);
+  const [showInbox, setShowInbox] = useState(() => {
+    const isAway = searchParams.get("away") === "true";
+    if (isAway) {
+      return true;
+    } else {
+      return false;
+    }
+  });
   const [filter, setFilter] = useState<InboxFilter>("all");
   const [editingItemId, setEditingItemId] = useState<{
     id: string | number | null;

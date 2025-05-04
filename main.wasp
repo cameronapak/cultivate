@@ -436,13 +436,6 @@ action returnThoughtFromAway {
   entities: [Thought]
 }
 
-// Away route and page
-route AwayRoute { path: "/away", to: AwayPage }
-page AwayPage {
-  authRequired: true,
-  component: import { AwayPage } from "@src/pages/AwayPage"
-}
-
 query getOldestAwayDate {
   fn: import { getOldestAwayDate } from "@src/queries",
   entities: [Task, Resource, Thought]
