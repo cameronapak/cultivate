@@ -828,7 +828,6 @@ export function InboxPage() {
                     {tabs.map((tab) => (
                       <motion.div
                         key={tab.id}
-                        initial={false}
                         className="relative"
                       >
                         <Button
@@ -884,7 +883,7 @@ export function InboxPage() {
                   className="relative overflow-hidden"
                 >
                   <motion.div
-                    key={filter}
+                    key={filter + isShowingAwayItems ? "away" : "inbox"}
                     initial={{
                       x: isInitialRender
                         ? 0
