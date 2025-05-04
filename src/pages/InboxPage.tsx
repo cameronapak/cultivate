@@ -165,7 +165,6 @@ export function InboxPage() {
   const [isInitialRender, setIsInitialRender] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isReviewing, setIsReviewing] = useState(false);
-  const [reviewIndex, setReviewIndex] = useState(0);
   const [reviewAnswers, setReviewAnswers] = useState<{
     [key: string]: {
       meaning: string;
@@ -198,8 +197,11 @@ export function InboxPage() {
   const createTaskOptimistically = useAction(createTask, {
     optimisticUpdates: [
       {
-        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
-        getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
+        getQuerySpecifier: () => [
+          // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
+          getInboxTasks,
+          { isAway: isShowingAwayItems },
+        ],
         updateQuery: (payload, oldData) => {
           const newTask = {
             id: Date.now(), // Temporary ID
@@ -221,8 +223,11 @@ export function InboxPage() {
   const updateTaskOptimistically = useAction(updateTask, {
     optimisticUpdates: [
       {
-        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
-        getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
+        getQuerySpecifier: () => [
+          // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
+          getInboxTasks,
+          { isAway: isShowingAwayItems },
+        ],
         updateQuery: (payload, oldData) => {
           return (oldData || []).map((task: Task & { type: "task" }) =>
             task.id === payload.id
@@ -237,8 +242,11 @@ export function InboxPage() {
   const deleteTaskOptimistically = useAction(deleteTask, {
     optimisticUpdates: [
       {
-        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
-        getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
+        getQuerySpecifier: () => [
+          // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
+          getInboxTasks,
+          { isAway: isShowingAwayItems },
+        ],
         updateQuery: (payload, oldData) => {
           return (oldData || []).filter(
             (task: Task & { type: "task" }) => task.id !== payload.id
@@ -252,8 +260,11 @@ export function InboxPage() {
   const createResourceOptimistically = useAction(createResource, {
     optimisticUpdates: [
       {
-        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
-        getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
+        getQuerySpecifier: () => [
+          // @ts-ignore: This iss the correct way to approach this, so I'm not sure why it's erroring out.
+          getInboxResources,
+          { isAway: isShowingAwayItems },
+        ],
         updateQuery: (payload, oldData) => {
           const newResource = {
             id: Date.now(), // Temporary ID
@@ -274,8 +285,11 @@ export function InboxPage() {
   const updateResourceOptimistically = useAction(updateResource, {
     optimisticUpdates: [
       {
-        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
-        getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
+        getQuerySpecifier: () => [
+          // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
+          getInboxResources,
+          { isAway: isShowingAwayItems },
+        ],
         updateQuery: (payload, oldData) => {
           return (oldData || []).map(
             (resource: Resource & { type: "resource" }) =>
@@ -291,8 +305,11 @@ export function InboxPage() {
   const deleteResourceOptimistically = useAction(deleteResource, {
     optimisticUpdates: [
       {
-        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
-        getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
+        getQuerySpecifier: () => [
+          // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
+          getInboxResources,
+          { isAway: isShowingAwayItems },
+        ],
         updateQuery: (payload, oldData) => {
           return (oldData || []).filter(
             (resource: Resource & { type: "resource" }) =>
@@ -306,8 +323,11 @@ export function InboxPage() {
   const createThoughtOptimistically = useAction(createThought, {
     optimisticUpdates: [
       {
-        // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
-        getQuerySpecifier: () => [getInboxThoughts, { isAway: isShowingAwayItems }],
+        getQuerySpecifier: () => [
+          // @ts-ignore: This is the correct way to approach this, so I'm not sure why it's erroring out.
+          getInboxThoughts,
+          { isAway: isShowingAwayItems },
+        ],
         updateQuery: (payload, oldData) => {
           const newThought = {
             id: Date.now().toString(), // Temporary ID
@@ -331,6 +351,7 @@ export function InboxPage() {
       localStorage.setItem("shouldShowTasks", (!prev).toString());
       return !prev;
     });
+    setIsInitialRender(true);
   };
 
   const handleToggleAwayItems = () => {
@@ -697,26 +718,7 @@ export function InboxPage() {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                variant={isShowingAwayItems ? "default" : "outline"}
-                type="submit"
-                onClick={handleToggleAwayItems}
-                size="icon"
-              >
-                {isShowingAwayItems ? (
-                  <PackageOpen className="h-5 w-5" />
-                ) : (
-                  <Package className="h-5 w-5" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {isShowingAwayItems ? "Show inbox" : "Show away items"}
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
+                disabled={isShowingAwayItems}
                 variant={showInbox ? "outline" : "default"}
                 type="submit"
                 onClick={handleToggleTasks}
@@ -785,35 +787,62 @@ export function InboxPage() {
 
           {showInbox && !isReviewing ? (
             <div>
-              {/* Replace Tabs with segmented control */}
-              <div
-                className="flex items-center mb-6 w-fit"
-                role="tablist"
-                aria-label="Filter inbox items"
-              >
-                {tabs.map((tab) => (
-                  <motion.div key={tab.id} initial={false} className="relative">
-                    <Button
-                      variant={filter === tab.id ? "secondary" : "ghost"}
-                      size="sm"
-                      onClick={() => handleFilterChange(tab.id)}
-                      className={cn(
-                        "relative px-3 rounded-full text-muted-foreground shadow-none",
-                        filter === tab.id && "text-primary"
-                      )}
-                      role="tab"
-                      aria-selected={filter === tab.id}
-                      aria-controls={`${tab.id}-items-tab`}
-                      id={`${tab.id}-tab`}
+              <div className="flex items-center justify-between gap-2 mb-6">
+                {/* Replace Tabs with segmented control */}
+                <div
+                  className="flex items-center w-fit"
+                  role="tablist"
+                  aria-label="Filter inbox items"
+                >
+                  {tabs.map((tab) => (
+                    <motion.div
+                      key={tab.id}
+                      initial={false}
+                      className="relative"
                     >
-                      {tab.icon}
-                      <span>{tab.label}</span>
-                      <span className="sr-only">
-                        {getItemCount(tab.id)} items
-                      </span>
+                      <Button
+                        variant={filter === tab.id ? "secondary" : "ghost"}
+                        size="sm"
+                        onClick={() => handleFilterChange(tab.id)}
+                        className={cn(
+                          "relative px-3 rounded-full text-muted-foreground shadow-none",
+                          filter === tab.id && "text-primary"
+                        )}
+                        role="tab"
+                        aria-selected={filter === tab.id}
+                        aria-controls={`${tab.id}-items-tab`}
+                        id={`${tab.id}-tab`}
+                      >
+                        {tab.icon}
+                        <span>{tab.label}</span>
+                        <span className="sr-only">
+                          {getItemCount(tab.id)} items
+                        </span>
+                      </Button>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      disabled={!showInbox}
+                      variant={isShowingAwayItems ? "default" : "outline"}
+                      type="submit"
+                      onClick={handleToggleAwayItems}
+                      size="icon"
+                    >
+                      {isShowingAwayItems ? (
+                        <PackageOpen className="h-5 w-5" />
+                      ) : (
+                        <Package className="h-5 w-5" />
+                      )}
                     </Button>
-                  </motion.div>
-                ))}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {isShowingAwayItems ? "Show inbox" : "Show away items"}
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               <div
