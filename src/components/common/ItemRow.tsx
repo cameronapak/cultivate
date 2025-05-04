@@ -52,6 +52,7 @@ interface ItemRowProps {
   onCancelEdit: () => void;
   onCheckedChange?: (item: Task, checked: boolean) => void;
   onUpdate?: (item: DisplayItem) => void;
+  onSave?: (item: DisplayItem) => void;
   renderEditForm: (
     item: DisplayItem,
     onSave: (values: any) => void,
@@ -81,6 +82,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
       onCancelEdit,
       onCheckedChange,
       onUpdate,
+      onSave,
       renderEditForm,
       hideDragHandle = false,
       actions,

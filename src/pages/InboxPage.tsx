@@ -6,12 +6,11 @@ import {
   useQuery,
   getInboxThoughts,
   useAction,
-  // @ts-ignore: Wasp will generate these operations
   sendTaskAway,
   sendResourceAway,
   sendThoughtAway,
 } from "wasp/client/operations";
-import type { Project, Task, Resource, Thought } from "wasp/entities";
+import type { Task, Resource, Thought } from "wasp/entities";
 import {
   createTask,
   updateTaskStatus,
@@ -30,9 +29,7 @@ import {
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Checkbox } from "../components/ui/checkbox";
 import {
-  Trash2,
   MoveRight,
   Eye,
   EyeClosed,
@@ -42,12 +39,7 @@ import {
   Link2,
   Minus,
   List,
-  Dot,
   Square,
-  ExternalLink,
-  Heart,
-  HandHeart,
-  Archive,
   Pencil,
   Trash,
   PackageOpen,
@@ -64,18 +56,8 @@ import {
 } from "../components/ui/tooltip";
 import { toast } from "sonner";
 import { EmptyStateView } from "../components/custom/EmptyStateView";
-import { getFaviconFromUrl, getMetadataFromUrl, isUrl } from "../lib/utils";
+import { getMetadataFromUrl, isUrl } from "../lib/utils";
 import { cn } from "../lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "../components/ui/dialog";
-import { Textarea } from "../components/ui/textarea";
-import { Toggle } from "../components/ui/toggle";
 import { Combobox } from "../components/custom/ComboBox";
 import { ItemRow, DisplayItem } from "../components/common/ItemRow";
 import {
@@ -84,7 +66,6 @@ import {
   EditThoughtForm,
 } from "../components/ProjectView";
 import { useSearchParams } from "react-router-dom";
-import { Progress } from "../components/ui/progress";
 
 // Create a type where the string is a date in the format "2025-04-20"
 type DateString =
@@ -217,7 +198,7 @@ export function InboxPage() {
   const createTaskOptimistically = useAction(createTask, {
     optimisticUpdates: [
       {
-        getQuerySpecifier: () => [getInboxTasks],
+        getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           const newTask = {
             id: Date.now(), // Temporary ID
@@ -239,7 +220,7 @@ export function InboxPage() {
   const updateTaskOptimistically = useAction(updateTask, {
     optimisticUpdates: [
       {
-        getQuerySpecifier: () => [getInboxTasks],
+        getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           return (oldData || []).map((task: Task & { type: "task" }) =>
             task.id === payload.id
@@ -254,7 +235,7 @@ export function InboxPage() {
   const deleteTaskOptimistically = useAction(deleteTask, {
     optimisticUpdates: [
       {
-        getQuerySpecifier: () => [getInboxTasks],
+        getQuerySpecifier: () => [getInboxTasks, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           return (oldData || []).filter(
             (task: Task & { type: "task" }) => task.id !== payload.id
@@ -268,7 +249,7 @@ export function InboxPage() {
   const createResourceOptimistically = useAction(createResource, {
     optimisticUpdates: [
       {
-        getQuerySpecifier: () => [getInboxResources],
+        getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           const newResource = {
             id: Date.now(), // Temporary ID
@@ -289,7 +270,7 @@ export function InboxPage() {
   const updateResourceOptimistically = useAction(updateResource, {
     optimisticUpdates: [
       {
-        getQuerySpecifier: () => [getInboxResources],
+        getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           return (oldData || []).map(
             (resource: Resource & { type: "resource" }) =>
@@ -305,7 +286,7 @@ export function InboxPage() {
   const deleteResourceOptimistically = useAction(deleteResource, {
     optimisticUpdates: [
       {
-        getQuerySpecifier: () => [getInboxResources],
+        getQuerySpecifier: () => [getInboxResources, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           return (oldData || []).filter(
             (resource: Resource & { type: "resource" }) =>
@@ -319,7 +300,7 @@ export function InboxPage() {
   const createThoughtOptimistically = useAction(createThought, {
     optimisticUpdates: [
       {
-        getQuerySpecifier: () => [getInboxThoughts],
+        getQuerySpecifier: () => [getInboxThoughts, { isAway: isShowingAwayItems }],
         updateQuery: (payload, oldData) => {
           const newThought = {
             id: Date.now().toString(), // Temporary ID
@@ -924,6 +905,9 @@ export function InboxPage() {
                                     renderEditForm={renderItemEditForm}
                                     onEdit={handleEditItem}
                                     onCancelEdit={handleCancelEdit}
+                                    onUpdate={async (item) => {
+                                      await handleSaveItem(item, item);
+                                    }}
                                     actions={[
                                       // Edit
                                       {
