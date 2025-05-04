@@ -67,17 +67,17 @@ export function Layout({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check for CMD+I (Mac) or CTRL+I (Windows)
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "i") {
         e.preventDefault();
         // if I'm on the inbox page, toggle the inbox
-        if (window.location.pathname !== '/inbox') {
-          navigate('/inbox');
+        if (window.location.pathname !== "/inbox") {
+          navigate("/inbox");
         }
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
 
   const toggleSidebar = () => {
@@ -105,8 +105,8 @@ export function Layout({
 
   return (
     <ThemeProvider>
-      <CommandMenuProvider>
-        <SidebarProvider onOpenChange={toggleSidebar} open={open}>
+      <SidebarProvider onOpenChange={toggleSidebar} open={open}>
+        <CommandMenuProvider>
           <CommandMenu />
           <Toaster />
           <AppSidebar items={sidebarItems} />
@@ -172,12 +172,14 @@ export function Layout({
                 </div>
               ) : null}
             </header>
-            <div className={`max-w-2xl w-full mx-auto p-6 ${mainContentClasses}`}>
+            <div
+              className={`max-w-2xl w-full mx-auto p-6 ${mainContentClasses}`}
+            >
               {children}
             </div>
           </SidebarInset>
-        </SidebarProvider>
-      </CommandMenuProvider>
+        </CommandMenuProvider>
+      </SidebarProvider>
     </ThemeProvider>
   );
 }
