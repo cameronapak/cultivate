@@ -134,7 +134,8 @@ const tabs: TabData[] = [
 ];
 
 export function InboxPage() {
-  const [isShowingAwayItems, setIsShowingAwayItems] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isShowingAwayItems = searchParams.get("away") === "true";
   const {
     data: tasks,
     isLoading: isLoadingTasks,
@@ -151,7 +152,6 @@ export function InboxPage() {
     error: thoughtsError,
   } = useQuery(getInboxThoughts, { isAway: isShowingAwayItems });
   const { data: projects } = useQuery(getProjects);
-  const [searchParams] = useSearchParams();
   const activeItemId = searchParams.get("resource");
   const [newItemText, setNewItemText] = useState("");
   const [isThought, setIsThought] = useState(false);
@@ -355,10 +355,12 @@ export function InboxPage() {
   };
 
   const handleToggleAwayItems = () => {
-    setIsShowingAwayItems((prev: boolean) => {
-      localStorage.setItem("shouldShowAwayItems", (!prev).toString());
-      return !prev;
-    });
+    if (isShowingAwayItems) {
+      searchParams.delete("away");
+    } else {
+      searchParams.set("away", "true");
+    }
+    setSearchParams(searchParams);
   };
 
   const handleToggleIsThought = () => {
