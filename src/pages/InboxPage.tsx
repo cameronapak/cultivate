@@ -1005,7 +1005,7 @@ export function InboxPage() {
                                       // Send Away
                                       isShowingAwayItems ? undefined : {
                                         icon: (
-                                          <Package className="h-4 w-4 mr-1" />
+                                          <Package className="h-5 w-5" />
                                         ),
                                         label: "Send Away",
                                         tooltip: "Send Away",
