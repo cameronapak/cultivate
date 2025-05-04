@@ -53,15 +53,13 @@ function SearchButton() {
 }
 
 export function AwayPage() {
-  const [search, setSearch] = useState("");
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const activeResourceId = searchParams.get("resource");
   const activeResourceType = searchParams.get("type");
   const [editingItemId, setEditingItemId] = useState<{
     id: string | number | null;
     type: string;
   } | null>(null);
-  const [loadedDates, setLoadedDates] = useState<string[]>([]); // YYYY-MM-DD
   const [itemsByDate, setItemsByDate] = useState<Record<string, DisplayItem[]>>(
     {}
   );
@@ -74,25 +72,36 @@ export function AwayPage() {
   const { data: oldestAwayDate, isLoading: isLoadingOldest } =
     useQuery(getOldestAwayDate);
 
-  // Helper: get the last N days as YYYY-MM-DD strings
-  const getLastNDates = (n: number, offset: number = 0) => {
+  // Helper: get all dates from today back to untilDate (inclusive)
+  const today = new Date();
+  const untilParam = searchParams.get("until");
+  const untilDate = untilParam ? new Date(untilParam) : today;
+
+  const getDatesUntil = (untilDate: Date) => {
     const dates: string[] = [];
-    const today = new Date();
-    for (let i = offset; i < n + offset; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
+    const d = new Date(today);
+    d.setHours(0, 0, 0, 0);
+    const until = new Date(untilDate);
+    until.setHours(0, 0, 0, 0);
+    while (d >= until) {
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
       const dd = String(d.getDate()).padStart(2, "0");
       dates.push(`${yyyy}-${mm}-${dd}`);
+      d.setDate(d.getDate() - 1);
     }
     return dates;
   };
 
-  // Load the most recent 3 days on mount, but only after oldestAwayDate is loaded
+  const loadedDates = getDatesUntil(untilDate);
+
+  // Load the most recent days on mount, but only after oldestAwayDate is loaded
   useEffect(() => {
     if (isInitialLoading && !isLoadingOldest && oldestAwayDate !== undefined) {
-      loadMoreDays();
+      // If no until param, set it to today
+      if (!untilParam) {
+        setSearchParams({ ...Object.fromEntries(searchParams), until: today.toISOString().slice(0, 10) });
+      }
       setIsInitialLoading(false);
     }
     // eslint-disable-next-line
@@ -133,93 +142,88 @@ export function AwayPage() {
   // Function to load more days (paged)
   const loadMoreDays = async () => {
     if (!oldestAwayDate) {
-      setHasMore(false);
       return;
     }
     const oldestDate = new Date(oldestAwayDate);
-    const nextDates = getLastNDates(3, loadedDates.length)
-      .filter((d) => !loadedDates.includes(d))
-      .filter((d) => new Date(d) >= oldestDate);
-    if (nextDates.length === 0) {
-      setHasMore(false);
-      return;
+    oldestDate.setHours(0, 0, 0, 0);
+    const currentUntil = untilParam ? new Date(untilParam) : today;
+    currentUntil.setHours(0, 0, 0, 0);
+    // Go back 3 more days from current untilDate
+    const newUntil = new Date(currentUntil);
+    newUntil.setDate(newUntil.getDate() - 3);
+    // If newUntil is before oldestDate, clamp to oldestDate
+    if (newUntil < oldestDate) {
+      newUntil.setTime(oldestDate.getTime());
     }
-    setLoadingDates((prev) => new Set([...prev, ...nextDates]));
-    for (const date of nextDates) {
-      // Fetch all three types for this date
-      const [tasksRes, resourcesRes, thoughtsRes] = await Promise.all([
-        getAwayTasksByDate({ date }),
-        getAwayResourcesByDate({ date }),
-        getAwayThoughtsByDate({ date }),
-      ]);
-      const items: DisplayItem[] = [
-        ...(tasksRes.items || []).map((t: Task) => ({
-          ...t,
-          type: "task" as const,
-        })),
-        ...(resourcesRes.items || []).map((r: Resource) => ({
-          ...r,
-          type: "resource" as const,
-        })),
-        ...(thoughtsRes.items || []).map((th: Thought) => ({
-          ...th,
-          type: "thought" as const,
-          title:
-            th.content.slice(0, 60) + (th.content.length > 60 ? "..." : ""),
-        })),
-      ];
-      setItemsByDate((prev) => ({
-        ...prev,
-        [date]: items.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ),
-      }));
-      setLoadedDates((prev) => Array.from(new Set([...prev, date])));
-      setLoadingDates((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(date);
-        return newSet;
-      });
-    }
-    // If the last date loaded is the oldest date, stop loading more
-    const lastLoaded = nextDates[nextDates.length - 1];
-    if (
-      lastLoaded &&
-      new Date(lastLoaded).getTime() === oldestDate.setHours(0, 0, 0, 0)
-    ) {
-      setHasMore(false);
-    }
+    setSearchParams({ ...Object.fromEntries(searchParams), until: newUntil.toISOString().slice(0, 10) });
   };
 
-  // Combine and filter items for search
-  const awayItems: DisplayItem[] = useMemo(() => {
-    const all = loadedDates.flatMap((date) => itemsByDate[date] || []);
-    if (!search.trim()) return all;
-    const s = search.toLowerCase();
-    return all.filter((item) => {
-      if (
-        item.type === "task" &&
-        (item.title?.toLowerCase().includes(s) ||
-          (item as Task).description?.toLowerCase().includes(s))
-      )
-        return true;
-      if (
-        item.type === "resource" &&
-        (item.title?.toLowerCase().includes(s) ||
-          (item as Resource).description?.toLowerCase().includes(s) ||
-          (item as Resource).url?.toLowerCase().includes(s))
-      )
-        return true;
-      if (
-        item.type === "thought" &&
-        (item.title?.toLowerCase().includes(s) ||
-          (item as Thought).content?.toLowerCase().includes(s))
-      )
-        return true;
-      return false;
-    });
-  }, [loadedDates, itemsByDate, search]);
+  // Update hasMore based on untilDate and oldestAwayDate
+  useEffect(() => {
+    if (!oldestAwayDate) return;
+    const oldest = new Date(oldestAwayDate);
+    oldest.setHours(0, 0, 0, 0);
+    const until = new Date(untilDate);
+    until.setHours(0, 0, 0, 0);
+    if (until <= oldest) {
+      setHasMore(false);
+    } else {
+      setHasMore(true);
+    }
+  }, [oldestAwayDate, untilDate]);
+
+  // Fetch items for all loadedDates
+  useEffect(() => {
+    let cancelled = false;
+    const fetchAll = async () => {
+      setLoadingDates(new Set(loadedDates));
+      for (const date of loadedDates) {
+        // Only fetch if not already loaded
+        if (itemsByDate[date]) continue;
+        const [tasksRes, resourcesRes, thoughtsRes] = await Promise.all([
+          getAwayTasksByDate({ date }),
+          getAwayResourcesByDate({ date }),
+          getAwayThoughtsByDate({ date }),
+        ]);
+        if (cancelled) return;
+        const items: DisplayItem[] = [
+          ...(tasksRes.items || []).map((t: Task) => ({
+            ...t,
+            type: "task" as const,
+          })),
+          ...(resourcesRes.items || []).map((r: Resource) => ({
+            ...r,
+            type: "resource" as const,
+          })),
+          ...(thoughtsRes.items || []).map((th: Thought) => ({
+            ...th,
+            type: "thought" as const,
+            title:
+              th.content.slice(0, 60) + (th.content.length > 60 ? "..." : ""),
+          })),
+        ];
+        setItemsByDate((prev) => ({
+          ...prev,
+          [date]: items.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          ),
+        }));
+        setLoadingDates((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(date);
+          return newSet;
+        });
+      }
+    };
+    if (loadedDates.length > 0) {
+      fetchAll();
+    }
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadedDates.join(",")]);
 
   // Group by date (only loaded dates)
   const grouped: GroupedItems = useMemo(() => {
