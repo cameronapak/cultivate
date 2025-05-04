@@ -973,7 +973,7 @@ export function InboxPage() {
                 <EmptyStateView
                   Icon={<EyeClosed className="h-10 w-10" />}
                   title="Inbox is safely hidden"
-                  description={inboxItems.length > 0 ? `${inboxItems.length} items ready for review` : "No items in the inbox"}
+                  description={inboxItems.length > 0 ? "You have items ready for review" : "No items in the inbox"}
                 />
               </div>
             </motion.div>
