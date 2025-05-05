@@ -831,12 +831,12 @@ export function InboxPage() {
                         className="relative"
                       >
                         <Button
-                          variant={filter === tab.id ? "secondary" : "ghost"}
+                          variant={filter === tab.id ? "default" : "ghost"}
                           size="sm"
                           onClick={() => handleFilterChange(tab.id)}
                           className={cn(
                             "relative px-3 rounded-full text-muted-foreground shadow-none",
-                            filter === tab.id && "text-primary"
+                            filter === tab.id && "text-primary-foreground"
                           )}
                           role="tab"
                           aria-selected={filter === tab.id}
