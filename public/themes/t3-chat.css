@@ -1,6 +1,7 @@
 /**
- * @name T3 Chat    
+ * @name T3 Chat (modified)  
  * @author [tweakcn](https://github.com/jnsahaj/tweakcn)
+ * This has been modified.
  */
 
 :root {
@@ -30,10 +31,10 @@
   --chart-5: 27.12 86.9% 67.06%;
   --sidebar: 290 50% 92.94%;
   --sidebar-foreground: 327.2 77.32% 38.04%;
-  --sidebar-primary: 240 9.8% 30%;
-  --sidebar-primary-foreground: 320 47.37% 96.27%;
-  --sidebar-accent: 60 6.67% 97.06%;
-  --sidebar-accent-foreground: 240 9.8% 30%;
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
   --sidebar-border: 20 7.32% 91.96%;
   --sidebar-ring: 333.33 71.43% 50.59%;
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
