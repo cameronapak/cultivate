@@ -381,7 +381,7 @@ export function CommandMenu() {
               <CommandSeparator />
               {/* Theme selection group */}
               <CommandGroup heading="Theme">
-                {APP_COLOR_THEMES.filter((theme) => theme.toLowerCase().includes(search.toLowerCase())).map((theme) => (
+                {APP_COLOR_THEMES.filter((theme) => theme.toLowerCase().includes(search.toLowerCase()) || search.toLowerCase() === "theme").map((theme) => (
                   <MotionAnimateHeight key={theme}>
                     <CommandItem
                       onSelect={() =>
