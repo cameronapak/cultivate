@@ -1,0 +1,108 @@
+/**
+ * @name Pastel Dreams    
+ * @author [tweakcn](https://github.com/jnsahaj/tweakcn)
+ */
+
+:root {
+  --background: 280 33.33% 96.47%;
+  --foreground: 216.92 19.12% 26.67%;
+  --card: 0 0% 100%;
+  --card-foreground: 216.92 19.12% 26.67%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 216.92 19.12% 26.67%;
+  --primary: 255.14 91.74% 76.27%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 267.57 90.24% 91.96%;
+  --secondary-foreground: 215 13.79% 34.12%;
+  --muted: 268.7 100% 95.49%;
+  --muted-foreground: 220 8.94% 46.08%;
+  --accent: 292.5 44.44% 92.94%;
+  --accent-foreground: 216.92 19.12% 26.67%;
+  --destructive: 0 93.55% 81.76%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 267.57 90.24% 91.96%;
+  --input: 267.57 90.24% 91.96%;
+  --ring: 255.14 91.74% 76.27%;
+  --chart-1: 255.14 91.74% 76.27%;
+  --chart-2: 258.31 89.53% 66.27%;
+  --chart-3: 262.12 83.26% 57.84%;
+  --chart-4: 263.39 69.96% 50.39%;
+  --chart-5: 263.36 69.3% 42.16%;
+  --sidebar: 267.57 90.24% 91.96%;
+  --sidebar-foreground: 216.92 19.12% 26.67%;
+  --sidebar-primary: 255.14 91.74% 76.27%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 292.5 44.44% 92.94%;
+  --sidebar-accent-foreground: 216.92 19.12% 26.67%;
+  --sidebar-border: 267.57 90.24% 91.96%;
+  --sidebar-ring: 255.14 91.74% 76.27%;
+  --font-sans: Open Sans, sans-serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: IBM Plex Mono, monospace;
+  --radius: 1.5rem;
+  --shadow-2xs: 0px 8px 16px -4px hsl(0 0% 0% / 0.04);
+  --shadow-xs: 0px 8px 16px -4px hsl(0 0% 0% / 0.04);
+  --shadow-sm: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 1px 2px -5px hsl(0 0% 0% / 0.08);
+  --shadow: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 1px 2px -5px hsl(0 0% 0% / 0.08);
+  --shadow-md: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 2px 4px -5px hsl(0 0% 0% / 0.08);
+  --shadow-lg: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 4px 6px -5px hsl(0 0% 0% / 0.08);
+  --shadow-xl: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 8px 10px -5px hsl(0 0% 0% / 0.08);
+  --shadow-2xl: 0px 8px 16px -4px hsl(0 0% 0% / 0.2);
+}
+
+.dark {
+  --background: 24 9.8% 10%;
+  --foreground: 226.45 100% 93.92%;
+  --card: 270 17.78% 17.65%;
+  --card-foreground: 226.45 100% 93.92%;
+  --popover: 270 17.78% 17.65%;
+  --popover-foreground: 226.45 100% 93.92%;
+  --primary: 255.9 95.4% 82.94%;
+  --primary-foreground: 24 9.8% 10%;
+  --secondary: 272.5 19.35% 24.31%;
+  --secondary-foreground: 216 12.2% 83.92%;
+  --muted: 270 17.78% 17.65%;
+  --muted-foreground: 217.89 10.61% 64.9%;
+  --accent: 266.9 19.21% 29.61%;
+  --accent-foreground: 216 12.2% 83.92%;
+  --destructive: 0 93.55% 81.76%;
+  --destructive-foreground: 24 9.8% 10%;
+  --border: 272.5 19.35% 24.31%;
+  --input: 272.5 19.35% 24.31%;
+  --ring: 255.9 95.4% 82.94%;
+  --chart-1: 255.9 95.4% 82.94%;
+  --chart-2: 255.14 91.74% 76.27%;
+  --chart-3: 258.31 89.53% 66.27%;
+  --chart-4: 262.12 83.26% 57.84%;
+  --chart-5: 263.39 69.96% 50.39%;
+  --sidebar: 272.5 19.35% 24.31%;
+  --sidebar-foreground: 226.45 100% 93.92%;
+  --sidebar-primary: 255.9 95.4% 82.94%;
+  --sidebar-primary-foreground: 24 9.8% 10%;
+  --sidebar-accent: 266.9 19.21% 29.61%;
+  --sidebar-accent-foreground: 216 12.2% 83.92%;
+  --sidebar-border: 272.5 19.35% 24.31%;
+  --sidebar-ring: 255.9 95.4% 82.94%;
+  --font-sans: Open Sans, sans-serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: IBM Plex Mono, monospace;
+  --radius: 1.5rem;
+  --shadow-2xs: 0px 8px 16px -4px hsl(0 0% 0% / 0.04);
+  --shadow-xs: 0px 8px 16px -4px hsl(0 0% 0% / 0.04);
+  --shadow-sm: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 1px 2px -5px hsl(0 0% 0% / 0.08);
+  --shadow: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 1px 2px -5px hsl(0 0% 0% / 0.08);
+  --shadow-md: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 2px 4px -5px hsl(0 0% 0% / 0.08);
+  --shadow-lg: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 4px 6px -5px hsl(0 0% 0% / 0.08);
+  --shadow-xl: 0px 8px 16px -4px hsl(0 0% 0% / 0.08),
+    0px 8px 10px -5px hsl(0 0% 0% / 0.08);
+  --shadow-2xl: 0px 8px 16px -4px hsl(0 0% 0% / 0.2);
+}

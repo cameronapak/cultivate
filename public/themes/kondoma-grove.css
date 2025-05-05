@@ -1,0 +1,108 @@
+/**
+ * @name Kondoma Grove    
+ * @author [tweakcn](https://github.com/jnsahaj/tweakcn)
+ */
+
+:root {
+  --background: 45 49.06% 79.22%;
+  --foreground: 26 19.48% 30.2%;
+  --card: 42 45.45% 82.75%;
+  --card-foreground: 26 19.48% 30.2%;
+  --popover: 43.64 57.89% 88.82%;
+  --popover-foreground: 26 19.48% 30.2%;
+  --primary: 72.31 33.05% 46.27%;
+  --primary-foreground: 42.86 63.64% 97.84%;
+  --secondary: 44.52 48.44% 74.9%;
+  --secondary-foreground: 26 19.48% 30.2%;
+  --muted: 44.52 48.44% 74.9%;
+  --muted-foreground: 26.67 11.3% 46.86%;
+  --accent: 43.94 49.65% 71.96%;
+  --accent-foreground: 26 19.48% 30.2%;
+  --destructive: 8.57 54.49% 67.25%;
+  --destructive-foreground: 45 44.44% 96.47%;
+  --border: 26.25 23.53% 60%;
+  --input: 43.94 49.65% 71.96%;
+  --ring: 92.43 19.17% 62.16%;
+  --chart-1: 92.43 19.17% 62.16%;
+  --chart-2: 95 15.79% 55.29%;
+  --chart-3: 102.86 16.28% 74.71%;
+  --chart-4: 104.44 11.3% 46.86%;
+  --chart-5: 103.64 11.11% 38.82%;
+  --sidebar: 44.06 52.46% 76.08%;
+  --sidebar-foreground: 26 19.48% 30.2%;
+  --sidebar-primary: 92.43 19.17% 62.16%;
+  --sidebar-primary-foreground: 42.86 63.64% 97.84%;
+  --sidebar-accent: 42.35 28.81% 88.43%;
+  --sidebar-accent-foreground: 26 19.48% 30.2%;
+  --sidebar-border: 42.35 24.64% 86.47%;
+  --sidebar-ring: 92.43 19.17% 62.16%;
+  --font-sans: Merriweather, serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.425rem;
+  --shadow-2xs: 3px 3px 2px 0px hsl(88 22% 35% / 0.07);
+  --shadow-xs: 3px 3px 2px 0px hsl(88 22% 35% / 0.07);
+  --shadow-sm: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 1px 2px -1px hsl(88 22% 35% / 0.15);
+  --shadow: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 1px 2px -1px hsl(88 22% 35% / 0.15);
+  --shadow-md: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 2px 4px -1px hsl(88 22% 35% / 0.15);
+  --shadow-lg: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 4px 6px -1px hsl(88 22% 35% / 0.15);
+  --shadow-xl: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 8px 10px -1px hsl(88 22% 35% / 0.15);
+  --shadow-2xl: 3px 3px 2px 0px hsl(88 22% 35% / 0.38);
+}
+
+.dark {
+  --background: 42.35 17.17% 19.41%;
+  --foreground: 38.4 40.98% 88.04%;
+  --card: 38.57 12.07% 22.75%;
+  --card-foreground: 38.4 40.98% 88.04%;
+  --popover: 38.57 12.07% 22.75%;
+  --popover-foreground: 38.4 40.98% 88.04%;
+  --primary: 95 15.79% 55.29%;
+  --primary-foreground: 26.67 12% 14.71%;
+  --secondary: 40 13.21% 31.18%;
+  --secondary-foreground: 38.4 40.98% 88.04%;
+  --muted: 38.82 12.98% 25.69%;
+  --muted-foreground: 33.33 9.37% 62.35%;
+  --accent: 44.35 27.27% 49.61%;
+  --accent-foreground: 26.67 12% 14.71%;
+  --destructive: 9.6 33.63% 56.27%;
+  --destructive-foreground: 40 41.18% 90%;
+  --border: 40 13.21% 31.18%;
+  --input: 40 13.21% 31.18%;
+  --ring: 95 15.79% 55.29%;
+  --chart-1: 95 15.79% 55.29%;
+  --chart-2: 92.43 19.17% 62.16%;
+  --chart-3: 104.44 11.3% 46.86%;
+  --chart-4: 44.35 27.27% 49.61%;
+  --chart-5: 103.64 11.11% 38.82%;
+  --sidebar: 42.35 17.17% 19.41%;
+  --sidebar-foreground: 38.4 40.98% 88.04%;
+  --sidebar-primary: 95 15.79% 55.29%;
+  --sidebar-primary-foreground: 26.67 12% 14.71%;
+  --sidebar-accent: 44.35 27.27% 49.61%;
+  --sidebar-accent-foreground: 26.67 12% 14.71%;
+  --sidebar-border: 40 13.21% 31.18%;
+  --sidebar-ring: 95 15.79% 55.29%;
+  --font-sans: Merriweather, serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.425rem;
+  --shadow-2xs: 3px 3px 2px 0px hsl(88 22% 35% / 0.07);
+  --shadow-xs: 3px 3px 2px 0px hsl(88 22% 35% / 0.07);
+  --shadow-sm: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 1px 2px -1px hsl(88 22% 35% / 0.15);
+  --shadow: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 1px 2px -1px hsl(88 22% 35% / 0.15);
+  --shadow-md: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 2px 4px -1px hsl(88 22% 35% / 0.15);
+  --shadow-lg: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 4px 6px -1px hsl(88 22% 35% / 0.15);
+  --shadow-xl: 3px 3px 2px 0px hsl(88 22% 35% / 0.15),
+    3px 8px 10px -1px hsl(88 22% 35% / 0.15);
+  --shadow-2xl: 3px 3px 2px 0px hsl(88 22% 35% / 0.38);
+}

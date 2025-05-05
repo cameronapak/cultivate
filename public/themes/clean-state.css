@@ -1,0 +1,108 @@
+/**
+ * @name Clean State    
+ * @author [tweakcn](https://github.com/jnsahaj/tweakcn)
+ */
+
+:root {
+  --background: 210 40% 98.04%;
+  --foreground: 217.24 32.58% 17.45%;
+  --card: 0 0% 100%;
+  --card-foreground: 217.24 32.58% 17.45%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 217.24 32.58% 17.45%;
+  --primary: 238.73 83.53% 66.67%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 13.04% 90.98%;
+  --secondary-foreground: 216.92 19.12% 26.67%;
+  --muted: 220 14.29% 95.88%;
+  --muted-foreground: 220 8.94% 46.08%;
+  --accent: 226.45 100% 93.92%;
+  --accent-foreground: 216.92 19.12% 26.67%;
+  --destructive: 0 84.24% 60.2%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 216 12.2% 83.92%;
+  --input: 216 12.2% 83.92%;
+  --ring: 238.73 83.53% 66.67%;
+  --chart-1: 238.73 83.53% 66.67%;
+  --chart-2: 243.4 75.36% 58.63%;
+  --chart-3: 244.52 57.94% 50.59%;
+  --chart-4: 243.65 54.5% 41.37%;
+  --chart-5: 242.17 47.43% 34.31%;
+  --sidebar: 220 14.29% 95.88%;
+  --sidebar-foreground: 217.24 32.58% 17.45%;
+  --sidebar-primary: 238.73 83.53% 66.67%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 226.45 100% 93.92%;
+  --sidebar-accent-foreground: 216.92 19.12% 26.67%;
+  --sidebar-border: 216 12.2% 83.92%;
+  --sidebar-ring: 238.73 83.53% 66.67%;
+  --font-sans: Inter, sans-serif;
+  --font-serif: Merriweather, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.5rem;
+  --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 1px 2px -2px hsl(0 0% 0% / 0.1);
+  --shadow: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 1px 2px -2px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 2px 4px -2px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 4px 6px -2px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 8px 10px -2px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
+}
+
+.dark {
+  --background: 222.22 47.37% 11.18%;
+  --foreground: 214.29 31.82% 91.37%;
+  --card: 217.24 32.58% 17.45%;
+  --card-foreground: 214.29 31.82% 91.37%;
+  --popover: 217.24 32.58% 17.45%;
+  --popover-foreground: 214.29 31.82% 91.37%;
+  --primary: 234.45 89.47% 73.92%;
+  --primary-foreground: 222.22 47.37% 11.18%;
+  --secondary: 217.78 23.08% 22.94%;
+  --secondary-foreground: 216 12.2% 83.92%;
+  --muted: 217.24 32.58% 17.45%;
+  --muted-foreground: 217.89 10.61% 64.9%;
+  --accent: 216.92 19.12% 26.67%;
+  --accent-foreground: 216 12.2% 83.92%;
+  --destructive: 0 84.24% 60.2%;
+  --destructive-foreground: 222.22 47.37% 11.18%;
+  --border: 215 13.79% 34.12%;
+  --input: 215 13.79% 34.12%;
+  --ring: 234.45 89.47% 73.92%;
+  --chart-1: 234.45 89.47% 73.92%;
+  --chart-2: 238.73 83.53% 66.67%;
+  --chart-3: 243.4 75.36% 58.63%;
+  --chart-4: 244.52 57.94% 50.59%;
+  --chart-5: 243.65 54.5% 41.37%;
+  --sidebar: 217.24 32.58% 17.45%;
+  --sidebar-foreground: 214.29 31.82% 91.37%;
+  --sidebar-primary: 234.45 89.47% 73.92%;
+  --sidebar-primary-foreground: 222.22 47.37% 11.18%;
+  --sidebar-accent: 216.92 19.12% 26.67%;
+  --sidebar-accent-foreground: 216 12.2% 83.92%;
+  --sidebar-border: 215 13.79% 34.12%;
+  --sidebar-ring: 234.45 89.47% 73.92%;
+  --font-sans: Inter, sans-serif;
+  --font-serif: Merriweather, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.5rem;
+  --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 1px 2px -2px hsl(0 0% 0% / 0.1);
+  --shadow: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 1px 2px -2px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 2px 4px -2px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 4px 6px -2px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.1),
+    0px 8px 10px -2px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
+}

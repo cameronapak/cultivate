@@ -1,0 +1,108 @@
+/**
+ * @name Tangerine    
+ * @author [tweakcn](https://github.com/jnsahaj/tweakcn)
+ */
+
+:root {
+  --background: 204 12.2% 91.96%;
+  --foreground: 0 0% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 20%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 20%;
+  --primary: 13.21 73.04% 54.9%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 14.29% 95.88%;
+  --secondary-foreground: 215 13.79% 34.12%;
+  --muted: 210 20% 98.04%;
+  --muted-foreground: 220 8.94% 46.08%;
+  --accent: 207.69 46.43% 89.02%;
+  --accent-foreground: 224.44 64.29% 32.94%;
+  --destructive: 0 84.24% 60.2%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 210 9.37% 87.45%;
+  --input: 220 15.79% 96.27%;
+  --ring: 13.21 73.04% 54.9%;
+  --chart-1: 210 37.5% 65.49%;
+  --chart-2: 12.9 73.23% 75.1%;
+  --chart-3: 213.16 29.92% 50.2%;
+  --chart-4: 216.92 35.78% 42.75%;
+  --chart-5: 221.01 43.65% 35.49%;
+  --sidebar: 216 7.94% 87.65%;
+  --sidebar-foreground: 0 0% 20%;
+  --sidebar-primary: 13.21 73.04% 54.9%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 207.69 46.43% 89.02%;
+  --sidebar-accent-foreground: 224.44 64.29% 32.94%;
+  --sidebar-border: 220 13.04% 90.98%;
+  --sidebar-ring: 13.21 73.04% 54.9%;
+  --font-sans: Inter, sans-serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.75rem;
+  --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
+}
+
+.dark {
+  --background: 219.13 29.11% 15.49%;
+  --foreground: 0 0% 89.8%;
+  --card: 223.64 20.75% 20.78%;
+  --card-foreground: 0 0% 89.8%;
+  --popover: 223.33 19.15% 18.43%;
+  --popover-foreground: 0 0% 89.8%;
+  --primary: 13.21 73.04% 54.9%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 222 19.23% 20.39%;
+  --secondary-foreground: 0 0% 89.8%;
+  --muted: 222 19.23% 20.39%;
+  --muted-foreground: 0 0% 63.92%;
+  --accent: 223.64 34.38% 25.1%;
+  --accent-foreground: 213.33 96.92% 87.25%;
+  --destructive: 0 84.24% 60.2%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 224.35 15.86% 28.43%;
+  --input: 224.35 15.86% 28.43%;
+  --ring: 13.21 73.04% 54.9%;
+  --chart-1: 210 37.5% 65.49%;
+  --chart-2: 11.72 63.5% 73.14%;
+  --chart-3: 213.16 29.92% 50.2%;
+  --chart-4: 216.92 35.78% 42.75%;
+  --chart-5: 221.01 43.65% 35.49%;
+  --sidebar: 222.86 20% 20.59%;
+  --sidebar-foreground: 0 0% 89.8%;
+  --sidebar-primary: 13.21 73.04% 54.9%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 223.64 34.38% 25.1%;
+  --sidebar-accent-foreground: 213.33 96.92% 87.25%;
+  --sidebar-border: 224.35 15.86% 28.43%;
+  --sidebar-ring: 13.21 73.04% 54.9%;
+  --font-sans: Inter, sans-serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.75rem;
+  --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0px 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
+}
