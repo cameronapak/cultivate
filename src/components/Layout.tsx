@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useState, useEffect } from "react";
+import { Fragment, ReactNode, useState, useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar, type SidebarItem } from "./custom/AppSidebar";
@@ -23,6 +23,7 @@ import {
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
 import { DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { getAndSetTheme } from "../lib/utils";
 
 interface MenuItem {
   title: string;
@@ -78,6 +79,10 @@ export function Layout({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
+
+  useLayoutEffect(() => {
+    getAndSetTheme();
+  }, []);
 
   const handleSidebarOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);

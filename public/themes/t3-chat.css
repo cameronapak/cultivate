@@ -1,0 +1,113 @@
+/**
+ * @name T3 Chat (modified)  
+ * @author [tweakcn](https://github.com/jnsahaj/tweakcn)
+ * This has been modified.
+ */
+
+:root {
+  --background: 300 33.33% 97.06%;
+  --foreground: 296 55.56% 21.18%;
+  --card: 300 33.33% 97.06%;
+  --card-foreground: 296 55.56% 21.18%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 296 55.56% 21.18%;
+  --primary: 333.27 42.98% 46.08%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 314.67 61.64% 85.69%;
+  --secondary-foreground: 295.83 40.91% 34.51%;
+  --muted: 310.59 48.57% 93.14%;
+  --muted-foreground: 295.52 32.68% 40.2%;
+  --accent: 314.67 61.64% 85.69%;
+  --accent-foreground: 295.83 40.91% 34.51%;
+  --destructive: 357.69 43.7% 46.67%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 304.8 60.98% 83.92%;
+  --input: 317.37 44.19% 83.14%;
+  --ring: 333.33 71.43% 50.59%;
+  --chart-1: 318.44 70.2% 50%;
+  --chart-2: 272.34 82.27% 39.8%;
+  --chart-3: 197.33 36.59% 24.12%;
+  --chart-4: 43.13 73.56% 65.88%;
+  --chart-5: 27.12 86.9% 67.06%;
+  --sidebar: 290 50% 92.94%;
+  --sidebar-foreground: 327.2 77.32% 38.04%;
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: 20 7.32% 91.96%;
+  --sidebar-ring: 333.33 71.43% 50.59%;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --radius: 0.5rem;
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+}
+
+.dark {
+  --background: 270 14.71% 13.33%;
+  --foreground: 272.31 28.26% 81.96%;
+  --card: 270 13.64% 17.25%;
+  --card-foreground: 324.55 23.4% 81.57%;
+  --popover: 320 23.08% 5.1%;
+  --popover-foreground: 325.71 33.33% 95.88%;
+  --primary: 332.02 100% 31.96%;
+  --primary-foreground: 329.36 59.49% 84.51%;
+  --secondary: 273.75 15.09% 20.78%;
+  --secondary-foreground: 270 30.23% 83.14%;
+  --muted: 272.73 13.92% 15.49%;
+  --muted-foreground: 268.8 20.66% 76.27%;
+  --accent: 272.14 20.29% 27.06%;
+  --accent-foreground: 325.71 33.33% 95.88%;
+  --destructive: 350.63 50% 12.55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 326.67 8.26% 21.37%;
+  --input: 312 8.77% 22.35%;
+  --ring: 333.33 71.43% 50.59%;
+  --chart-1: 333.27 42.98% 46.08%;
+  --chart-2: 273.33 54.78% 54.9%;
+  --chart-3: 30 80% 54.9%;
+  --chart-4: 280 64.71% 60%;
+  --chart-5: 339.77 74.78% 54.9%;
+  --sidebar: 308.57 17.07% 8.04%;
+  --sidebar-foreground: 327.27 26.19% 83.53%;
+  --sidebar-primary: 224.28 76.33% 48.04%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 318.46 20.63% 12.35%;
+  --sidebar-accent-foreground: 240 4.76% 95.88%;
+  --sidebar-border: 0 0% 0%;
+  --sidebar-ring: 333.33 71.43% 50.59%;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --radius: 0.5rem;
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+}

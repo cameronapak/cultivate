@@ -303,6 +303,7 @@ const TaskList = ({
             item={{ ...task, type: 'task' }}
             isEditing={editingItemId?.id === task.id && editingItemId?.type === 'task'}
             onEdit={handleEdit}
+            onCheckedChange={handleStatusChange}
             onCancelEdit={handleCancelEdit}
             renderEditForm={(item, onSave, onCancel) => renderTaskEditForm(item, (values) => handleSave(item, values), onCancel)}
           />

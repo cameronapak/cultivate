@@ -26,10 +26,13 @@ import {
   Link2,
   Square,
   Minus,
+  Check,
+  Palette,
 } from "lucide-react";
 import { useLayoutState } from "../../hooks/useLayoutState";
 import { useSidebar } from "../ui/sidebar";
 import { AnimatePresence, motion, MotionProps } from "motion/react";
+import { setTheme, getTheme, APP_COLOR_THEMES } from "../../lib/utils";
 
 type NavigationCommand = {
   title: string;
@@ -45,7 +48,11 @@ function MotionAnimateHeight({
     <motion.div
       initial={{ height: 0, opacity: 0, filter: "blur(8px)" }}
       // https://developer.chrome.com/docs/css-ui/animate-to-height-auto
-      animate={{ height: "calc-size(min-content, size)", opacity: 1, filter: "blur(0px)" }}
+      animate={{
+        height: "calc-size(min-content, size)",
+        opacity: 1,
+        filter: "blur(0px)",
+      }}
       exit={{ height: 0, opacity: 0, filter: "blur(8px)" }}
       transition={{ type: "spring", bounce: 0.1, duration: 0.25 }}
       {...props}
@@ -56,19 +63,27 @@ function MotionAnimateHeight({
 }
 
 // CommandMenuContext for global open/close
-const CommandMenuContext = React.createContext<{
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  openCommandMenu: () => void;
-} | undefined>(undefined);
+const CommandMenuContext = React.createContext<
+  | {
+      open: boolean;
+      setOpen: (open: boolean) => void;
+      openCommandMenu: () => void;
+    }
+  | undefined
+>(undefined);
 
 export function useCommandMenu() {
   const ctx = React.useContext(CommandMenuContext);
-  if (!ctx) throw new Error("useCommandMenu must be used within CommandMenuProvider");
+  if (!ctx)
+    throw new Error("useCommandMenu must be used within CommandMenuProvider");
   return ctx;
 }
 
-export function CommandMenuProvider({ children }: { children: React.ReactNode }) {
+export function CommandMenuProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = React.useState(false);
   const openCommandMenu = React.useCallback(() => setOpen(true), []);
   return (
@@ -187,7 +202,9 @@ export function CommandMenu() {
             `/projects/${result.projectId}?resource=${result.id}&tab=task`
           );
         } else {
-          navigate(`/inbox?resource=${result.id}&type=task&away=${result.isAway}`);
+          navigate(
+            `/inbox?resource=${result.id}&type=task&away=${result.isAway}`
+          );
         }
         break;
       case "resource":
@@ -196,7 +213,9 @@ export function CommandMenu() {
             `/projects/${result.projectId}?resource=${result.id}&tab=resource`
           );
         } else {
-          navigate(`/inbox?resource=${result.id}&type=resource&away=${result.isAway}`);
+          navigate(
+            `/inbox?resource=${result.id}&type=resource&away=${result.isAway}`
+          );
         }
         break;
       case "thought":
@@ -205,7 +224,9 @@ export function CommandMenu() {
             `/projects/${result.projectId}?resource=${result.id}&tab=notes`
           );
         } else {
-          navigate(`/inbox?resource=${result.id}&type=thought&away=${result.isAway}`);
+          navigate(
+            `/inbox?resource=${result.id}&type=thought&away=${result.isAway}`
+          );
         }
         break;
     }
@@ -234,6 +255,13 @@ export function CommandMenu() {
     matchesSearch("Show completed tasks");
   const showSidebarAction =
     matchesSearch("Hide sidebar") || matchesSearch("Show sidebar");
+
+  // Theme state for CommandMenu
+  const [themeState, setThemeState] = React.useState(getTheme());
+  const handleThemeChange = (theme: string) => {
+    setThemeState(theme);
+    setTheme(theme);
+  };
 
   return (
     <CommandDialog shouldFilter={false} open={open} onOpenChange={setOpen}>
@@ -348,7 +376,31 @@ export function CommandMenu() {
             </>
           )}
 
-          <CommandSeparator />
+          {search.length !== 0 ? (
+            <>
+              <CommandSeparator />
+              {/* Theme selection group */}
+              <CommandGroup heading="Theme">
+                {APP_COLOR_THEMES.filter((theme) => theme.toLowerCase().includes(search.toLowerCase()) || search.toLowerCase() === "theme").map((theme) => (
+                  <MotionAnimateHeight key={theme}>
+                    <CommandItem
+                      onSelect={() =>
+                        runCommand(() => handleThemeChange(theme))
+                      }
+                      className="flex items-center"
+                    >
+                      <Palette className="mr-2 h-4 w-4" />
+                      <div className="w-full flex items-center justify-between">
+                        <div>{theme}</div>
+                        {themeState === theme && <Check className="h-4 w-4" />}
+                      </div>
+                    </CommandItem>
+                  </MotionAnimateHeight>
+                ))}
+              </CommandGroup>
+            </>
+          ) : null}
+
           {searchResults && searchResults?.length === 0 && (
             <CommandEmpty>No results found.</CommandEmpty>
           )}
