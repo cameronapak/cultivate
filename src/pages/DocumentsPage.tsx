@@ -119,7 +119,7 @@ export function DocumentsPage() {
                     ) : (
                       <Badge
                         variant="secondary"
-                        className="text-muted-foreground font-normal"
+                        className="bg-muted text-muted-foreground font-normal"
                       >
                         Draft
                       </Badge>
