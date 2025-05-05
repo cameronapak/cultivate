@@ -13,12 +13,10 @@ import { setTheme, getTheme, APP_COLOR_THEMES } from "../../lib/utils"
 export function AppColorThemeToggle() {
   const [themeState, setThemeState] = useState(getTheme());
 
-  useEffect(() => {
-    if (themeState) {
-      console.log("setting theme", themeState);
-      setTheme(themeState);
-    }
-  }, [themeState]);
+  const handleThemeChange = (theme: string) => {
+    setThemeState(theme);
+    setTheme(theme);
+  }
 
   return (
     <DropdownMenu>
@@ -30,7 +28,7 @@ export function AppColorThemeToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-h-[128px] overflow-y-auto" align="end">
         {APP_COLOR_THEMES.map((theme) => (
-          <DropdownMenuItem className="flex items-center justify-between" key={theme} onClick={() => setThemeState(theme)}>
+          <DropdownMenuItem className="flex items-center justify-between" key={theme} onClick={() => handleThemeChange(theme)}>
             {theme}
             {themeState === theme && <Check className="h-4 w-4" />}
           </DropdownMenuItem>
