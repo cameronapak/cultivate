@@ -23,6 +23,7 @@ import {
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
 import { DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { getAndSetTheme } from "../lib/utils";
 
 interface MenuItem {
   title: string;
@@ -78,6 +79,10 @@ export function Layout({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
+
+  useEffect(() => {
+    getAndSetTheme();
+  }, []);
 
   const handleSidebarOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);

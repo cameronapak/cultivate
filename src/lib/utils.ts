@@ -90,3 +90,34 @@ export function debounce<T extends (...args: any[]) => any>(
     }, wait);
   };
 }
+
+export function getAndSetTheme() {
+  const theme = getTheme();
+  setTheme(theme);
+  return theme;
+}
+
+export function getTheme() {
+  const theme = localStorage.getItem('theme');
+  if (!theme) {
+    return 'default';
+  }
+  return theme;
+}
+
+export function setTheme(themeName: string) {
+  // Remove any existing theme link
+  const existing = document.getElementById('theme-css') as HTMLLinkElement | null;
+  if (existing) {
+    existing.remove();
+  }
+
+  // Create new link
+  const link = document.createElement('link');
+  link.id = 'theme-css';
+  link.rel = 'stylesheet';
+  link.href = `/themes/${themeName}.css`; // e.g., neo-brutalism.css
+  document.head.appendChild(link);
+
+  localStorage.setItem('theme', themeName);
+}
