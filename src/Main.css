@@ -29,6 +29,7 @@
     --chart-4: 84 63% 82.8%;
     --chart-5: 70 68% 76.9%;
     --sidebar: 0 0% 98.5%;
+    --sidebar-background: var(--background);
     --sidebar-foreground: 0 0% 14.5%;
     --sidebar-primary: 0 0% 20.5%;
     --sidebar-primary-foreground: 0 0% 98.5%;
@@ -85,6 +86,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --sidebar: 240 5.9% 10%;
+    --sidebar-background: var(--background);
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
