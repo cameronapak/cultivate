@@ -105,11 +105,34 @@ export function getTheme() {
   return theme;
 }
 
+export const APP_COLOR_THEMES = [
+  'claude',
+  'clean-slate',
+  'cosmic-night',
+  'default',
+  'elegant-luxury',
+  'graphite',
+  'kondoma-grove',
+  'modern-minimal',
+  'nature',
+  'neo-brutalism',
+  'ocean-breeze',
+  'pastel-dreams',
+  't3-chat',
+  'tangerine',
+  'twitter',
+  'vercel',
+]
+
 export function setTheme(themeName: string) {
   // Remove any existing theme link
   const existing = document.getElementById('theme-css') as HTMLLinkElement | null;
   if (existing) {
     existing.remove();
+  }
+
+  if (!APP_COLOR_THEMES.includes(themeName)) {
+    throw new Error(`Theme ${themeName} not found`);
   }
 
   // Create new link

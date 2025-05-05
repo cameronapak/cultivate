@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { Kbd } from "./Kbd";
 import { useCommandMenu } from "./CommandMenu";
+import { AppColorThemeToggle } from "./AppColorThemeToggle";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -152,6 +153,7 @@ export function AppSidebar() {
         </Card>
         <div className="flex flex-row items-center gap-2">
           <ThemeToggle />
+          <AppColorThemeToggle />
           <a target="_blank" href="https://git.new/cultivate">
             <Button variant="ghost" size="icon" className="p-0">
               <Github className="w-4 h-4 text-muted-foreground" />
