@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useState, useEffect } from "react";
+import { Fragment, ReactNode, useState, useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar, type SidebarItem } from "./custom/AppSidebar";
@@ -80,7 +80,7 @@ export function Layout({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     getAndSetTheme();
   }, []);
 
