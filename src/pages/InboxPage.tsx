@@ -421,6 +421,7 @@ export function InboxPage() {
       searchParams.set("away", "true");
     }
     setSearchParams(searchParams);
+    setIsInitialRender(true);
   };
 
   const handleToggleIsThought = () => {
