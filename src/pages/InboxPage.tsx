@@ -891,7 +891,6 @@ export function InboxPage() {
                         animate={{ 
                           width: isMobile && filter !== tab.id ? 32 : "calc-size(auto, size)"
                         }}
-                        exit={{ width: 32 }}
                         transition={{ type: "spring", bounce: 0.25 }}
                       >
                         <Button
@@ -901,7 +900,7 @@ export function InboxPage() {
                           className={cn(
                             "relative rounded-full text-muted-foreground shadow-none px-3 pr-4",
                             filter === tab.id && "text-primary-foreground",
-                            isMobile && filter !== tab.id && "pr-0 pl-2 justify-start w-8 overflow-hidden"
+                            isMobile && filter !== tab.id && "pr-0 pl-2 justify-start overflow-hidden"
                           )}
                           role="tab"
                           aria-selected={filter === tab.id}
