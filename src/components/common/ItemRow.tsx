@@ -128,7 +128,8 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
         ? "grid grid-cols-[auto_1fr_auto]"
         : "grid grid-cols-[auto_auto_1fr_auto]",
       item.type === "task" && (item as Task).complete ? "completed" : "",
-      isActive && "bg-muted/80 hover:bg-muted"
+      isActive && "bg-muted/80 hover:bg-muted",
+      isMobile && "py-3"
     );
 
     const renderItemContent = () => {
