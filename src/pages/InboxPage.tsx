@@ -873,7 +873,7 @@ export function InboxPage() {
 
             {showInbox && !isReviewing ? (
               <div>
-                <div className="flex items-center justify-between gap-2 mb-6">
+                <div className="grid grid-cols-[1fr_auto] overflow-x-auto items-center justify-between gap-2 mb-6">
                   {/* Replace Tabs with segmented control */}
                   <div
                     className="flex items-center w-fit"
