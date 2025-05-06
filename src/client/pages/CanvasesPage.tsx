@@ -30,7 +30,7 @@ import { Combobox } from "../../components/custom/ComboBox";
 export function CanvasesPage() {
   const navigate = useNavigate();
   const { data: canvases, isLoading, error } = useQuery(getCanvases);
-  const { data: projects } = useQuery(getProjects);
+  const { data: projects, isLoading: projectsLoading } = useQuery(getProjects);
 
   const handleDeleteCanvas = async (canvasId: string) => {
     try {
@@ -46,7 +46,7 @@ export function CanvasesPage() {
 
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
 
-  if (!canvases?.length) {
+  if (!canvases?.length && !isLoading && !projectsLoading) {
     return (
       <Layout isLoading={isLoading} breadcrumbItems={[{ title: "Canvases" }]}>
         <EmptyStateRoot className="mx-auto">
