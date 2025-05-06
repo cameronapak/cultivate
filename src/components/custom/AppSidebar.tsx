@@ -55,7 +55,7 @@ export function AppSidebar() {
       toast.success(
         <div className="flex flex-col gap-2">
           <p>Invite code generated:</p>
-          <p className="font-bold select-all font-mono w-fit max-w-full bg-muted p-2 rounded-md">
+          <p className="font-bold select-all font-mono w-fit max-w-full bg-muted text-muted-foreground p-2 rounded-md">
             {newCode.code}
           </p>
         </div>
