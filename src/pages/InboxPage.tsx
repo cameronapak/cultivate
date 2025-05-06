@@ -235,7 +235,8 @@ export function InboxPage() {
         // This will restore the inbox view and cause the inbox
         // input to be in focus.
         if (isShowingAwayItems) {
-          setSearchParams({ away: "false" });
+          searchParams.delete("away");
+          setSearchParams(searchParams);
         }
 
         if (inputRef.current) {
