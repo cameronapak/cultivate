@@ -1171,12 +1171,12 @@ export const ProjectView = ({ project }: { project: Project }) => {
           {/ * <span className="sr-only">{getItemCount("all")} items</span> * /}
         </Button> */}
         <Button
-          variant={currentTab === "task" ? "secondary" : "ghost"}
+          variant={currentTab === "task" ? "default" : "ghost"}
           size="sm"
           onClick={() => handleTabChange("task")}
           className={cn(
             "relative px-3 rounded-full text-muted-foreground shadow-none",
-            currentTab === "task" && "text-primary"
+            currentTab === "task" && "text-primary-foreground"
           )}
           role="tab"
           aria-selected={currentTab === "task"}
@@ -1188,12 +1188,12 @@ export const ProjectView = ({ project }: { project: Project }) => {
           {/* <span className="sr-only">{getItemCount("task")} tasks</span> */}
         </Button>
         <Button
-          variant={currentTab === "resource" ? "secondary" : "ghost"}
+          variant={currentTab === "resource" ? "default" : "ghost"}
           size="sm"
           onClick={() => handleTabChange("resource")}
           className={cn(
             "relative px-3 rounded-full text-muted-foreground shadow-none",
-            currentTab === "resource" && "text-primary"
+            currentTab === "resource" && "text-primary-foreground"
           )}
           role="tab"
           aria-selected={currentTab === "resource"}
@@ -1204,12 +1204,12 @@ export const ProjectView = ({ project }: { project: Project }) => {
           <span>Links</span>
         </Button>
         <Button
-          variant={currentTab === "notes" ? "secondary" : "ghost"}
+          variant={currentTab === "notes" ? "default" : "ghost"}
           size="sm"
           onClick={() => handleTabChange("notes")}
           className={cn(
             "relative px-3 rounded-full text-muted-foreground shadow-none",
-            currentTab === "notes" && "text-primary"
+            currentTab === "notes" && "text-primary-foreground"
           )}
           role="tab"
           aria-selected={currentTab === "notes"}
@@ -1220,12 +1220,12 @@ export const ProjectView = ({ project }: { project: Project }) => {
           <span>Notes</span>
         </Button>
         <Button
-          variant={currentTab === "about" ? "secondary" : "ghost"}
+          variant={currentTab === "about" ? "default" : "ghost"}
           size="sm"
           onClick={() => handleTabChange("about")}
           className={cn(
             "relative px-3 rounded-full text-muted-foreground shadow-none",
-            currentTab === "about" && "text-primary"
+            currentTab === "about" && "text-primary-foreground"
           )}
           role="tab"
           aria-selected={currentTab === "about"}
