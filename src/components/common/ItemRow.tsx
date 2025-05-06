@@ -335,7 +335,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
             {renderItemContent()}
           </div>
           {hideActions ? null : (
-            <div className="flex sm:opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto sm:justify-end gap-1 max-sm:text-muted-foreground">
+            <div className="flex sm:opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto sm:justify-end gap-1 text-muted-foreground">
               {/* Custom actions if provided */}
               {Array.isArray(actions) && actions.length > 0 ? (
                 actions
