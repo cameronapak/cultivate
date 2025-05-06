@@ -876,19 +876,32 @@ export function InboxPage() {
                 <div className="grid grid-cols-[1fr_auto] overflow-x-auto items-center justify-between gap-2 mb-6">
                   {/* Replace Tabs with segmented control */}
                   <div
-                    className="flex items-center w-fit"
+                    className={cn(
+                      "flex justify-start items-center w-fit",
+                      isMobile && "gap-2"
+                    )}
                     role="tablist"
                     aria-label="Filter inbox items"
                   >
                     {tabs.map((tab) => (
-                      <motion.div key={tab.id} className="relative">
+                      <motion.div 
+                        key={tab.id} 
+                        className="relative overflow-hidden rounded-full"
+                        initial={false}
+                        animate={{ 
+                          width: isMobile && filter !== tab.id ? 32 : "calc-size(auto, size)"
+                        }}
+                        exit={{ width: 32 }}
+                        transition={{ type: "spring", bounce: 0.25 }}
+                      >
                         <Button
                           variant={filter === tab.id ? "default" : "ghost"}
                           size="sm"
                           onClick={() => handleFilterChange(tab.id)}
                           className={cn(
-                            "relative px-3 rounded-full text-muted-foreground shadow-none",
-                            filter === tab.id && "text-primary-foreground"
+                            "relative rounded-full text-muted-foreground shadow-none px-3 pr-4",
+                            filter === tab.id && "text-primary-foreground",
+                            isMobile && filter !== tab.id && "pr-0 pl-2 justify-start w-8 overflow-hidden"
                           )}
                           role="tab"
                           aria-selected={filter === tab.id}
