@@ -133,7 +133,7 @@ export const EditTaskForm = ({
             <FormItem>
               <FormControl>
                 <Textarea
-                  className="text-muted-foreground"
+                  className="text-muted-foreground placeholder:text-muted-foreground"
                   placeholder="Task description"
                   {...field}
                 />
@@ -1349,25 +1349,32 @@ export const ProjectView = ({ project }: { project: Project }) => {
                 <Table className="mt-4">
                   <TableBody>
                     {sortedThoughts?.map((thought: Thought) => (
-                       <ItemRow
-                          isActive={`${activeResourceId}` === `${thought.id}`}
-                          key={thought.id}
-                          item={{ 
-                            ...thought, 
-                            type: 'thought', 
-                            title: thought.content.slice(0, 60) + (thought.content.length > 60 ? "..." : "") 
-                          }} 
-                          isEditing={editingItemId?.id === thought.id && editingItemId?.type === 'thought'}
-                          onEdit={handleEditNote}
-                          onCancelEdit={handleCancelEditNote}
-                          renderEditForm={(item, onSave, onCancel) => item.type === 'thought' ? (
-                            <EditThoughtForm 
-                              thought={item as Thought} 
-                              onSave={(values) => handleSaveNote(item, values)} 
-                              onCancel={onCancel} 
+                      <ItemRow
+                        isActive={`${activeResourceId}` === `${thought.id}`}
+                        key={thought.id}
+                        item={{
+                          ...thought,
+                          type: "thought",
+                          title:
+                            thought.content.slice(0, 60) +
+                            (thought.content.length > 60 ? "..." : ""),
+                        }}
+                        isEditing={
+                          editingItemId?.id === thought.id &&
+                          editingItemId?.type === "thought"
+                        }
+                        onEdit={handleEditNote}
+                        onCancelEdit={handleCancelEditNote}
+                        renderEditForm={(item, onSave, onCancel) =>
+                          item.type === "thought" ? (
+                            <EditThoughtForm
+                              thought={item as Thought}
+                              onSave={(values) => handleSaveNote(item, values)}
+                              onCancel={onCancel}
                             />
-                          ) : null}
-                       />
+                          ) : null
+                        }
+                      />
                     ))}
                   </TableBody>
                 </Table>
