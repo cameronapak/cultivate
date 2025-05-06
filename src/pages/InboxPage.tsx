@@ -907,7 +907,12 @@ export function InboxPage() {
                           id={`${tab.id}-tab`}
                         >
                           {tab.icon}
-                          <span>{tab.label}</span>
+                          <span className={
+                            cn(
+                              filter !== tab.id ? "blur-sm opacity-0" : 'opacity-100 blur-none',
+                              "transition-[transform,opacity] duration-500"
+                            )
+                          }>{tab.label}</span>
                           <span className="sr-only">
                             {getItemCount(tab.id)} items
                           </span>
