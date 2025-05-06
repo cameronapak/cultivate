@@ -54,6 +54,11 @@ export function useTabShortcuts(handleTabChange: (tab: TabType) => void) {
     },
     {
       key: '3',
+      handler: () => handleTabChange('notes'),
+      description: 'Switch to Notes tab',
+    },
+    {
+      key: '4',
       handler: () => handleTabChange('about'),
       description: 'Switch to About tab',
     },
