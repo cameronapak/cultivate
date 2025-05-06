@@ -113,7 +113,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
       };
       return (
         <TableRow>
-          <TableCell colSpan={4} className="bg-background p-0">
+          <TableCell colSpan={4} className="bg-card p-0">
             {renderEditForm(item, onSave, onCancelEdit)}
           </TableCell>
         </TableRow>
