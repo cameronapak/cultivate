@@ -45,6 +45,7 @@ import {
   Package,
   Folder,
   PartyPopper,
+  ArchiveRestore,
 } from "lucide-react";
 import { getProjects } from "wasp/client/operations";
 import { Table, TableBody, TableRow, TableCell } from "../components/ui/table";
@@ -132,6 +133,51 @@ const tabs: TabData[] = [
   { id: "resource", label: "Links", icon: <Link2 className="h-4 w-4" /> },
   { id: "thought", label: "Notes", icon: <Minus className="h-4 w-4" /> },
 ];
+
+async function updateItemAwayStatus(item: DisplayItem, isAway: boolean) {
+  if (item.type === "task") {
+    return updateTask({
+      id: item.id as number,
+      isAway: isAway,
+    });
+  } else if (item.type === "resource") {
+    return updateResource({
+      id: item.id as number,
+      isAway: isAway,
+    });
+  } else if (item.type === "thought") {
+    return updateThought({
+      id: item.id as string,
+      isAway: isAway,
+    });
+  }
+
+  return null;
+}
+
+function getRestoreItemObject(item: DisplayItem) {
+  const isAttachedToProject = item.projectId !== null;
+  let label = "Restore to Inbox";
+  let tooltip = "Restore to Inbox";
+  let icon = <ArchiveRestore className="h-5 w-5" />;
+
+  if (isAttachedToProject) {
+    label = "Restore to Project";
+    tooltip = "Restore to Project";
+    icon = <PackageOpen className="h-5 w-5" />;
+  }
+
+  return {
+    icon,
+    label,
+    tooltip,
+    onClick: async () => {
+      await updateItemAwayStatus(item, false);
+      toast.success(`Item restored to ${isAttachedToProject ? "Project" : "Inbox"}`);
+    },
+    show: () => true,
+  }
+}
 
 export function InboxPage() {
   const isMobile = useIsMobile();
@@ -827,10 +873,7 @@ export function InboxPage() {
                     aria-label="Filter inbox items"
                   >
                     {tabs.map((tab) => (
-                      <motion.div
-                        key={tab.id}
-                        className="relative"
-                      >
+                      <motion.div key={tab.id} className="relative">
                         <Button
                           variant={filter === tab.id ? "default" : "ghost"}
                           size="sm"
@@ -990,7 +1033,11 @@ export function InboxPage() {
                                               <Combobox
                                                 button={
                                                   <Button
-                                                    variant={isMobile ? "outline" : "ghost"}
+                                                    variant={
+                                                      isMobile
+                                                        ? "outline"
+                                                        : "ghost"
+                                                    }
                                                     size="icon"
                                                   >
                                                     <Folder className="h-4 w-4" />
@@ -1022,7 +1069,8 @@ export function InboxPage() {
                                         : undefined,
                                       // Send Away
                                       isShowingAwayItems
-                                        ? undefined
+                                        // Make it where I can send to the inbox
+                                        ? getRestoreItemObject(item)
                                         : {
                                             icon: (
                                               <Package className="h-5 w-5" />

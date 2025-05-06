@@ -370,8 +370,9 @@ export const updateTaskStatus: UpdateTaskStatus<UpdateTaskStatusPayload, Task> =
 
 type UpdateTaskPayload = {
   id: number
-  title: string
+  title?: string
   description?: string
+  isAway?: boolean
 }
 
 export const updateTask: UpdateTask<UpdateTaskPayload, Task> = async (
@@ -387,8 +388,9 @@ export const updateTask: UpdateTask<UpdateTaskPayload, Task> = async (
       userId: context.user.id 
     },
     data: {
-      title: args.title,
-      description: args.description
+      ...(args.title && { title: args.title }),
+      ...(args.description && { description: args.description }),
+      ...(typeof args.isAway === 'boolean' && { isAway: args.isAway })
     }
   })
   return task
@@ -517,9 +519,10 @@ export const createResource: CreateResource<CreateResourcePayload, Resource> = a
 
 type UpdateResourcePayload = {
   id: number
-  url: string
-  title: string
+  url?: string
+  title?: string
   description?: string
+  isAway?: boolean
 }
 
 export const updateResource: UpdateResource<UpdateResourcePayload, Resource> = async (
@@ -535,9 +538,10 @@ export const updateResource: UpdateResource<UpdateResourcePayload, Resource> = a
       userId: context.user.id 
     },
     data: {
-      url: args.url,
-      title: args.title,
-      description: args.description
+      ...(args.url && { url: args.url }),
+      ...(args.title && { title: args.title }),
+      ...(args.description && { description: args.description }),
+      ...(typeof args.isAway === 'boolean' && { isAway: args.isAway })
     }
   })
   return resource
@@ -994,8 +998,9 @@ export const createThought: CreateThought<CreateThoughtPayload, Thought> = async
 
 type UpdateThoughtPayload = {
   id: string
-  content: string
+  content?: string
   projectId?: number
+  isAway?: boolean
 }
 
 export const updateThought: UpdateThought<UpdateThoughtPayload, Thought> = async (
@@ -1020,7 +1025,8 @@ export const updateThought: UpdateThought<UpdateThoughtPayload, Thought> = async
   return context.entities.Thought.update({
     where: { id: args.id },
     data: {
-      content: args.content,
+      ...(args.content && { content: args.content }),
+      ...(typeof args.isAway === 'boolean' && { isAway: args.isAway }),
       ...(args.projectId && { projectId: args.projectId })
     }
   })
