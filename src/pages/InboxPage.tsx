@@ -173,10 +173,12 @@ function getRestoreItemObject(item: DisplayItem) {
     tooltip,
     onClick: async () => {
       await updateItemAwayStatus(item, false);
-      toast.success(`Item restored to ${isAttachedToProject ? "Project" : "Inbox"}`);
+      toast.success(
+        `Item restored to ${isAttachedToProject ? "Project" : "Inbox"}`
+      );
     },
     show: () => true,
-  }
+  };
 }
 
 export function InboxPage() {
@@ -878,20 +880,25 @@ export function InboxPage() {
                   {/* Replace Tabs with segmented control */}
                   <div
                     className={cn(
-                      "flex justify-start items-center w-fit gap-2",
+                      "flex justify-start items-center w-fit gap-2"
                     )}
                     role="tablist"
                     aria-label="Filter inbox items"
                   >
                     {tabs.map((tab) => (
-                      <motion.div 
-                        key={tab.id} 
+                      <motion.div
+                        key={tab.id}
                         className="relative overflow-hidden rounded-full"
                         initial={false}
-                        animate={{ 
-                          width: filter !== tab.id ? 32 : "calc-size(auto, size)"
+                        animate={{
+                          width:
+                            filter !== tab.id ? 32 : "calc-size(auto, size)",
                         }}
-                        transition={{ type: "spring", bounce: 0.15 }}
+                        transition={{
+                          duration: 0.5,
+                          type: "spring",
+                          bounce: 0.15,
+                        }}
                       >
                         <Button
                           variant={filter === tab.id ? "default" : "ghost"}
@@ -900,7 +907,8 @@ export function InboxPage() {
                           className={cn(
                             "relative rounded-full text-muted-foreground shadow-none px-3 pr-4",
                             filter === tab.id && "text-primary-foreground",
-                            filter !== tab.id && "pr-0 pl-2 justify-start overflow-hidden"
+                            filter !== tab.id &&
+                              "pr-0 pl-2 justify-start overflow-hidden"
                           )}
                           role="tab"
                           aria-selected={filter === tab.id}
@@ -908,12 +916,16 @@ export function InboxPage() {
                           id={`${tab.id}-tab`}
                         >
                           {tab.icon}
-                          <span className={
-                            cn(
-                              filter !== tab.id ? "blur-sm opacity-0" : 'opacity-100 blur-none',
+                          <span
+                            className={cn(
+                              filter !== tab.id
+                                ? "blur-sm opacity-0"
+                                : "opacity-100 blur-none",
                               "transition-[transform,opacity] duration-500"
-                            )
-                          }>{tab.label}</span>
+                            )}
+                          >
+                            {tab.label}
+                          </span>
                           <span className="sr-only">
                             {getItemCount(tab.id)} items
                           </span>
@@ -985,8 +997,9 @@ export function InboxPage() {
                       left: 0,
                     }}
                     transition={{
-                      duration: 0.25,
-                      ease: "easeInOut",
+                      type: "spring",
+                      bounce: 0.15,
+                      duration: 0.5,
                     }}
                   >
                     <Table>
@@ -1094,8 +1107,8 @@ export function InboxPage() {
                                         : undefined,
                                       // Send Away
                                       isShowingAwayItems
-                                        // Make it where I can send to the inbox
-                                        ? getRestoreItemObject(item)
+                                        ? // Make it where I can send to the inbox
+                                          getRestoreItemObject(item)
                                         : {
                                             icon: (
                                               <Package className="h-5 w-5" />
