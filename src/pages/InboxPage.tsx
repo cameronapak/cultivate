@@ -890,7 +890,7 @@ export function InboxPage() {
                         animate={{ 
                           width: filter !== tab.id ? 32 : "calc-size(auto, size)"
                         }}
-                        transition={{ type: "spring", bounce: 0.25 }}
+                        transition={{ type: "spring", bounce: 0.15 }}
                       >
                         <Button
                           variant={filter === tab.id ? "default" : "ghost"}
