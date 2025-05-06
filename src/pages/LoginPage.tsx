@@ -32,7 +32,7 @@ export function LoginPage({
     event.preventDefault();
     try {
       await login(username, password);
-      navigate("/");
+      navigate("/inbox");
     } catch (error: HttpError | any) {
       toast.error(error?.data?.data?.message || error?.data?.message || "An unknown error occurred");
     }
