@@ -330,12 +330,12 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
         </TableCell>
 
         {/* Item Content */}
-        <TableCell className="py-2">{renderItemContent()}</TableCell>
-
-        {/* Actions */}
-        {hideActions ? null : (
-          <TableCell className="text-right p-2 pl-0">
-            <div className="flex opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto justify-end gap-1">
+        <TableCell className="py-2 flex sm:flex-row max-sm:flex-col">
+          <div className="flex-1">
+            {renderItemContent()}
+          </div>
+          {hideActions ? null : (
+            <div className="flex sm:opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto sm:justify-end gap-1 max-sm:text-muted-foreground">
               {/* Custom actions if provided */}
               {Array.isArray(actions) && actions.length > 0 ? (
                 actions
@@ -476,8 +476,8 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                 </>
               )}
             </div>
-          </TableCell>
-        )}
+          )}
+        </TableCell>
       </TableRow>
     );
   }
