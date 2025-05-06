@@ -877,8 +877,7 @@ export function InboxPage() {
                   {/* Replace Tabs with segmented control */}
                   <div
                     className={cn(
-                      "flex justify-start items-center w-fit",
-                      isMobile && "gap-2"
+                      "flex justify-start items-center w-fit gap-2",
                     )}
                     role="tablist"
                     aria-label="Filter inbox items"
@@ -889,7 +888,7 @@ export function InboxPage() {
                         className="relative overflow-hidden rounded-full"
                         initial={false}
                         animate={{ 
-                          width: isMobile && filter !== tab.id ? 32 : "calc-size(auto, size)"
+                          width: filter !== tab.id ? 32 : "calc-size(auto, size)"
                         }}
                         transition={{ type: "spring", bounce: 0.25 }}
                       >
@@ -900,7 +899,7 @@ export function InboxPage() {
                           className={cn(
                             "relative rounded-full text-muted-foreground shadow-none px-3 pr-4",
                             filter === tab.id && "text-primary-foreground",
-                            isMobile && filter !== tab.id && "pr-0 pl-2 justify-start overflow-hidden"
+                            filter !== tab.id && "pr-0 pl-2 justify-start overflow-hidden"
                           )}
                           role="tab"
                           aria-selected={filter === tab.id}
