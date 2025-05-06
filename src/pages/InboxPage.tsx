@@ -231,6 +231,13 @@ export function InboxPage() {
       // Check for CMD+I (Mac) or CTRL+I (Windows)
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "i") {
         e.preventDefault();
+
+        // This will restore the inbox view and cause the inbox
+        // input to be in focus.
+        if (isShowingAwayItems) {
+          setSearchParams({ away: "false" });
+        }
+
         if (inputRef.current) {
           inputRef.current.focus();
           inputRef.current.scrollIntoView({
