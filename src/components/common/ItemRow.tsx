@@ -330,7 +330,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
         </TableCell>
 
         {/* Item Content */}
-        <TableCell className="py-2 flex sm:flex-row max-sm:flex-col">
+        <TableCell className="py-2 flex sm:flex-row max-sm:flex-col sm:items-center">
           <div className="flex-1">
             {renderItemContent()}
           </div>
