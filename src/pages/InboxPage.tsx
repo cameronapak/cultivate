@@ -66,7 +66,7 @@ import {
   EditThoughtForm,
 } from "../components/ProjectView";
 import { useSearchParams } from "react-router-dom";
-
+import { useIsMobile } from "../hooks/use-mobile";
 // Create a type where the string is a date in the format "2025-04-20"
 type DateString =
   `${number}${number}${number}${number}-${number}${number}-${number}${number}`;
@@ -134,6 +134,7 @@ const tabs: TabData[] = [
 ];
 
 export function InboxPage() {
+  const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
   const isShowingAwayItems = searchParams.get("away") === "true";
   const {
@@ -989,7 +990,7 @@ export function InboxPage() {
                                               <Combobox
                                                 button={
                                                   <Button
-                                                    variant="ghost"
+                                                    variant={isMobile ? "outline" : "ghost"}
                                                     size="icon"
                                                   >
                                                     <Folder className="h-4 w-4" />

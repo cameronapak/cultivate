@@ -23,6 +23,7 @@ import { Link } from "react-router-dom";
 import { Combobox } from "../custom/ComboBox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import type { Project } from "../../types";
+import { useIsMobile } from "../../hooks/use-mobile";
 
 // Define a discriminated union type for the item
 export type DisplayItem =
@@ -90,6 +91,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
     ref
   ) => {
     const rowRef = useRef<HTMLTableCellElement>(null);
+    const isMobile = useIsMobile();
 
     // Scroll to the row when it becomes active
     React.useEffect(() => {
@@ -330,12 +332,12 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
         </TableCell>
 
         {/* Item Content */}
-        <TableCell className="py-2 flex sm:flex-row max-sm:flex-col sm:items-center">
+        <TableCell className="py-2 flex sm:flex-row max-sm:flex-col sm:items-center max-sm:gap-2">
           <div className="flex-1">
             {renderItemContent()}
           </div>
           {hideActions ? null : (
-            <div className="flex sm:opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto sm:justify-end gap-1 text-muted-foreground">
+            <div className="flex sm:opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto sm:justify-end max-sm:gap-2 sm:gap-1 text-muted-foreground">
               {/* Custom actions if provided */}
               {Array.isArray(actions) && actions.length > 0 ? (
                 actions
@@ -364,7 +366,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                           {action.asChild ? (
                             <Button
                               asChild
-                              variant="ghost"
+                              variant={isMobile ? "outline" : "ghost"}
                               size="icon"
                               disabled={isDisabled}
                             >
@@ -378,7 +380,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                             </Button>
                           ) : (
                             <Button
-                              variant="ghost"
+                              variant={isMobile ? "outline" : "ghost"}
                               size="icon"
                               onClick={() => action.onClick?.(item)}
                               disabled={isDisabled}
@@ -400,7 +402,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                   {item.type === "resource" && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button asChild variant="ghost" size="icon">
+                        <Button asChild variant={isMobile ? "outline" : "ghost"} size="icon">
                           <a
                             href={item.url}
                             target="_blank"
@@ -419,7 +421,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                     <TooltipTrigger asChild>
                       <Button
                         onClick={() => onEdit(item)}
-                        variant="ghost"
+                        variant={isMobile ? "outline" : "ghost"}
                         size="icon"
                       >
                         <Pencil className="w-4 h-4" />
@@ -436,7 +438,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                         <div>
                           <Combobox
                             button={
-                              <Button variant="ghost" size="icon">
+                              <Button variant={isMobile ? "outline" : "ghost"} size="icon">
                                 <MoveRight className="h-4 w-4" />
                               </Button>
                             }
@@ -467,7 +469,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                   {/* Delete Button */}
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant={isMobile ? "outline" : "ghost"} size="icon">
                         <Trash className="w-4 h-4" />
                       </Button>
                     </TooltipTrigger>
