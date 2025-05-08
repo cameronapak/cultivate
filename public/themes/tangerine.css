@@ -21,7 +21,7 @@
   --destructive: 0 84.24% 60.2%;
   --destructive-foreground: 0 0% 100%;
   --border: 210 9.37% 87.45%;
-  --input: 220 15.79% 96.27%;
+  --input: var(--border);
   --ring: 13.21 73.04% 54.9%;
   --chart-1: 210 37.5% 65.49%;
   --chart-2: 12.9 73.23% 75.1%;
@@ -73,7 +73,7 @@
   --destructive: 0 84.24% 60.2%;
   --destructive-foreground: 0 0% 100%;
   --border: 224.35 15.86% 28.43%;
-  --input: 224.35 15.86% 28.43%;
+  --input: var(--border);
   --ring: 13.21 73.04% 54.9%;
   --chart-1: 210 37.5% 65.49%;
   --chart-2: 11.72 63.5% 73.14%;

@@ -12,6 +12,9 @@ import {
   Package,
   PackageOpen,
   Search,
+  Pin,
+  User2,
+  ChevronUp,
 } from "lucide-react";
 import {
   Sidebar,
@@ -23,18 +26,28 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuAction,
+  SidebarGroupLabel,
+  SidebarSeparator,
 } from "../../components/ui/sidebar";
 import { Link } from "wasp/client/router";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "../ui/button";
 import Logo from "./Logo";
 import { Card, CardDescription, CardHeader } from "../ui/card";
-import { generateInviteCode } from "wasp/client/operations";
+import {
+  generateInviteCode,
+  getProjects,
+  useQuery,
+} from "wasp/client/operations";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Kbd } from "./Kbd";
+import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { useCommandMenu } from "./CommandMenu";
 import { AppColorThemeToggle } from "./AppColorThemeToggle";
+import { DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu } from "../ui/dropdown-menu";
+import { useAuth, logout } from "wasp/client/auth";
 
 export type SidebarItem = {
   isActive: boolean;
@@ -43,10 +56,12 @@ export type SidebarItem = {
 };
 
 export function AppSidebar() {
+  const { data: user } = useAuth();
   // Get the current path
   const currentPath = window.location.pathname;
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const { openCommandMenu } = useCommandMenu();
+  const { data: pinnedProjects } = useQuery(getProjects, { pinned: true });
 
   const handleGenerateCode = async () => {
     setIsGeneratingCode(true);
@@ -71,6 +86,9 @@ export function AppSidebar() {
     }
   };
 
+  // Make it where pinned projects is a max of 3
+  const pinnedProjectsWithLimit = pinnedProjects?.slice(0, 3) || [];
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -83,7 +101,7 @@ export function AppSidebar() {
               <Logo />
             </SidebarMenuButton>
             <SidebarMenuAction onClick={openCommandMenu}>
-              <Search className="h-5 w-5" />{" "}
+              <Search className="h-5 w-5 text-muted-foreground" />{" "}
               <span className="sr-only">Search</span>
             </SidebarMenuAction>
           </SidebarMenuItem>
@@ -99,7 +117,7 @@ export function AppSidebar() {
                 isActive={currentPath === "/inbox"}
               >
                 <Link to={"/inbox"}>
-                  <InboxIcon className="h-5 w-5" />
+                  <InboxIcon className="h-5 w-5 text-muted-foreground" />
                   <span>Inbox</span>
                   <Kbd className="absolute right-2 top-0 bottom-0 h-fit my-auto group-hover:opacity-100 opacity-0 transition-all duration-300 border border-border rounded-sm px-1">
                     ⌘ + i
@@ -113,7 +131,7 @@ export function AppSidebar() {
                 isActive={currentPath.includes("/canvas")}
               >
                 <Link to={"/canvases"}>
-                  <PencilRuler className="h-5 w-5" />
+                  <PencilRuler className="h-5 w-5 text-muted-foreground" />
                   <span>Canvas</span>
                 </Link>
               </SidebarMenuButton>
@@ -124,7 +142,7 @@ export function AppSidebar() {
                 isActive={currentPath.includes("/documents")}
               >
                 <Link to={"/documents"}>
-                  <BookOpen className="h-5 w-5" />
+                  <BookOpen className="h-5 w-5 text-muted-foreground" />
                   <span>Docs</span>
                 </Link>
               </SidebarMenuButton>
@@ -133,45 +151,42 @@ export function AppSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={
-                  currentPath === "/" || currentPath.includes("/projects")
+                  currentPath === "/"
                 }
               >
                 <Link to={"/"}>
                   {currentPath === "/" ? (
-                    <FolderOpen className="h-5 w-5" />
+                    <FolderOpen className="text-muted-foreground h-5 w-5" />
                   ) : (
-                    <Folder className="h-5 w-5" />
+                    <Folder className="text-muted-foreground h-5 w-5" />
                   )}
-                  <span>Projects</span>
+                  <span>Collections</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            {pinnedProjectsWithLimit?.length ? (
+              <SidebarSeparator />
+            ) : null}
+            {pinnedProjectsWithLimit?.map((project) => (
+              <SidebarMenuItem key={project.id}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={currentPath === `/projects/${project.id}`}
+                >
+                  <Link
+                    to="/projects/:projectId"
+                    params={{ projectId: project.id }}
+                  >
+                    <Pin className="w-3 h-3 text-muted-foreground" />
+                    <span className="truncate">{project.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarGroup>
-        {/* {pinnedProjects.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Pinned Projects</SidebarGroupLabel>
-            <SidebarMenu>
-              {pinnedProjects.map((project) => (
-                <SidebarMenuItem key={project.id}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={currentPath === `/projects/${project.id}`}
-                  >
-                    <Link
-                      to="/projects/:projectId"
-                      params={{ projectId: project.id }}
-                    >
-                      <span className="truncate">{project.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-        )} */}
       </SidebarContent>
-      <SidebarFooter className="flex flex-col gap-4 items-start justify-between">
+      <SidebarFooter className="flex flex-col items-start justify-between">
         <Card className="w-full">
           <CardHeader>
             <CardDescription className="flex flex-col gap-4">
@@ -220,7 +235,7 @@ export function AppSidebar() {
               {isGeneratingCode ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <MailPlus className="h-5 w-5" />
+                <MailPlus className="h-5 w-5 text-muted-foreground" />
               )}
               <span className="sr-only">
                 {isGeneratingCode ? "Generating..." : "Generate Invite Code"}
@@ -228,6 +243,26 @@ export function AppSidebar() {
             </Button>
           </div>
         </div>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton>
+                  <User2 className="text-muted-foreground" /> {user?.getFirstProviderUserId() || ""}
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem onClick={logout}>
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

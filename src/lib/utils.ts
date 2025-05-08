@@ -124,6 +124,10 @@ export const APP_COLOR_THEMES = [
   'vercel',
 ]
 
+export function getReadableThemeName(themeName: string) {
+  return themeName.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+}
+
 export function setTheme(themeName: string) {
   // Remove any existing theme link
   const existing = document.getElementById('theme-css') as HTMLLinkElement | null;

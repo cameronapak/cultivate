@@ -183,6 +183,11 @@ action updateProject {
   entities: [Project]
 }
 
+action pinProject {
+  fn: import { pinProject } from "@src/queries",
+  entities: [Project]
+}
+
 action deleteProject {
   fn: import { deleteProject } from "@src/queries",
   entities: [Project]
