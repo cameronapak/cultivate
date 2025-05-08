@@ -40,14 +40,16 @@ type WaspContext = any;
 // Define our own GetProject type since we need to include related entities
 type GetProject<Input, Output> = (args: Input, context: WaspContext) => Output | Promise<Output>
 
-export const getProjects: GetProjects<void, Project[]> = async (_args: void, context: WaspContext) => {
+export const getProjects: GetProjects<{ pinned?: boolean }, Project[]> = async (args: { pinned?: boolean }, context: WaspContext) => {
   if (!context.user) {
     throw new HttpError(401)
   }
+
   return context.entities.Project.findMany({
     orderBy: { id: 'asc' },
     where: {
-      userId: context.user.id
+      userId: context.user.id,
+      ...(args.pinned && { pinned: true })
     },
     include: { 
       tasks: true,

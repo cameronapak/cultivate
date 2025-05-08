@@ -23,7 +23,7 @@ export function AppColorThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
-          <Palette className="h-[1.2rem] w-[1.2rem]" />
+          <Palette className="text-muted-foreground h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
