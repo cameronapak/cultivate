@@ -32,7 +32,7 @@ import {
 import { useLayoutState } from "../../hooks/useLayoutState";
 import { useSidebar } from "../ui/sidebar";
 import { AnimatePresence, motion, MotionProps } from "motion/react";
-import { setTheme, getTheme, APP_COLOR_THEMES } from "../../lib/utils";
+import { setTheme, getTheme, APP_COLOR_THEMES, getReadableThemeName } from "../../lib/utils";
 
 type NavigationCommand = {
   title: string;
@@ -98,7 +98,7 @@ export function CommandMenu() {
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [search, setSearch] = React.useState("");
   const navigate = useNavigate();
-  const { data: projects } = useQuery(getProjects, null, {
+  const { data: projects } = useQuery(getProjects, undefined, {
     enabled: debouncedSearch.length > 0,
   });
   // Add a minimum search length to reduce unnecessary searches
@@ -391,7 +391,7 @@ export function CommandMenu() {
                     >
                       <Palette className="mr-2 h-4 w-4" />
                       <div className="w-full flex items-center justify-between">
-                        <div>{theme}</div>
+                        <div>{getReadableThemeName(theme)}</div>
                         {themeState === theme && <Check className="h-4 w-4" />}
                       </div>
                     </CommandItem>

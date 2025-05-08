@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
-import { setTheme, getTheme, APP_COLOR_THEMES } from "../../lib/utils"
+import { setTheme, getTheme, APP_COLOR_THEMES, getReadableThemeName } from "../../lib/utils"
 
 export function AppColorThemeToggle() {
   const [themeState, setThemeState] = useState(getTheme());
@@ -33,7 +33,7 @@ export function AppColorThemeToggle() {
         </DropdownMenuLabel>
         {APP_COLOR_THEMES.map((theme) => (
           <DropdownMenuItem className="flex items-center justify-between" key={theme} onClick={() => handleThemeChange(theme)}>
-            {theme.replace(/-/g, " ").split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+            {getReadableThemeName(theme)}
             {themeState === theme && <Check className="h-4 w-4" />}
           </DropdownMenuItem>
         ))}
