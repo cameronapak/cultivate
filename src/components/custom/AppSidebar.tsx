@@ -86,6 +86,9 @@ export function AppSidebar() {
     }
   };
 
+  // Make it where pinned projects is a max of 3
+  const pinnedProjectsWithLimit = pinnedProjects?.slice(0, 3) || [];
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -161,10 +164,10 @@ export function AppSidebar() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {pinnedProjects?.length ? (
+            {pinnedProjectsWithLimit?.length ? (
               <SidebarSeparator />
             ) : null}
-            {pinnedProjects?.map((project) => (
+            {pinnedProjectsWithLimit?.map((project) => (
               <SidebarMenuItem key={project.id}>
                 <SidebarMenuButton
                   asChild
