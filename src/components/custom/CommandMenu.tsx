@@ -376,7 +376,7 @@ export function CommandMenu() {
             </>
           )}
 
-          {search.length !== 0 ? (
+          {search.length !== 0 && (APP_COLOR_THEMES.some(theme => getReadableThemeName(theme).toLowerCase().includes(search.toLowerCase())) || search.toLowerCase() === "theme") ? (
             <>
               <CommandSeparator />
               {/* Theme selection group */}
