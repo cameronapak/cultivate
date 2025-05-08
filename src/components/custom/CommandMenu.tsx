@@ -32,7 +32,12 @@ import {
 import { useLayoutState } from "../../hooks/useLayoutState";
 import { useSidebar } from "../ui/sidebar";
 import { AnimatePresence, motion, MotionProps } from "motion/react";
-import { setTheme, getTheme, APP_COLOR_THEMES, getReadableThemeName } from "../../lib/utils";
+import {
+  setTheme,
+  getTheme,
+  APP_COLOR_THEMES,
+  getReadableThemeName,
+} from "../../lib/utils";
 
 type NavigationCommand = {
   title: string;
@@ -139,7 +144,7 @@ export function CommandMenu() {
         path: "/documents",
       },
       {
-        title: "Open Projects",
+        title: "Open Collections",
         icon: <Folder className="mr-2 h-4 w-4" />,
         path: "/",
       },
@@ -274,10 +279,10 @@ export function CommandMenu() {
       />
       <AnimatePresence>
         <CommandList>
-          {searchResults && searchResults?.length > 0 && (
+          {search.length !== 0 && (
             <>
               <CommandGroup heading="Search Results">
-                {searchResults.map((result: any, index: number) => (
+                {searchResults?.map((result: any, index: number) => (
                   <MotionAnimateHeight key={`${result.id}-${result.type}`}>
                     <CommandItem
                       onSelect={() =>
@@ -303,10 +308,7 @@ export function CommandMenu() {
                     </CommandItem>
                   </MotionAnimateHeight>
                 ))}
-              </CommandGroup>
-              {filteredProjects.length > 0 && (
-                <CommandGroup heading="Projects">
-                  {filteredProjects.map((project: Project) => (
+                {filteredProjects?.map((project: Project) => (
                     <MotionAnimateHeight key={project.id}>
                       <CommandItem
                         onSelect={() =>
@@ -322,8 +324,7 @@ export function CommandMenu() {
                       </CommandItem>
                     </MotionAnimateHeight>
                   ))}
-                </CommandGroup>
-              )}
+              </CommandGroup>
             </>
           )}
 
@@ -376,12 +377,22 @@ export function CommandMenu() {
             </>
           )}
 
-          {search.length !== 0 && (APP_COLOR_THEMES.some(theme => getReadableThemeName(theme).toLowerCase().includes(search.toLowerCase())) || search.toLowerCase() === "theme") ? (
+          {search.length !== 0 &&
+          (APP_COLOR_THEMES.some((theme) =>
+            getReadableThemeName(theme)
+              .toLowerCase()
+              .includes(search.toLowerCase())
+          ) ||
+            search.toLowerCase() === "theme") ? (
             <>
               <CommandSeparator />
               {/* Theme selection group */}
               <CommandGroup heading="Theme">
-                {APP_COLOR_THEMES.filter((theme) => theme.toLowerCase().includes(search.toLowerCase()) || search.toLowerCase() === "theme").map((theme) => (
+                {APP_COLOR_THEMES.filter(
+                  (theme) =>
+                    theme.toLowerCase().includes(search.toLowerCase()) ||
+                    search.toLowerCase() === "theme"
+                ).map((theme) => (
                   <MotionAnimateHeight key={theme}>
                     <CommandItem
                       onSelect={() =>
