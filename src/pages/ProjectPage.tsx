@@ -23,7 +23,7 @@ export const ProjectPage = () => {
       <Layout
         isLoading={isLoading}
         breadcrumbItems={[
-          { title: "Projects", url: "/" },
+          { title: "Collections", url: "/" },
           { title: "Loading..." },
         ]}
         // Yes, this is redundant, but the component expects children
@@ -36,7 +36,7 @@ export const ProjectPage = () => {
     <Layout
       isLoading={isLoading}
       breadcrumbItems={[
-        { title: "Projects", url: "/" },
+        { title: "Collections", url: "/" },
         { title: project.title },
       ]}
       activeProjectId={parsedProjectId}

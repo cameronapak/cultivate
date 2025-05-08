@@ -129,13 +129,13 @@ export const ProjectsPage = () => {
   return (
     <Layout
       isLoading={isLoading}
-      breadcrumbItems={[{ title: "Projects" }]}
+      breadcrumbItems={[{ title: "Collections" }]}
       ctaButton={
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon">
               <Plus className="w-4 h-4" />
-              <span className="sr-only">New Project</span>
+              <span className="sr-only">New Collection</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80">
@@ -231,6 +231,7 @@ export const ProjectsPage = () => {
 };
 
 const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
+  const navigate = useNavigate();
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
@@ -241,11 +242,12 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
 
   async function onSubmit(values: ProjectFormValues) {
     try {
-      await createProject({
+      const project = await createProject({
         title: values.title,
         description: values.description || "",
       });
-      toast.success(`Created project "${values.title}"`);
+      toast.success(`Created collection "${values.title}"`);
+      navigate(`/projects/${project.id}`);
       form.reset();
     } catch (err: any) {
       window.alert("Error: " + err.message);
@@ -260,11 +262,11 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Project Title</FormLabel>
+              <FormLabel>Collection Title</FormLabel>
               <FormControl>
                 <Input
                   required
-                  placeholder="Give your project a clear title"
+                  placeholder="Give your collection a clear title"
                   {...field}
                 />
               </FormControl>
@@ -301,7 +303,9 @@ const NewProjectForm = ({ onCancel }: { onCancel: () => void }) => {
               Cancel
             </Button>
           </PopoverClose>
-          <Button type="submit">Create</Button>
+          <Button type="submit">
+            Create
+          </Button>
         </div>
       </form>
     </Form>
