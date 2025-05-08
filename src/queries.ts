@@ -31,7 +31,8 @@ import {
   type MoveThought,
   type CheckInviteCode,
   type ClaimInviteCode,
-  type GenerateInviteCode
+  type GenerateInviteCode,
+  type PinProject
 } from 'wasp/server/operations'
 
 // Wasp operation context type (adjust if a more specific type is available)
@@ -164,6 +165,38 @@ export const updateProject: UpdateProject<UpdateProjectPayload, Project> = async
       ...(typeof args.pinned === 'boolean' && { pinned: args.pinned })
     }
   })
+}
+
+type PinProjectPayload = {
+  id: number
+  pinned: boolean
+}
+
+export const pinProject: PinProject<PinProjectPayload, Project> = async (
+  args: PinProjectPayload,
+  context: WaspContext
+) => {
+  if (!context.user) {
+    throw new HttpError(401)
+  }
+
+  // If pinning a project, first check if there are 3 already pinned.
+  const pinnedProjects = await context.entities.Project.findMany({
+    where: {
+      userId: context.user.id,
+      pinned: true
+    },
+    take: 3
+  })
+
+  if (pinnedProjects.length >= 3) {
+    throw new HttpError(400, "You can only pin up to 3 projects at a time.")
+  }
+
+  return updateProject({
+    id: args.id,
+    pinned: args.pinned
+  }, context)
 }
 
 type DeleteProjectPayload = {

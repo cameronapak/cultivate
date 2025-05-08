@@ -10,10 +10,10 @@ import {
   getProjects,
   useQuery,
   createProject,
-  deleteProject,
   createTask,
   updateTaskStatus,
   updateTask,
+  pinProject,
   updateProject,
   createResource,
   updateResource,
@@ -116,13 +116,14 @@ export const ProjectsPage = () => {
 
   const handlePinToggle = async (project: Project) => {
     try {
-      await updateProject({
+      await pinProject({
         id: project.id,
         pinned: !project.pinned,
       });
-    } catch (error) {
+      toast.success(`Project "${project.title}" ${project.pinned ? "unpinned" : "pinned"}`);
+    } catch (error: any) {
       console.error("Failed to update project pin status:", error);
-      toast.error("Failed to update project pin status");
+      toast.error(error?.message || "Failed to update project pin status");
     }
   };
 
