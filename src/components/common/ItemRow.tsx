@@ -183,7 +183,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                 }}
                 htmlFor={item.id.toString()}
                 className={cn(
-                  "cursor-text text-sm leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                  "break-words overflow-wrap-[anywhere] cursor-text text-sm leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
                   item.complete ? "line-through text-muted-foreground" : ""
                 )}
               >
@@ -191,7 +191,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
               </label>
               {/* Only show description if NOT complete */}
               {taskDescription && !item.complete && (
-                <p className="text-sm text-muted-foreground line-clamp-1">
+                <p className="break-words overflow-wrap-[anywhere] text-sm text-muted-foreground line-clamp-1">
                   {formatTextWithUrls(taskDescription)}
                 </p>
               )}
@@ -229,9 +229,9 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
                     {linkAsUrl.host}
                   </p>
                 </div>
-                <p className="text-sm hover:underline">{item.title}</p>
+                <p className="break-words overflow-wrap-[anywhere] text-sm hover:underline">{item.title}</p>
                 {item.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-1">
+                  <p className="break-words overflow-wrap-[anywhere] text-sm text-muted-foreground line-clamp-1">
                     {item.description}
                   </p>
                 )}
@@ -248,7 +248,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 w-full"
+              className="break-words overflow-wrap-[anywhere] flex items-center gap-2 w-full"
             >
               {content}
             </a>
@@ -256,7 +256,7 @@ export const ItemRow = React.forwardRef<HTMLTableRowElement, ItemRowProps>(
         case "thought":
           const thoughtContent = item.content;
           return (
-            <p className="text-sm cursor-text">
+            <p className="break-words overflow-wrap-anywhere text-sm cursor-text">
               {formatTextWithUrls(thoughtContent)}
             </p>
           );
