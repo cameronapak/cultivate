@@ -116,6 +116,7 @@ export const APP_COLOR_THEMES = [
   'modern-minimal',
   'nature',
   'neo-brutalism',
+  'notebook',
   'ocean-breeze',
   'pastel-dreams',
   't3-chat',
