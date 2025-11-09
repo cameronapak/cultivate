@@ -61,8 +61,8 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 2.5 Delete the old `tailwind.config.cjs` file
   - [x] 2.6 Read `package.json` to check current Vite version
   - [x] 2.7 Note Vite version (Wasp may auto-update this via SDK, manual update only if needed)
-  - [ ] 2.8 Commit Phase 2 changes with message: "Update to Wasp v0.18"
-  - [ ] 2.9 Push Phase 2 commit to remote branch
+  - [x] 2.8 Commit Phase 2 changes with message: "Update to Wasp v0.18"
+  - [x] 2.9 Push Phase 2 commit to remote branch
 
 - [ ] 3.0 Testing and validation
   - [ ] 3.1 Run `wasp build` to verify application builds without errors
