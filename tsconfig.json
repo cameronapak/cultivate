@@ -15,6 +15,7 @@
       "@/*": ["./src/*"]
     },
     "module": "esnext",
+    "moduleDetection": "force",
     // Needed because this is used as a project reference.
     "composite": true,
     "target": "esnext",
@@ -24,6 +25,7 @@
     // JSX support
     "jsx": "preserve",
     "strict": true,
+    "isolatedModules": true,
     // Allow default imports.
     "esModuleInterop": true,
     "lib": [
@@ -33,17 +35,6 @@
     ],
     "skipLibCheck": true,
     "allowJs": true,
-    "typeRoots": [
-      // This is needed to properly support Vitest testing with jest-dom matchers.
-      // Types for jest-dom are not recognized automatically and Typescript complains
-      // about missing types e.g. when using `toBeInTheDocument` and other matchers.
-      "node_modules/@testing-library",
-      // Specifying type roots overrides the default behavior of looking at the
-      // node_modules/@types folder so we had to list it explicitly.
-      // Source 1: https://www.typescriptlang.org/tsconfig#typeRoots 
-      // Source 2: https://github.com/testing-library/jest-dom/issues/546#issuecomment-1889884843
-      "node_modules/@types"
-    ],
     "outDir": ".wasp/out/user"
   },
   "include": [

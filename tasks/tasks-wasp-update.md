@@ -27,24 +27,24 @@ Update the file after completing each sub-task, not just after completing an ent
 
 ## Tasks
 
-- [ ] 0.0 Preparation and branch verification
-  - [ ] 0.1 Verify current branch is `claude/plan-wasp-update-011CUxnEaf4x9yCLC4vbf9eq`
-  - [ ] 0.2 Verify Node.js version is >=v22.12 (run `node --version`)
-  - [ ] 0.3 Ensure working directory is clean (run `git status`)
-  - [ ] 0.4 Read current `main.wasp` to confirm current version is 0.16.2
+- [x] 0.0 Preparation and branch verification
+  - [x] 0.1 Verify current branch is `claude/plan-wasp-update-011CUxnEaf4x9yCLC4vbf9eq`
+  - [x] 0.2 Verify Node.js version is >=v22.12 (run `node --version`)
+  - [x] 0.3 Ensure working directory is clean (run `git status`)
+  - [x] 0.4 Read current `main.wasp` to confirm current version is 0.16.2
 
 - [ ] 1.0 Phase 1: Update to Wasp v0.17
-  - [ ] 1.1 Update Wasp version in `main.wasp` from `^0.16.2` to `^0.17.0`
-  - [ ] 1.2 Read `src/pages/LoginPage.tsx` to locate the login function call
-  - [ ] 1.3 Update authentication API in `src/pages/LoginPage.tsx`
+  - [x] 1.1 Update Wasp version in `main.wasp` from `^0.16.2` to `^0.17.0`
+  - [x] 1.2 Read `src/pages/LoginPage.tsx` to locate the login function call
+  - [x] 1.3 Update authentication API in `src/pages/LoginPage.tsx`
     - Change `await login(username, password)` to `await login({ username, password })`
-  - [ ] 1.4 Read current `tsconfig.json` to understand existing configuration
-  - [ ] 1.5 Update `tsconfig.json` compiler options:
+  - [x] 1.4 Read current `tsconfig.json` to understand existing configuration
+  - [x] 1.5 Update `tsconfig.json` compiler options:
     - Add `"moduleDetection": "force"` to `compilerOptions`
     - Add `"isolatedModules": true` to `compilerOptions`
     - Remove the `"typeRoots"` array (lines 36-46)
-  - [ ] 1.6 Read `src/server/apis/urlMetadata.ts` to review Express 5 compatibility
-  - [ ] 1.7 Verify no obvious Express 5 breaking changes in middleware code
+  - [x] 1.6 Read `src/server/apis/urlMetadata.ts` to review Express 5 compatibility
+  - [x] 1.7 Verify no obvious Express 5 breaking changes in middleware code
   - [ ] 1.8 Commit Phase 1 changes with message: "Update to Wasp v0.17"
   - [ ] 1.9 Push Phase 1 commit to remote branch
 

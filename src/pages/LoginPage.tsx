@@ -31,7 +31,7 @@ export function LoginPage({
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
-      await login(username, password);
+      await login({ username, password });
       navigate("/inbox");
     } catch (error: HttpError | any) {
       toast.error(error?.data?.data?.message || error?.data?.message || "An unknown error occurred");
