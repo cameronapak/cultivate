@@ -45,22 +45,22 @@ Update the file after completing each sub-task, not just after completing an ent
     - Remove the `"typeRoots"` array (lines 36-46)
   - [x] 1.6 Read `src/server/apis/urlMetadata.ts` to review Express 5 compatibility
   - [x] 1.7 Verify no obvious Express 5 breaking changes in middleware code
-  - [ ] 1.8 Commit Phase 1 changes with message: "Update to Wasp v0.17"
-  - [ ] 1.9 Push Phase 1 commit to remote branch
+  - [x] 1.8 Commit Phase 1 changes with message: "Update to Wasp v0.17"
+  - [x] 1.9 Push Phase 1 commit to remote branch
 
 - [ ] 2.0 Phase 2: Update to Wasp v0.18
-  - [ ] 2.1 Update Wasp version in `main.wasp` from `^0.17.0` to `^0.18.2`
-  - [ ] 2.2 Read current `tailwind.config.cjs` to understand the full configuration
-  - [ ] 2.3 Convert Tailwind config from CommonJS to ESM:
+  - [x] 2.1 Update Wasp version in `main.wasp` from `^0.17.0` to `^0.18.2`
+  - [x] 2.2 Read current `tailwind.config.cjs` to understand the full configuration
+  - [x] 2.3 Convert Tailwind config from CommonJS to ESM:
     - Change `const { resolveProjectPath } = require("wasp/dev")` to `import { resolveProjectPath } from "wasp/dev"`
     - Change `module.exports = {...}` to `export default {...}`
     - Change `require("tailwindcss-animate")` to `import tailwindcssAnimate from "tailwindcss-animate"`
     - Change `require('tailwindcss/plugin')` to `import plugin from "tailwindcss/plugin"`
     - Update the plugin usage from `require('tailwindcss/plugin')(function...)` to `plugin(function...)`
-  - [ ] 2.4 Save the converted configuration as `tailwind.config.js`
-  - [ ] 2.5 Delete the old `tailwind.config.cjs` file
-  - [ ] 2.6 Read `package.json` to check current Vite version
-  - [ ] 2.7 Note Vite version (Wasp may auto-update this via SDK, manual update only if needed)
+  - [x] 2.4 Save the converted configuration as `tailwind.config.js`
+  - [x] 2.5 Delete the old `tailwind.config.cjs` file
+  - [x] 2.6 Read `package.json` to check current Vite version
+  - [x] 2.7 Note Vite version (Wasp may auto-update this via SDK, manual update only if needed)
   - [ ] 2.8 Commit Phase 2 changes with message: "Update to Wasp v0.18"
   - [ ] 2.9 Push Phase 2 commit to remote branch
 

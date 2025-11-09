@@ -1,6 +1,6 @@
 app shapeUp {
   wasp: {
-    version: "^0.17.0"
+    version: "^0.18.2"
   },
   title: "Cultivate - A Calm PKM Tool",
   client: {
