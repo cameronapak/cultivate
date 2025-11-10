@@ -44,6 +44,7 @@
   },
   "scripts": {
     "start": "wasp start",
+    "db:seed": "wasp db seed",
     "db:migrate": "wasp db migrate",
     "db:studio": "wasp db studio",
     "deploy:fly": "wasp deploy fly deploy"
