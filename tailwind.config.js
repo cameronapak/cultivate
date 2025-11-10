@@ -1,7 +1,9 @@
-const { resolveProjectPath } = require("wasp/dev");
+import { resolveProjectPath } from "wasp/dev";
+import tailwindcssAnimate from "tailwindcss-animate";
+import plugin from "tailwindcss/plugin";
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: ["class"],
   content: [resolveProjectPath("./src/**/*.{js,jsx,ts,tsx}")],
   theme: {
@@ -76,8 +78,8 @@ module.exports = {
     },
   },
   plugins: [
-    require("tailwindcss-animate"),
-    require('tailwindcss/plugin')(function({ addUtilities }) {
+    tailwindcssAnimate,
+    plugin(function({ addUtilities }) {
       addUtilities({
         '.overflow-wrap-anywhere': {
           'overflow-wrap': 'anywhere',

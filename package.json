@@ -44,6 +44,7 @@
   },
   "scripts": {
     "start": "wasp start",
+    "db:seed": "wasp db seed",
     "db:migrate": "wasp db migrate",
     "db:studio": "wasp db studio",
     "deploy:fly": "wasp deploy fly deploy"
@@ -51,7 +52,7 @@
   "devDependencies": {
     "@types/react": "^18.0.37",
     "prisma": "5.19.1",
-    "typescript": "^5.1.0",
-    "vite": "^4.3.9"
+    "typescript": "5.8.2",
+    "vite": "^7.0.6"
   }
 }
