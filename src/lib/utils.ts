@@ -99,7 +99,7 @@ export function getAndSetTheme() {
 
 export function getTheme() {
   const theme = localStorage.getItem('theme');
-  if (!theme) {
+  if (!theme || !APP_COLOR_THEMES.includes(theme)) {
     return 'default';
   }
   return theme;
