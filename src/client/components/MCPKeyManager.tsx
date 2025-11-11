@@ -1,23 +1,24 @@
 import { useState } from 'react';
-import { useQuery, useAction } from 'wasp/client/operations';
-import { generateMcpApiKey, revokeMcpApiKey, getMcpKeyStatus } from 'wasp/client/operations';
-import { Button } from '@/components/ui/button';
+import { useQuery, generateMcpApiKey, revokeMcpApiKey, getMcpKeyStatus } from 'wasp/client/operations';
+import { Button } from '../../components/ui/button';
 import { Copy, Check, Trash2, Loader } from 'lucide-react';
 
 export function MCPKeyManager() {
   const { data: keyStatus, isLoading: statusLoading, error: statusError } = useQuery(getMcpKeyStatus);
-  const { mutateAsync: generateKey, isLoading: generateLoading } = useAction(generateMcpApiKey);
-  const { mutateAsync: revokeKey, isLoading: revokeLoading } = useAction(revokeMcpApiKey);
-
   const [displayedKey, setDisplayedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isRevoking, setIsRevoking] = useState(false);
 
   const handleGenerateKey = async () => {
     try {
-      const result = await generateKey();
+      setIsGenerating(true);
+      const result = await generateMcpApiKey();
       setDisplayedKey(result.apiKey);
     } catch (error) {
       console.error('Failed to generate API key:', error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -32,10 +33,13 @@ export function MCPKeyManager() {
   const handleRevokeKey = async () => {
     if (confirm('Are you sure you want to revoke this API key? Any integrations using it will stop working.')) {
       try {
-        await revokeKey();
+        setIsRevoking(true);
+        await revokeMcpApiKey();
         setDisplayedKey(null);
       } catch (error) {
         console.error('Failed to revoke API key:', error);
+      } finally {
+        setIsRevoking(false);
       }
     }
   };
@@ -85,19 +89,19 @@ export function MCPKeyManager() {
             <Button
               variant="secondary"
               onClick={handleGenerateKey}
-              disabled={generateLoading}
+              disabled={isGenerating}
               className="flex-1"
             >
-              {generateLoading && <Loader className="w-4 h-4 mr-2 animate-spin" />}
+              {isGenerating && <Loader className="w-4 h-4 mr-2 animate-spin" />}
               Generate new key
             </Button>
             <Button
               variant="destructive"
               onClick={handleRevokeKey}
-              disabled={revokeLoading}
+              disabled={isRevoking}
               size="sm"
             >
-              {revokeLoading && <Loader className="w-4 h-4 mr-2 animate-spin" />}
+              {isRevoking && <Loader className="w-4 h-4 mr-2 animate-spin" />}
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
@@ -109,10 +113,10 @@ export function MCPKeyManager() {
           </p>
           <Button
             onClick={handleGenerateKey}
-            disabled={generateLoading}
+            disabled={isGenerating}
             className="w-full"
           >
-            {generateLoading && <Loader className="w-4 h-4 mr-2 animate-spin" />}
+            {isGenerating && <Loader className="w-4 h-4 mr-2 animate-spin" />}
             Generate API key
           </Button>
         </div>

@@ -472,4 +472,53 @@ query getMcpKeyStatus {
   entities: [User]
 }
 
+// MCP API Namespace
+apiNamespace mcp {
+  middlewareConfigFn: import { mcpMiddleware } from "@src/server/apis/mcp",
+  path: "/mcp"
+}
+
+// MCP Tools APIs
+api mcpListTools {
+  fn: import { mcpListTools } from "@src/server/apis/mcp",
+  httpRoute: (GET, "/mcp/tools"),
+  entities: [Task, Thought, Resource, Project, User]
+}
+
+api mcpCreateTask {
+  fn: import { mcpCreateTask } from "@src/server/apis/mcp",
+  httpRoute: (POST, "/mcp/tools/create_task"),
+  entities: [Task, User]
+}
+
+api mcpCreateNote {
+  fn: import { mcpCreateNote } from "@src/server/apis/mcp",
+  httpRoute: (POST, "/mcp/tools/create_note"),
+  entities: [Thought, User]
+}
+
+api mcpCreateResource {
+  fn: import { mcpCreateResource } from "@src/server/apis/mcp",
+  httpRoute: (POST, "/mcp/tools/create_resource"),
+  entities: [Resource, User]
+}
+
+api mcpSearchAll {
+  fn: import { mcpSearchAll } from "@src/server/apis/mcp",
+  httpRoute: (GET, "/mcp/tools/search_all"),
+  entities: [Task, Thought, Resource, Project, User]
+}
+
+api mcpSearchProject {
+  fn: import { mcpSearchProject } from "@src/server/apis/mcp",
+  httpRoute: (GET, "/mcp/tools/search_project"),
+  entities: [Task, Thought, Resource, Project, User]
+}
+
+api mcpSearchByType {
+  fn: import { mcpSearchByType } from "@src/server/apis/mcp",
+  httpRoute: (GET, "/mcp/tools/search_by_type"),
+  entities: [Task, Thought, Resource, Project, User]
+}
+
 //#endregion

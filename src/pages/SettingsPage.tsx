@@ -1,4 +1,4 @@
-import { MCPKeyManager } from '@/client/components/MCPKeyManager';
+import { MCPKeyManager } from '../client/components/MCPKeyManager';
 
 export function SettingsPage() {
   return (
