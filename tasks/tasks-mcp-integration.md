@@ -1,0 +1,178 @@
+# Task List: MCP Integration for Cultivate
+
+## Relevant Files
+
+- `schema.prisma` - Database schema where API key field will be added to User model
+- `src/server/mcp/server.ts` - Main MCP server implementation
+- `src/server/mcp/middleware.ts` - API key validation middleware
+- `src/server/mcp/tools/create.ts` - MCP create tool implementations
+- `src/server/mcp/tools/search.ts` - MCP search tool implementations
+- `src/server/mcp/types.ts` - TypeScript types for MCP tools and responses
+- `src/server/mcp/utils.ts` - Utility functions for search, validation, etc.
+- `src/queries.ts` - Existing queries file; add new MCP-related actions here
+- `src/pages/SettingsPage.tsx` - Settings page where MCP key management UI lives
+- `src/client/components/MCPKeyManager.tsx` - Component for managing API keys
+- `main.wasp` - Add new MCP-related actions/queries to Wasp configuration
+- `migrations/[timestamp]_add_mcp_api_key.sql` - Database migration for API key field
+- `src/server/mcp/__tests__/server.test.ts` - Tests for MCP server
+- `src/server/mcp/__tests__/middleware.test.ts` - Tests for auth middleware
+- `src/server/mcp/__tests__/tools.test.ts` - Tests for all MCP tools
+- `.env.example` - Add MCP_SERVER_PORT and MCP_SECRET documentation
+- `README.md` - Documentation on how to use MCP integration
+
+### Notes
+
+- The MCP server will be a separate HTTP server running on a different port from the main Wasp app
+- API keys will be stored in the User model with a new `mcpApiKey` field
+- Leverage existing Wasp queries/actions where possible; MCP server acts as a thin HTTP wrapper
+- All operations must enforce `userId` isolation via API key validation
+- Use simple bearer token auth (no JWT complexity) for MVP
+
+---
+
+## Tasks
+
+- [ ] 0.0 Create feature branch
+  - [ ] 0.1 Create and checkout a new branch: `git checkout -b feature/mcp-integration`
+
+- [ ] 1.0 Database schema and API key storage setup
+  - [ ] 1.1 Decide on API key storage approach: add `mcpApiKey` field directly to User model (simpler for MVP)
+  - [ ] 1.2 Add `mcpApiKey` field to User model in `schema.prisma` with unique constraint
+  - [ ] 1.3 Create a Prisma migration file for the new `mcpApiKey` field
+  - [ ] 1.4 Run migration locally: `npm run db:migrate`
+  - [ ] 1.5 Verify schema changes in database using `npm run db:studio`
+
+- [ ] 2.0 MCP server infrastructure and authentication middleware
+  - [ ] 2.1 Install MCP SDK and dependencies: `npm install @modelcontextprotocol/sdk express cors`
+  - [ ] 2.2 Create directory structure: `src/server/mcp/`
+  - [ ] 2.3 Create `src/server/mcp/types.ts` with TypeScript interfaces for MCP tool inputs/outputs
+  - [ ] 2.4 Create `src/server/mcp/middleware.ts` with API key validation middleware
+    - [ ] 2.4.1 Extract API key from `Authorization: Bearer {api_key}` header
+    - [ ] 2.4.2 Query User table by mcpApiKey and attach user to request context
+    - [ ] 2.4.3 Return 401 if key is missing or invalid
+  - [ ] 2.5 Create `src/server/mcp/server.ts` with Express HTTP server setup
+    - [ ] 2.5.1 Initialize Express app on configurable port (e.g., 3001)
+    - [ ] 2.5.2 Add CORS middleware
+    - [ ] 2.5.3 Add authentication middleware to all MCP routes
+    - [ ] 2.5.4 Set up error handling for 401/403/500 responses
+  - [ ] 2.6 Create `src/server/mcp/utils.ts` with helper functions (search logic, result formatting, pagination)
+  - [ ] 2.7 Update `main.wasp` to export MCP server startup logic if needed
+
+- [ ] 3.0 Implement MCP create tools (create_task, create_note, create_resource)
+  - [ ] 3.1 Create `src/server/mcp/tools/create.ts`
+  - [ ] 3.2 Implement `create_task` tool
+    - [ ] 3.2.1 Accept `title` (required), `description` (optional), `projectId` (optional)
+    - [ ] 3.2.2 Use existing `createTask` action or create wrapper
+    - [ ] 3.2.3 Auto-assign to authenticated user via API key
+    - [ ] 3.2.4 Return created task ID and metadata (id, title, projectId, createdAt)
+  - [ ] 3.3 Implement `create_note` tool
+    - [ ] 3.3.1 Accept `content` (required)
+    - [ ] 3.3.2 Map to internal "Thought" entity
+    - [ ] 3.3.3 Auto-assign to authenticated user
+    - [ ] 3.3.4 Return created note ID and metadata
+  - [ ] 3.4 Implement `create_resource` tool
+    - [ ] 3.4.1 Accept `url` (required), `title` (optional), `description` (optional), `projectId` (optional)
+    - [ ] 3.4.2 Use existing `createResource` action or create wrapper
+    - [ ] 3.4.3 Default title to URL if not provided
+    - [ ] 3.4.4 Auto-assign to authenticated user
+    - [ ] 3.4.5 Return created resource ID and metadata
+  - [ ] 3.5 Register all create tools in MCP server with proper tool definitions
+  - [ ] 3.6 Test each create tool manually with curl or Postman
+
+- [ ] 4.0 Implement MCP search tools (search_all, search_project, search_by_type)
+  - [ ] 4.1 Create `src/server/mcp/tools/search.ts`
+  - [ ] 4.2 Implement `search_all` tool
+    - [ ] 4.2.1 Accept `query` (required), `type` (optional: "task", "note", "resource"), pagination params
+    - [ ] 4.2.2 Query Task, Thought, and Resource models by userId with partial/fuzzy matching
+    - [ ] 4.2.3 Support type filtering if provided
+    - [ ] 4.2.4 Implement pagination (offset/limit, max 50 results per page)
+    - [ ] 4.2.5 Return array of results with id, title/content, type, projectName, createdAt
+  - [ ] 4.3 Implement `search_project` tool
+    - [ ] 4.3.1 Accept `projectId` (required), `query` (optional), `type` (optional), pagination params
+    - [ ] 4.3.2 Verify projectId belongs to authenticated user
+    - [ ] 4.3.3 Query items filtered by projectId and userId
+    - [ ] 4.3.4 If query is omitted, return all items in project
+    - [ ] 4.3.5 Support type filtering if provided
+    - [ ] 4.3.6 Implement pagination
+    - [ ] 4.3.7 Return same result format as search_all
+  - [ ] 4.4 Implement `search_by_type` tool
+    - [ ] 4.4.1 Accept `type` (required: "task", "note", "resource"), `query` (optional), pagination params
+    - [ ] 4.4.2 Query the specific entity type filtered by userId
+    - [ ] 4.4.3 Apply partial/fuzzy search if query is provided
+    - [ ] 4.4.4 Implement pagination
+    - [ ] 4.4.5 Return same result format as other search tools
+  - [ ] 4.5 Implement fuzzy/partial search matching in `utils.ts`
+    - [ ] 4.5.1 Use PostgreSQL `ILIKE` operator or Prisma full-text search for case-insensitive partial matching
+    - [ ] 4.5.2 Handle special characters and spaces in queries
+  - [ ] 4.6 Register all search tools in MCP server with proper tool definitions
+  - [ ] 4.7 Test each search tool with various queries and filters
+
+- [ ] 5.0 Add API key management backend and UI
+  - [ ] 5.1 Create backend action in `src/queries.ts`: `generateMcpApiKey`
+    - [ ] 5.1.1 Accept no arguments
+    - [ ] 5.1.2 Check if user already has an API key
+    - [ ] 5.1.3 Generate a random 32-character hex string using `crypto.randomBytes(16).toString('hex')`
+    - [ ] 5.1.4 Update User record with new mcpApiKey
+    - [ ] 5.1.5 Return the API key (only displayed once to user)
+    - [ ] 5.1.6 Require authentication
+  - [ ] 5.2 Create backend action in `src/queries.ts`: `revokeMcpApiKey`
+    - [ ] 5.2.1 Accept no arguments
+    - [ ] 5.2.2 Set user's mcpApiKey to null
+    - [ ] 5.2.3 Return success message
+    - [ ] 5.2.4 Require authentication
+  - [ ] 5.3 Create backend query in `src/queries.ts`: `getMcpKeyStatus`
+    - [ ] 5.3.1 Return whether user has an active API key (true/false, don't return the actual key)
+    - [ ] 5.3.2 Return key creation date if it exists
+    - [ ] 5.3.3 Require authentication
+  - [ ] 5.4 Add actions/queries to `main.wasp`
+  - [ ] 5.5 Create `src/client/components/MCPKeyManager.tsx` component
+    - [ ] 5.5.1 Display current key status (has key or doesn't)
+    - [ ] 5.5.2 Show button to generate new API key
+    - [ ] 5.5.3 When key is generated, display it in a copyable code block with clear warning ("This will only be shown once")
+    - [ ] 5.5.4 After user dismisses, replace display with revoke button
+    - [ ] 5.5.5 Show key creation date
+    - [ ] 5.5.6 Handle loading and error states
+  - [ ] 5.6 Add MCPKeyManager component to user settings page
+    - [ ] 5.6.1 Create or update `src/pages/SettingsPage.tsx` if it doesn't exist
+    - [ ] 5.6.2 Add a section for "MCP Integration" in settings
+    - [ ] 5.6.3 Include MCPKeyManager component in that section
+  - [ ] 5.7 Test API key generation, revocation, and retrieval flow
+
+- [ ] 6.0 Testing, documentation, and deployment preparation
+  - [ ] 6.1 Create comprehensive test suite in `src/server/mcp/__tests__/`
+    - [ ] 6.1.1 Create `middleware.test.ts` testing API key validation (valid, invalid, missing)
+    - [ ] 6.1.2 Create `tools.test.ts` testing all create and search tools with various inputs
+    - [ ] 6.1.3 Create `server.test.ts` testing MCP server startup and error handling
+  - [ ] 6.2 Write integration tests
+    - [ ] 6.2.1 Test full flow: generate API key → create task → search for task
+    - [ ] 6.2.2 Test data isolation: ensure users only see their own data
+    - [ ] 6.2.3 Test authentication: verify 401 errors for invalid keys
+  - [ ] 6.3 Create MCP documentation
+    - [ ] 6.3.1 Document all 6 tools with required/optional parameters
+    - [ ] 6.3.2 Include example requests and responses
+    - [ ] 6.3.3 Document error codes and messages
+    - [ ] 6.3.4 Create user guide for generating and using API keys
+  - [ ] 6.4 Update `README.md` with MCP section
+    - [ ] 6.4.1 Add overview of MCP integration feature
+    - [ ] 6.4.2 Link to full MCP documentation
+    - [ ] 6.4.3 Explain how to set up MCP client (e.g., Claude plugin)
+  - [ ] 6.5 Create `.env.example` entries
+    - [ ] 6.5.1 Add `MCP_SERVER_PORT=3001` (default)
+    - [ ] 6.5.2 Add any other environment configuration needed
+  - [ ] 6.6 Update deployment configuration
+    - [ ] 6.6.1 Test MCP server startup on local environment
+    - [ ] 6.6.2 Verify MCP server can connect to production database if deployed
+    - [ ] 6.6.3 Document any additional Fly.io configuration needed (e.g., separate process type or port exposure)
+  - [ ] 6.7 Run full test suite: `npm test`
+  - [ ] 6.8 Manual end-to-end testing
+    - [ ] 6.8.1 Generate API key from web UI
+    - [ ] 6.8.2 Test all 6 tools with valid key using curl/Postman
+    - [ ] 6.8.3 Test error cases (invalid key, missing params, unauthorized projectId)
+    - [ ] 6.8.4 Verify data isolation (user A can't see user B's data)
+  - [ ] 6.9 Code review and cleanup
+    - [ ] 6.9.1 Review all MCP server code for security issues
+    - [ ] 6.9.2 Remove any console.log statements or debugging code
+    - [ ] 6.9.3 Ensure all error messages are user-friendly
+  - [ ] 6.10 Commit changes and create pull request
+  - [ ] 6.11 Merge to main and deploy to staging
+  - [ ] 6.12 Final testing on staging environment before production release
