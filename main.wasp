@@ -84,6 +84,12 @@ page InboxPage {
   component: import { InboxPage } from "@src/pages/InboxPage"
 }
 
+route SettingsRoute { path: "/settings", to: SettingsPage }
+page SettingsPage {
+  authRequired: true,
+  component: import { SettingsPage } from "@src/pages/SettingsPage"
+}
+
 route DocumentsRoute { path: "/documents", to: DocumentsPage }
 page DocumentsPage {
   authRequired: true,
@@ -445,4 +451,25 @@ query getOldestAwayDate {
   fn: import { getOldestAwayDate } from "@src/queries",
   entities: [Task, Resource, Thought]
 }
+//#endregion
+
+//#region MCP Integration
+
+action generateMcpApiKey {
+  auth: true,
+  fn: import { generateMcpApiKey } from "@src/queries",
+  entities: [User]
+}
+
+action revokeMcpApiKey {
+  auth: true,
+  fn: import { revokeMcpApiKey } from "@src/queries",
+  entities: [User]
+}
+
+query getMcpKeyStatus {
+  fn: import { getMcpKeyStatus } from "@src/queries",
+  entities: [User]
+}
+
 //#endregion

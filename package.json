@@ -2,9 +2,12 @@
   "name": "cultivate",
   "type": "module",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
     "@blocknote/core": "^0.28.0",
     "@blocknote/mantine": "^0.28.0",
     "@blocknote/react": "^0.28.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
     "@formkit/drag-and-drop": "^0.4.2",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.7",

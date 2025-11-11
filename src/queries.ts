@@ -7,6 +7,7 @@ import {
   User,
   InviteCode,
 } from "wasp/entities";
+import { randomBytes } from "crypto";
 import { HttpError } from "wasp/server";
 import {
   type GetProjects,
@@ -1773,3 +1774,67 @@ export const getOldestAwayDate = async (_args: any, context: WaspContext) => {
   if (dates.length === 0) return null;
   return new Date(Math.min(...dates.map((d) => new Date(d).getTime())));
 };
+
+//#endregion
+
+//#region MCP Integration
+
+type GenerateMcpApiKeyPayload = void;
+
+export const generateMcpApiKey = async (
+  _args: GenerateMcpApiKeyPayload,
+  context: WaspContext
+) => {
+  if (!context.user) {
+    throw new HttpError(401);
+  }
+
+  const apiKey = randomBytes(16).toString('hex');
+
+  const user = await context.entities.User.update({
+    where: { id: context.user.id },
+    data: { mcpApiKey: apiKey },
+  });
+
+  return { apiKey };
+};
+
+type RevokeMcpApiKeyPayload = void;
+
+export const revokeMcpApiKey = async (
+  _args: RevokeMcpApiKeyPayload,
+  context: WaspContext
+) => {
+  if (!context.user) {
+    throw new HttpError(401);
+  }
+
+  await context.entities.User.update({
+    where: { id: context.user.id },
+    data: { mcpApiKey: null },
+  });
+
+  return { success: true };
+};
+
+type GetMcpKeyStatusPayload = void;
+
+export const getMcpKeyStatus = async (
+  _args: GetMcpKeyStatusPayload,
+  context: WaspContext
+) => {
+  if (!context.user) {
+    throw new HttpError(401);
+  }
+
+  const user = await context.entities.User.findUnique({
+    where: { id: context.user.id },
+    select: { mcpApiKey: true },
+  });
+
+  return {
+    hasKey: !!user?.mcpApiKey,
+  };
+};
+
+//#endregion
