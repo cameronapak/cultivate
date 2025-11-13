@@ -454,7 +454,6 @@ query getOldestAwayDate {
 //#endregion
 
 //#region MCP Integration
-
 action generateMcpApiKey {
   auth: true,
   fn: import { generateMcpApiKey } from "@src/queries",

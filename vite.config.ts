@@ -7,7 +7,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": resolveProjectPath('./src'),
+      '@': resolveProjectPath('./src'),
     },
   },
 })
