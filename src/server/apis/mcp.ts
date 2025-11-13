@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
 import { type MiddlewareConfigFn } from 'wasp/server'
 import cors from 'cors'
+import { handleJsonRpcMessage } from './mcp/router'
+import { JsonRpcErrors } from './mcp/jsonrpc'
 
 const prisma = new PrismaClient()
 
@@ -39,6 +41,73 @@ async function authenticateApiKey(req: Request): Promise<any> {
   }
 
   return user
+}
+
+// Main JSON-RPC endpoint for MCP
+export const mcpJsonRpc = async (req: Request, res: Response, context: McpContext) => {
+  try {
+    // Authenticate user
+    const user = await authenticateApiKey(req)
+
+    // Parse JSON body
+    let body: any
+    try {
+      body = req.body
+    } catch (parseError) {
+      const error = JsonRpcErrors.parseError({ message: 'Invalid JSON' })
+      return res.status(400).json(error)
+    }
+
+    // Handle JSON-RPC message
+    const result = await handleJsonRpcMessage(body, user)
+
+    // Notifications return null (no response)
+    if (result === null) {
+      return res.status(204).send()
+    }
+
+    // Check if it's an error response
+    if ('error' in result) {
+      // Map JSON-RPC error codes to HTTP status codes
+      const httpStatus = getHttpStatusFromJsonRpcError(result.error.code)
+      return res.status(httpStatus).json(result)
+    }
+
+    // Success response
+    return res.status(200).json(result)
+  } catch (error: any) {
+    // Authentication errors
+    if (error.message.includes('authorization') || error.message.includes('API key')) {
+      const jsonRpcError = JsonRpcErrors.authError(null, error.message)
+      return res.status(401).json(jsonRpcError)
+    }
+
+    // Other unexpected errors
+    const jsonRpcError = JsonRpcErrors.internalError(null, {
+      message: error.message || 'Internal server error',
+    })
+    return res.status(500).json(jsonRpcError)
+  }
+}
+
+// Map JSON-RPC error codes to HTTP status codes
+function getHttpStatusFromJsonRpcError(code: number): number {
+  switch (code) {
+    case -32700: // Parse error
+      return 400
+    case -32600: // Invalid request
+      return 400
+    case -32601: // Method not found
+      return 404
+    case -32602: // Invalid params
+      return 400
+    case -32001: // Auth error
+      return 401
+    case -32002: // State error
+      return 400
+    default:
+      return 500
+  }
 }
 
 // MCP Tool: Create Task
