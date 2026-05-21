@@ -262,7 +262,7 @@ export function CanvasPage() {
 
   if (loadingState.status === "error") {
     return (
-      <Layout mainContentClasses="w-full max-w-full !p-0 h-full">
+      <Layout mainContentClasses="w-full max-w-full p-0! h-full">
         <div className="tldraw__editor h-full flex items-center justify-center">
           <h2>Error!</h2>
           <p>{loadingState.error}</p>
@@ -274,7 +274,7 @@ export function CanvasPage() {
   return (
     <Layout
       isLoading={loadingState.status === "loading" || !canvasId}
-      mainContentClasses="w-full max-w-full !p-0 h-full"
+      mainContentClasses="w-full max-w-full p-0! h-full"
       breadcrumbItems={[
         {
           title: "Canvas",

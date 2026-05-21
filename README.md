@@ -33,7 +33,9 @@ If `.env.server` defines `DATABASE_URL`, start that database yourself before run
 ## Development Notes
 
 - Global Tailwind styles load from `src/client/setup.ts`.
-- Tailwind v4 uses `@tailwindcss/vite`; theme tokens live in `src/Main.css`.
+- Tailwind v4 uses `@tailwindcss/vite`; theme tokens live in `src/Main.css` as full CSS color values.
+- Public theme CSS files use full CSS color values; run `npm run themes:check` after editing `public/themes`.
+- Animations use `tw-animate-css`, not `tailwindcss-animate`.
 - Wasp app config lives in `main.wasp.ts`.
 - Run `wasp compile` after framework, Wasp, or dependency changes.
 

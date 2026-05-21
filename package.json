@@ -6,11 +6,12 @@
     ".wasp/out/sdk/wasp"
   ],
   "dependencies": {
+    "@base-ui/react": "^1.4.1",
     "@blocknote/core": "^0.28.0",
     "@blocknote/mantine": "^0.28.0",
     "@blocknote/react": "^0.28.0",
     "@formkit/drag-and-drop": "^0.4.2",
-    "@hookform/resolvers": "^5.0.1",
+    "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.7",
     "@radix-ui/react-checkbox": "^1.1.4",
     "@radix-ui/react-collapsible": "^1.1.3",
@@ -31,20 +32,27 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "date-fns": "^4.1.0",
+    "embla-carousel-react": "^8.6.0",
+    "input-otp": "^1.4.2",
     "lucide-react": "^0.487.0",
     "motion": "^12.9.2",
     "next-themes": "^0.4.6",
+    "radix-ui": "^1.4.3",
     "react": "^19.2.1",
+    "react-day-picker": "^10.0.0",
     "react-dom": "^19.2.1",
-    "react-hook-form": "^7.55.0",
+    "react-hook-form": "^7.75.0",
     "react-hotkeys-hook": "^5.0.1",
+    "react-resizable-panels": "^4.11.1",
     "react-router": "^7.12.0",
-    "sonner": "^2.0.3",
+    "recharts": "^3.8.0",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.1.0",
-    "tailwindcss-animate": "^1.0.7",
     "tldraw": "^3.11.1",
     "url-metadata": "^5.0.5",
-    "zod": "^4.3.6"
+    "vaul": "^1.1.2",
+    "zod": "^4.4.3"
   },
   "scripts": {
     "ts-setup": "wasp ts-setup",
@@ -52,6 +60,8 @@
     "db:seed": "wasp db seed",
     "db:migrate": "wasp db migrate",
     "db:studio": "wasp db studio",
+    "themes:migrate": "node scripts/theme-css-vars.mjs --write",
+    "themes:check": "node scripts/theme-css-vars.mjs --check",
     "deploy:fly": "wasp deploy fly deploy"
   },
   "devDependencies": {
@@ -60,6 +70,7 @@
     "@types/react-dom": "^19.2.3",
     "prisma": "5.19.1",
     "tailwindcss": "^4.3.0",
+    "tw-animate-css": "^1.4.0",
     "typescript": "5.9.3",
     "vite": "^7.0.6",
     "wasp-config": "file:.wasp/wasp-config"

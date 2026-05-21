@@ -37,6 +37,9 @@
 - Run `wasp ts-setup` after `wasp clean` or removing `node_modules`.
 - Tailwind is v4, uses `@tailwindcss/vite`, and global styles load from `src/client/setup.ts`.
 - Tailwind theme tokens and custom utilities live in `src/Main.css`; there is no JS Tailwind config.
+- Theme variables should store full CSS color values like `hsl(...)`; runtime theme writes go through `src/lib/fix-global-css.ts`.
+- Public theme CSS files in `public/themes` should pass `npm run themes:check`.
+- Animations use `tw-animate-css`, not `tailwindcss-animate`.
 - Keep `wasp()` from `wasp/client/vite` in `vite.config.ts`.
 - Direct React Router imports should come from `react-router`.
 - `.npmrc` sets `min-release-age=7`.

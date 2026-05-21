@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import { wasp } from 'wasp/client/vite'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from "vite";
+import { wasp } from "wasp/client/vite";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [wasp(), tailwindcss()],
@@ -9,7 +9,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": new URL('./src', import.meta.url).pathname,
+      "@": new URL("./src", import.meta.url).pathname,
     },
   },
-})
+});
