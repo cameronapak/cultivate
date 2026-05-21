@@ -17,7 +17,8 @@ primary_region = 'mia'
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  # The client image only serves static files, so 256MB should be enough.
+  memory = '256mb'
   cpu_kind = 'shared'
   cpus = 1
 

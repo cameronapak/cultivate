@@ -39,6 +39,19 @@ If `.env.server` defines `DATABASE_URL`, start that database yourself before run
 - Wasp app config lives in `main.wasp.ts`.
 - Run `wasp compile` after framework, Wasp, or dependency changes.
 
+## Deployment Notes
+
+- Fly config lives in `fly-client.toml` and `fly-server.toml`.
+- The client is static file serving and uses `256mb`.
+- The server is Node + Prisma and uses `512mb`.
+- The server can scale to zero; first request after idle time may cold-start.
+- After Fly deploys, keep both app Machine counts at one unless traffic grows:
+
+```sh
+fly scale count 1 -a cultivate-server
+fly scale count 1 -a cultivate-client
+```
+
 ## Contributing
 
 This project is open source code and open to ideas, with the direction honed in by its creator, Cam Pak.

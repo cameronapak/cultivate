@@ -40,6 +40,9 @@
 - Theme variables should store full CSS color values like `hsl(...)`; runtime theme writes go through `src/lib/fix-global-css.ts`.
 - Public theme CSS files in `public/themes` should pass `npm run themes:check`.
 - Animations use `tw-animate-css`, not `tailwindcss-animate`.
+- Fly deploy config is split across `fly-client.toml` and `fly-server.toml`.
+- Fly is tuned for low-traffic cost: the static client uses `256mb`, the Node/Prisma server uses `512mb`, and the server can scale to zero with a cold start.
+- Fly Machine count is app state, not just TOML. After deploys, keep `cultivate-client` and `cultivate-server` at one Machine each unless traffic requires more.
 - Keep `wasp()` from `wasp/client/vite` in `vite.config.ts`.
 - Direct React Router imports should come from `react-router`.
 - `.npmrc` sets `min-release-age=7`.
@@ -57,6 +60,14 @@ wasp start
 ```
 
 If `.env.server` defines `DATABASE_URL`, start that database yourself. Wasp does not start its managed dev database when a custom `DATABASE_URL` is present.
+
+Fly deployment uses:
+
+```sh
+npm run deploy:fly
+fly scale count 1 -a cultivate-server
+fly scale count 1 -a cultivate-client
+```
 
 <!-- DOC_FRESHNESS_START -->
 Repo reality is the source of truth. If `AGENTS.md` or `README.md` becomes false, update it in the same change when the fix is objective.
