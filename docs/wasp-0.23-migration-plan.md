@@ -8,13 +8,16 @@ Cultivate now targets Wasp `^0.23.0` after migrating from `^0.18.2` through the 
 - Install Wasp from npm: `npm i -g @wasp.sh/wasp-cli@0.23.0`.
 - Keep npm and `package-lock.json`.
 - Keep `.npmrc` with `min-release-age=7`.
+- Wasp app config now lives in `main.wasp.ts`.
+- Run `wasp ts-setup` after `wasp clean` or removing `node_modules`.
 - Do not edit generated `.wasp/` files manually.
 - Deployment validation is out of scope for this migration.
 
 ## Applied Changes
 
-- `main.wasp` now uses Wasp `^0.23.0`.
+- `main.wasp` was replaced by `main.wasp.ts`.
 - `package.json` uses Wasp workspaces: `[".wasp/out/*", ".wasp/out/sdk/wasp"]`.
+- `package.json` includes the local `wasp-config` dev dependency for Wasp TS config.
 - The old root `wasp` file dependency was removed.
 - React was upgraded to 19.
 - React Router was upgraded to 7, and direct `react-router-dom` imports moved to `react-router`.

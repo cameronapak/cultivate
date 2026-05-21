@@ -22,9 +22,10 @@ Cultivate is a PKM tool where you can calmly brain dump, write, manage projects,
 2. Install the Wasp CLI: `npm i -g @wasp.sh/wasp-cli@0.23.0`
 3. Install Docker or [Orbstack](https://orbstack.dev/) (recommended for macOS).
 4. Run `npm install`
-5. Run `wasp db migrate-dev` to set up the database schema.
-6. Run `wasp db seed` to create the default user (`dev_user` / `password`) and initial invite code (`JESUS-SAVES`).
-7. Run `wasp start` to get the app running locally at `localhost:3000`.
+5. Run `wasp ts-setup` if you ran `wasp clean` or removed `node_modules`.
+6. Run `wasp db migrate-dev` to set up the database schema.
+7. Run `wasp db seed` to create the default user (`dev_user` / `password`) and initial invite code (`JESUS-SAVES`).
+8. Run `wasp start` to get the app running locally at `localhost:3000`.
 
 If `.env.server` defines `DATABASE_URL`, start that database yourself before running Wasp commands. Without a custom `DATABASE_URL`, use Wasp's managed dev database flow.
 
@@ -32,6 +33,7 @@ If `.env.server` defines `DATABASE_URL`, start that database yourself before run
 
 - Global Tailwind styles load from `src/client/setup.ts`.
 - Keep Tailwind on v3 unless the Wasp migration docs require otherwise.
+- Wasp app config lives in `main.wasp.ts`.
 - Run `wasp compile` after framework, Wasp, or dependency changes.
 
 ## Contributing

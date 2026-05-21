@@ -1,6 +1,7 @@
 .wasp/
 .codegraph/
 node_modules/
+*.tsbuildinfo
 
 # Ignore all dotenv files by default to prevent accidentally committing any secrets.
 # To include specific dotenv files, use the `!` operator or adjust these rules.

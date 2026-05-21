@@ -33,6 +33,8 @@
 - Install the matching CLI with `npm i -g @wasp.sh/wasp-cli@0.23.0`.
 - Use npm and `package-lock.json`.
 - Wasp workspaces are `[".wasp/out/*", ".wasp/out/sdk/wasp"]`.
+- Wasp app config lives in `main.wasp.ts`.
+- Run `wasp ts-setup` after `wasp clean` or removing `node_modules`.
 - Tailwind is v3 and global styles load from `src/client/setup.ts`.
 - Keep `wasp()` from `wasp/client/vite` in `vite.config.ts`.
 - Direct React Router imports should come from `react-router`.
@@ -43,6 +45,7 @@
 ```sh
 nvm use
 npm install
+wasp ts-setup
 wasp compile
 wasp db migrate-dev
 wasp db seed
