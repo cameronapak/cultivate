@@ -35,7 +35,8 @@
 - Wasp workspaces are `[".wasp/out/*", ".wasp/out/sdk/wasp"]`.
 - Wasp app config lives in `main.wasp.ts`.
 - Run `wasp ts-setup` after `wasp clean` or removing `node_modules`.
-- Tailwind is v3 and global styles load from `src/client/setup.ts`.
+- Tailwind is v4, uses `@tailwindcss/vite`, and global styles load from `src/client/setup.ts`.
+- Tailwind theme tokens and custom utilities live in `src/Main.css`; there is no JS Tailwind config.
 - Keep `wasp()` from `wasp/client/vite` in `vite.config.ts`.
 - Direct React Router imports should come from `react-router`.
 - `.npmrc` sets `min-release-age=7`.
