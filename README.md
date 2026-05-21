@@ -13,6 +13,7 @@ Cultivate is a PKM tool where you can calmly brain dump, write, manage projects,
 ## Stack
 
 - [Wasp](https://wasp.sh) `^0.23.0` - a Rails-like framework for JS, with a focus on reducing boilerplate
+- [Tailwind CSS](https://tailwindcss.com/) `^4.3.0` - utility-first CSS
 - [Shadcn-ui](https://ui.shadcn.com/) - a beautiful component library/framework
 - [Lucide Icons](https://lucide.dev/) - Beautiful & consistent icons
 
@@ -32,7 +33,9 @@ If `.env.server` defines `DATABASE_URL`, start that database yourself before run
 ## Development Notes
 
 - Global Tailwind styles load from `src/client/setup.ts`.
-- Keep Tailwind on v3 unless the Wasp migration docs require otherwise.
+- Tailwind v4 uses `@tailwindcss/vite`; theme tokens live in `src/Main.css` as full CSS color values.
+- Public theme CSS files use full CSS color values; run `npm run themes:check` after editing `public/themes`.
+- Animations use `tw-animate-css`, not `tailwindcss-animate`.
 - Wasp app config lives in `main.wasp.ts`.
 - Run `wasp compile` after framework, Wasp, or dependency changes.
 

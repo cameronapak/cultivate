@@ -3,29 +3,20 @@
 import { colorFormatter } from "./color-converter";
 import type { ThemeState } from "./types";
 
-// Convert any color to Tailwind-compatible HSL format
-// Tailwind expects "h s% l%" format without the hsl() wrapper
-export function formatHslForCssVar(color: string): string {
-  if (!color) return "0 0% 0%";
+// Tailwind v4 theme variables reference full CSS color values.
+export function formatColorForCssVar(color: string): string {
+  if (!color) return "hsl(0 0% 0%)";
 
   // If already in correct format (e.g., "240 10% 3.9%")
   if (/^\d+\s+\d+%\s+\d+%$/.test(color)) {
+    return `hsl(${color})`;
+  }
+
+  if (color.startsWith("hsl(") || color.startsWith("oklch(") || color.startsWith("rgb(")) {
     return color;
   }
 
-  // Convert to HSL string format first
-  const hslValue = colorFormatter(color, "hsl", "4");
-
-  // Then extract just the values without the hsl() wrapper
-  if (hslValue.startsWith("hsl(")) {
-    return hslValue
-      .replace(/^hsl\(/, "")
-      .replace(/\)$/, "")
-      .replace(/,\s*/g, " ");
-  }
-
-  // If it's already space-separated, return as is
-  return hslValue;
+  return colorFormatter(color, "hsl", "4");
 }
 
 // Get the target element for applying styles
@@ -83,7 +74,7 @@ export function createThemeStylesheet(themeState: ThemeState): void {
             key.includes("border") ||
             key.includes("ring"))
         ) {
-          cssValue = formatHslForCssVar(value);
+          cssValue = formatColorForCssVar(value);
         }
 
         cssText += `  --${key}: ${cssValue};\n`;

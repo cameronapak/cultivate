@@ -96,7 +96,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <Logo />
             </SidebarMenuButton>
@@ -239,7 +239,7 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="top"
-                className="w-[--radix-popper-anchor-width]"
+                className="w-(--radix-popper-anchor-width)"
               >
                 <DropdownMenuItem onClick={logout}>
                   <span>Sign out</span>

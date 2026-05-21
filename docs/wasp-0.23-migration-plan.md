@@ -24,8 +24,12 @@ Cultivate now targets Wasp `^0.23.0` after migrating from `^0.18.2` through the 
 - Zod was upgraded to 4.
 - TypeScript was pinned to `5.9.3`.
 - `vite.config.ts` uses `wasp()` from `wasp/client/vite`.
-- Tailwind stays on v3 with root `tailwindcss`, `postcss`, and `autoprefixer` dev dependencies.
-- `tailwind.config.js` no longer uses Wasp's old `resolveProjectPath` helper.
+- Tailwind was upgraded to v4 with `@tailwindcss/vite`.
+- Tailwind theme tokens and custom utilities now live in `src/Main.css`; there is no JS Tailwind config.
+- Theme variables now store full CSS color values and `@theme inline` references them directly.
+- `tailwindcss-animate` was replaced with `tw-animate-css`.
+- shadcn/ui primitives were refreshed with `npx shadcn@latest add --all --overwrite`.
+- Public theme CSS files were migrated to full CSS color values and can be checked with `npm run themes:check`.
 - Global styles load once from `src/client/setup.ts`.
 
 ## Database Notes

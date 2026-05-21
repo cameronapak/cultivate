@@ -23,7 +23,7 @@ export function ColorSwatch({
 	return (
 		<div
 			className={cn(
-				"rounded-md flex-shrink-0 border border-border/30",
+				"rounded-md shrink-0 border border-border/30",
 				sizeClasses[size],
 				className,
 			)}
