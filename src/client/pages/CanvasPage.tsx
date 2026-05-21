@@ -24,10 +24,10 @@ import {
   createCanvas,
   saveCanvas,
 } from "wasp/client/operations";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import "tldraw/tldraw.css";
 import { Layout } from "../../components/Layout";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useTheme } from "../../components/custom/ThemeProvider";
 import { toast } from "sonner";
 import {

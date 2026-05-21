@@ -1,5 +1,5 @@
 import { useState, useRef, FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router";
 import type { Task, Resource, Pitch, Thought } from "wasp/entities";
 import {
   deleteTask,

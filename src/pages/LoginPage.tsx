@@ -1,7 +1,7 @@
 import { login } from "wasp/client/auth";
 import type { HttpError } from "wasp/server";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Link } from "wasp/client/router";
 import {
   Card,

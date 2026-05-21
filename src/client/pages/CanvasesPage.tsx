@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useQuery, getCanvases, deleteCanvas, createResource, getProjects } from "wasp/client/operations";
 import { Canvas } from "wasp/entities";
 import { Layout } from "../../components/Layout";

@@ -6,7 +6,7 @@ import {
 import type { HttpError } from "wasp/server";
 import "https://platform.twitter.com/widgets.js";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Link } from "wasp/client/router";
 import {
   Card,

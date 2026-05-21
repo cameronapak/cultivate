@@ -1,5 +1,5 @@
 import { Fragment, ReactNode, useState, useEffect, useLayoutEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar, type SidebarItem } from "./custom/AppSidebar";
 import { CommandMenu, CommandMenuProvider } from "./custom/CommandMenu";

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { createDocument } from "wasp/client/operations";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { createResource, deleteDocument, useQuery } from "wasp/client/operations";
 import { getDocuments, getProjects } from "wasp/client/operations";
 import { Document } from "wasp/entities";

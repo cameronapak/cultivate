@@ -66,7 +66,7 @@ import {
   EditResourceForm,
   EditThoughtForm,
 } from "../components/ProjectView";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { useIsMobile } from "../hooks/use-mobile";
 // Create a type where the string is a date in the format "2025-04-20"
 type DateString =

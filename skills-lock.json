@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "add-feature": {
+      "source": "wasp-lang/wasp-agent-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/wasp/skills/add-feature/SKILL.md",
+      "computedHash": "1b121a5ef9f31e493048de0410451cd4042a260a123962b5526dfe21acd03784"
+    },
+    "deploying-app": {
+      "source": "wasp-lang/wasp-agent-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/wasp/skills/deploying-app/SKILL.md",
+      "computedHash": "d85fd19db75637c2c038add1618de86d8847271643f55b836f91d1ad274ea9c9"
+    },
+    "expert-advice": {
+      "source": "wasp-lang/wasp-agent-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/wasp/skills/expert-advice/SKILL.md",
+      "computedHash": "6c1163a6bb35bb75851740007ba385000e35e5c8b932d7725419f0e4abb8ffdb"
+    },
+    "start-dev-server": {
+      "source": "wasp-lang/wasp-agent-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/wasp/skills/start-dev-server/SKILL.md",
+      "computedHash": "256995081a54f945600c5cec871a981bbb257e132cdc11a66df7d48be360df31"
+    },
+    "wasp-plugin-help": {
+      "source": "wasp-lang/wasp-agent-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/wasp/skills/wasp-plugin-help/SKILL.md",
+      "computedHash": "219f88583e84a34784d9e650ba1a01600eaaa512dc939814e48e401a6c25105f"
+    },
+    "wasp-plugin-init": {
+      "source": "wasp-lang/wasp-agent-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/wasp/skills/wasp-plugin-init/SKILL.md",
+      "computedHash": "6a2ce30dcb3349b87b6e63784137b82cc9fd74c1ce89da6f3bd80a0dd91a96b6"
+    }
+  }
+}

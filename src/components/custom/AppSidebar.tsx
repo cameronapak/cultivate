@@ -73,13 +73,13 @@ export function AppSidebar() {
           <p className="font-bold select-all font-mono w-fit max-w-full bg-muted text-muted-foreground p-2 rounded-md">
             {newCode.code}
           </p>
-        </div>
+        </div>,
       );
     } catch (error: any) {
       toast.error(
         error?.data?.message ||
           error?.message ||
-          "Failed to generate invite code."
+          "Failed to generate invite code.",
       );
     } finally {
       setIsGeneratingCode(false);
@@ -148,12 +148,7 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                isActive={
-                  currentPath === "/"
-                }
-              >
+              <SidebarMenuButton asChild isActive={currentPath === "/"}>
                 <Link to={"/"}>
                   {currentPath === "/" ? (
                     <FolderOpen className="text-muted-foreground h-5 w-5" />
@@ -164,9 +159,7 @@ export function AppSidebar() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {pinnedProjectsWithLimit?.length ? (
-              <SidebarSeparator />
-            ) : null}
+            {pinnedProjectsWithLimit?.length ? <SidebarSeparator /> : null}
             {pinnedProjectsWithLimit?.map((project) => (
               <SidebarMenuItem key={project.id}>
                 <SidebarMenuButton
@@ -191,17 +184,8 @@ export function AppSidebar() {
           <CardHeader>
             <CardDescription className="flex flex-col gap-4">
               <p className="text-xs text-muted-foreground">
-                Thanks for being an early tester of Cultivate, an indie project
-                created by{" "}
-                <a
-                  href="https://cameronpak.com"
-                  target="_blank"
-                  className="hover:underline"
-                >
-                  Cam
-                </a>
-                . Honestly, things will be buggy. Your feedback is invaluable to
-                me.
+                🔥 Hey, would you be sad if Cultivate were no longer available?
+                Let me know ASAP
               </p>
               <a
                 className="flex flex-row items-center gap-1 text-xs text-muted-foreground hover:text-primary hover:underline p-0 m-0"
@@ -248,7 +232,8 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 className="text-muted-foreground" /> {user?.getFirstProviderUserId() || ""}
+                  <User2 className="text-muted-foreground" />{" "}
+                  {user?.getFirstProviderUserId() || ""}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

@@ -17,7 +17,9 @@ const EmptyStateIcon = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
-  const childElement = React.Children.only(children) as React.ReactElement;
+  const childElement = React.Children.only(children) as React.ReactElement<{
+    className?: string;
+  }>;
   const clonedIcon = React.cloneElement(childElement, {
     className: cn("w-12 h-12 text-muted-foreground mb-4", childElement.props.className),
   });
