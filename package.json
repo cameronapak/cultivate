@@ -47,6 +47,7 @@
     "zod": "^4.3.6"
   },
   "scripts": {
+    "ts-setup": "wasp ts-setup",
     "start": "wasp start",
     "db:seed": "wasp db seed",
     "db:migrate": "wasp db migrate",
