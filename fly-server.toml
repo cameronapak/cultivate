@@ -13,10 +13,14 @@ primary_region = 'mia'
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 1
+  # Keep costs low while Cultivate is low-traffic. Fly will cold-start the
+  # server on the first request after idle time.
+  min_machines_running = 0
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  # Live server RSS was ~250MB total on 1GB; 512MB is the safer cheap floor for
+  # Node + Prisma. Try 256MB only after production memory proves it is stable.
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
