@@ -1,11 +1,10 @@
-import { resolveProjectPath } from "wasp/dev";
 import tailwindcssAnimate from "tailwindcss-animate";
 import plugin from "tailwindcss/plugin";
 
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
-  content: [resolveProjectPath("./src/**/*.{js,jsx,ts,tsx}")],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       keyframes: {

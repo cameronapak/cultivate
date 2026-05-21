@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { useQuery, getProject } from 'wasp/client/operations'
 import { ProjectView } from '../components/ProjectView'
 import { Layout } from '../components/Layout'

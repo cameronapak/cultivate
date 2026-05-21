@@ -4,7 +4,7 @@ import {
   Task as BaseTask,
   Resource as BaseResource,
 } from "wasp/entities";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Link } from "wasp/client/router";
 import {
   getProjects,
@@ -29,7 +29,6 @@ import {
   Pin,
   PinOff,
 } from "lucide-react";
-import "../Main.css";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";

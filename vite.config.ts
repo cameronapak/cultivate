@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
-import { resolveProjectPath } from 'wasp/dev'
+import { wasp } from 'wasp/client/vite'
 
 export default defineConfig({
+  plugins: [wasp()],
   server: {
     open: true,
   },
   resolve: {
     alias: {
-      "@": resolveProjectPath('./src'),
+      "@": new URL('./src', import.meta.url).pathname,
     },
   },
 })

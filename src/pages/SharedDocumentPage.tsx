@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router";
 import { useQuery, getPublicDocument } from "wasp/client/operations";
 import { BlockNoteEditor } from "../components/custom/BlockNoteEditor";
 import { Button } from "../components/ui/button";

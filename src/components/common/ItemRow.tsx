@@ -19,7 +19,7 @@ import {
 import { cn } from "../../lib/utils";
 import { toast } from "sonner";
 import { getFaviconFromUrl, isUrl } from "../../lib/utils";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { Combobox } from "../custom/ComboBox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import type { Project } from "../../types";

@@ -1,0 +1,52 @@
+# Wasp 0.23 Migration Notes
+
+Cultivate now targets Wasp `^0.23.0` after migrating from `^0.18.2` through the official Wasp migration paths.
+
+## Current Setup
+
+- Use Node `24.14.1` from `.nvmrc`.
+- Install Wasp from npm: `npm i -g @wasp.sh/wasp-cli@0.23.0`.
+- Keep npm and `package-lock.json`.
+- Keep `.npmrc` with `min-release-age=7`.
+- Do not edit generated `.wasp/` files manually.
+- Deployment validation is out of scope for this migration.
+
+## Applied Changes
+
+- `main.wasp` now uses Wasp `^0.23.0`.
+- `package.json` uses Wasp workspaces: `[".wasp/out/*", ".wasp/out/sdk/wasp"]`.
+- The old root `wasp` file dependency was removed.
+- React was upgraded to 19.
+- React Router was upgraded to 7, and direct `react-router-dom` imports moved to `react-router`.
+- Zod was upgraded to 4.
+- TypeScript was pinned to `5.9.3`.
+- `vite.config.ts` uses `wasp()` from `wasp/client/vite`.
+- Tailwind stays on v3 with root `tailwindcss`, `postcss`, and `autoprefixer` dev dependencies.
+- `tailwind.config.js` no longer uses Wasp's old `resolveProjectPath` helper.
+- Global styles load once from `src/client/setup.ts`.
+
+## Database Notes
+
+Wasp can manage the dev database only when there is no custom `DATABASE_URL`.
+
+If `.env.server` defines `DATABASE_URL`, start that database yourself before running migrations. The local migration smoke used a Docker Postgres container named `cultivate-wasp-postgres` on `localhost:5432`.
+
+## Verification
+
+These checks passed after the migration:
+
+```sh
+wasp compile
+wasp db migrate-dev
+wasp db seed
+wasp start
+```
+
+Browser smoke passed with the in-app browser on:
+
+- `/`
+- `/inbox`
+- `/documents`
+- `/canvases`
+
+The smoke verified that rendered pages load the shared Tailwind styles.
