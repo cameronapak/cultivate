@@ -52,6 +52,19 @@ type GetProject<Input, Output> = (
   context: WaspContext
 ) => Output | Promise<Output>;
 
+const assertProjectOwnership = async (
+  projectId: number,
+  context: WaspContext
+) => {
+  const project = await context.entities.Project.findUnique({
+    where: { id: projectId, userId: context.user.id },
+  });
+  if (!project) {
+    throw new HttpError(404, "Project not found");
+  }
+  return project;
+};
+
 export const getProjects: GetProjects<{ pinned?: boolean }, Project[]> = async (
   args: { pinned?: boolean },
   context: WaspContext
@@ -379,6 +392,10 @@ export const createTask: CreateTask<CreateTaskPayload, Task> = async (
     throw new HttpError(401);
   }
 
+  const project = args.projectId
+    ? await assertProjectOwnership(args.projectId, context)
+    : null;
+
   // Create the task
   const task = await context.entities.Task.create({
     data: {
@@ -393,17 +410,12 @@ export const createTask: CreateTask<CreateTaskPayload, Task> = async (
   });
 
   // If the task is associated with a project, update the project's taskOrder
-  if (args.projectId) {
-    const project = await context.entities.Project.findUnique({
-      where: { id: args.projectId },
-      select: { taskOrder: true },
-    });
-
+  if (project) {
     // Append the new task's ID to the taskOrder array
-    const updatedTaskOrder = [...(project?.taskOrder || []), task.id];
+    const updatedTaskOrder = [...(project.taskOrder || []), task.id];
 
     await context.entities.Project.update({
-      where: { id: args.projectId },
+      where: { id: project.id, userId: context.user.id },
       data: { taskOrder: updatedTaskOrder },
     });
   }
@@ -556,6 +568,10 @@ export const createResource: CreateResource<
     throw new HttpError(401);
   }
 
+  const project = args.projectId
+    ? await assertProjectOwnership(args.projectId, context)
+    : null;
+
   // Create the resource
   const resource = await context.entities.Resource.create({
     data: {
@@ -571,20 +587,15 @@ export const createResource: CreateResource<
   });
 
   // If the resource is associated with a project, update the project's resourceOrder
-  if (args.projectId) {
-    const project = await context.entities.Project.findUnique({
-      where: { id: args.projectId },
-      select: { resourceOrder: true },
-    });
-
+  if (project) {
     // Append the new resource's ID to the resourceOrder array
     const updatedResourceOrder = [
-      ...(project?.resourceOrder || []),
+      ...(project.resourceOrder || []),
       resource.id,
     ];
 
     await context.entities.Project.update({
-      where: { id: args.projectId },
+      where: { id: project.id, userId: context.user.id },
       data: { resourceOrder: updatedResourceOrder },
     });
   }
@@ -659,6 +670,9 @@ export const moveTask: MoveTask<MoveTaskArgs, Task> = async (
 ) => {
   if (!context.user) {
     throw new HttpError(401);
+  }
+  if (args.projectId) {
+    await assertProjectOwnership(args.projectId, context);
   }
   const task = await context.entities.Task.update({
     where: {
@@ -979,6 +993,9 @@ export const moveResource: MoveResource<MoveResourceArgs, Resource> = async (
   if (!context.user) {
     throw new HttpError(401);
   }
+  if (args.projectId) {
+    await assertProjectOwnership(args.projectId, context);
+  }
   const resource = await context.entities.Resource.update({
     where: {
       id: args.resourceId,
@@ -1113,6 +1130,10 @@ export const createThought: CreateThought<
     throw new HttpError(401);
   }
 
+  if (args.projectId) {
+    await assertProjectOwnership(args.projectId, context);
+  }
+
   return context.entities.Thought.create({
     data: {
       content: args.content,
@@ -1146,6 +1167,10 @@ export const updateThought: UpdateThought<
 
   if (!thought) {
     throw new HttpError(404, "Thought not found");
+  }
+
+  if (args.projectId) {
+    await assertProjectOwnership(args.projectId, context);
   }
 
   return context.entities.Thought.update({
@@ -1208,6 +1233,10 @@ export const moveThought: MoveThought<MoveThoughtArgs, Thought> = async (
 
   if (!thought) {
     throw new HttpError(404, "Thought not found");
+  }
+
+  if (args.projectId) {
+    await assertProjectOwnership(args.projectId, context);
   }
 
   return context.entities.Thought.update({
