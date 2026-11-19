@@ -32,7 +32,7 @@
 - Use Node `24.14.1` from `.nvmrc`.
 - Install the matching CLI with `npm i -g @wasp.sh/wasp-cli@0.23.0`.
 - Use npm and `package-lock.json`.
-- Wasp workspaces are `[".wasp/out/*", ".wasp/out/sdk/wasp"]`.
+- Wasp workspaces are `[".wasp/wasp-config", ".wasp/out/*", ".wasp/out/sdk/wasp"]`.
 - Wasp app config lives in `main.wasp.ts`.
 - Run `wasp ts-setup` after `wasp clean` or removing `node_modules`.
 - Tailwind is v4, uses `@tailwindcss/vite`, and global styles load from `src/client/setup.ts`.

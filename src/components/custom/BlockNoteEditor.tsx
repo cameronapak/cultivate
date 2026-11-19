@@ -1,6 +1,8 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
 import "../../client/blocknote.css";
 import { useTheme, getSystemTheme } from "./ThemeProvider";
 
