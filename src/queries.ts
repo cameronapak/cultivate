@@ -132,7 +132,7 @@ export const getProjectPitches: GetProjectPitches<
     throw new HttpError(401);
   }
   return context.entities.Pitch.findMany({
-    where: { projectId: args.projectId },
+    where: { projectId: args.projectId, project: { userId: context.user.id } },
     orderBy: { createdAt: "desc" },
   });
 };
@@ -266,6 +266,13 @@ export const createPitch: CreatePitch<CreatePitchPayload, Pitch> = async (
   if (!context.user) {
     throw new HttpError(401);
   }
+  const project = await context.entities.Project.findUnique({
+    where: { id: args.projectId, userId: context.user.id },
+  });
+  if (!project) {
+    throw new HttpError(404, `Project with id ${args.projectId} not found`);
+  }
+
   // First, check if the project already has a pitch
   const existingPitch = await context.entities.Pitch.findUnique({
     where: { projectId: args.projectId },
@@ -306,8 +313,14 @@ export const deletePitch: DeletePitch<DeletePitchPayload, Pitch> = async (
   if (!context.user) {
     throw new HttpError(401);
   }
+  const pitch = await context.entities.Pitch.findFirst({
+    where: { id: args.id, project: { userId: context.user.id } },
+  });
+  if (!pitch) {
+    throw new HttpError(404, `Pitch with id ${args.id} not found`);
+  }
   return context.entities.Pitch.delete({
-    where: { id: args.id },
+    where: { id: pitch.id },
   });
 };
 
@@ -505,8 +518,14 @@ export const updatePitch: UpdatePitch<UpdatePitchPayload, Pitch> = async (
   if (!context.user) {
     throw new HttpError(401);
   }
+  const pitch = await context.entities.Pitch.findFirst({
+    where: { id: args.id, project: { userId: context.user.id } },
+  });
+  if (!pitch) {
+    throw new HttpError(404, `Pitch with id ${args.id} not found`);
+  }
   return context.entities.Pitch.update({
-    where: { id: args.id },
+    where: { id: pitch.id },
     data: {
       title: args.title,
       problem: args.problem,
